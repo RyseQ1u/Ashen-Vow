@@ -1,89 +1,19 @@
+// Ashen Vow engine — rules layer. Static tables live in ./data/tables.js
+import {
+  VERSION,CLASSES,SKILLS,ENEMIES,DIFFICULTIES,SKILL_BRANCHES,BRANCH_TRAINING_COST,
+  TRINKET_SETS,STATUS_LABELS,V08_ROOMS,MAX_SKILL_LEVEL,TRAITS,CRISES,SPECIAL_ROOMS,
+  REGIONS,ELITE_TRAITS,BOSS_TYPES,REGION_EVENTS,BUILDINGS,MAX_BUILDING_LEVEL,
+  EXPEDITION_PLANS,TALENTS,HERO_NAMES,RECRUIT_NAMES,MAX_RESERVES,
+  TRINKET_BASES,AFFIXES,MOD_LABELS,RARITY_NAMES,ACHIEVEMENTS,SKILL_CATEGORY_LABELS,MAX_SUPPLIES,SUPPLY_META,NODE_NAME_POOL
+} from './data/tables.js';
+export {
+  VERSION,CLASSES,SKILLS,ENEMIES,DIFFICULTIES,SKILL_BRANCHES,BRANCH_TRAINING_COST,
+  TRINKET_SETS,STATUS_LABELS,V08_ROOMS,MAX_SKILL_LEVEL,TRAITS,CRISES,SPECIAL_ROOMS,
+  REGIONS,ELITE_TRAITS,BUILDINGS,MAX_BUILDING_LEVEL,
+  EXPEDITION_PLANS,TALENTS,HERO_NAMES,RECRUIT_NAMES,MAX_RESERVES,
+  TRINKET_BASES,AFFIXES,MOD_LABELS,RARITY_NAMES,ACHIEVEMENTS,SKILL_CATEGORY_LABELS,MAX_SUPPLIES,SUPPLY_META,NODE_NAME_POOL
+};
 // 灰烬誓约 / Ashen Vow — deterministic, browser-independent game rules.
-export const VERSION = 1;
-export const CLASSES = {
-  warden: { name:'灰盾卫士', title:'THE WARDEN', icon:'盾', color:'#d6b88b', maxHp:48, attack:7, speed:3, armor:3, lore:'沉默的壁垒。誓言从未被赦免。', skills:['cleave','bulwark','crush'] },
-  ranger: { name:'夜巡猎手', title:'THE RANGER', icon:'弓', color:'#88ada3', maxHp:34, attack:9, speed:8, armor:0, lore:'她能听见黑暗伸出的手。', skills:['snipe','dagger','mark'] },
-  medic: { name:'血烬医师', title:'THE MEDIC', icon:'药', color:'#c58f9d', maxHp:35, attack:5, speed:5, armor:1, lore:'救赎总与鲜血相伴。', skills:['mend','scarlet','remedy'] },
-  occult: { name:'余烬术士', title:'THE OCCULTIST', icon:'焰', color:'#ac9bd1', maxHp:30, attack:10, speed:6, armor:0, lore:'烛火熄灭后，仍有什么在燃烧。', skills:['cinder','hex','solace'] },
-  duelist: { name:'影刃决斗者', title:'THE DUELIST', icon:'刃', color:'#b4b4d4', maxHp:32, attack:9, speed:9, armor:0, lore:'她的剑总比影子先到。', skills:['bloodlet','puncture','taunt'] },
-  penitent: { name:'忏悔行者', title:'THE PENITENT', icon:'罪', color:'#c99082', maxHp:43, attack:7, speed:4, armor:2, lore:'痛苦不能赎罪，但能教会人活下去。', skills:['scourge','atonement','sacrifice'] }
-};
-export const SKILLS = {
-  cleave:{name:'断誓斩',desc:'向敌方前排挥出沉重一击。',type:'damage',power:1.2,accuracy:92,caster:[1,2],targets:[1,2],side:'enemy',icon:'⚔'},
-  bulwark:{name:'铁壁誓言',desc:'自身获得 2 回合护卫，并减轻压力。',type:'guard',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'self',icon:'⬡'},
-  crush:{name:'碎骨冲击',desc:'对敌方前排造成伤害，有概率眩晕。',type:'damage',power:0.8,accuracy:88,caster:[1,2],targets:[1,2],side:'enemy',status:'stun',chance:35,icon:'✦'},
-  snipe:{name:'夜幕穿心',desc:'狙击中后排敌人，造成高额伤害。',type:'damage',power:1.4,accuracy:90,caster:[2,3,4],targets:[2,3,4],side:'enemy',icon:'➤'},
-  dagger:{name:'隐刃',desc:'突袭前排，造成快速伤害。',type:'damage',power:0.9,accuracy:97,caster:[1,2,3],targets:[1,2],side:'enemy',icon:'⌁'},
-  mark:{name:'猎影标记',desc:'标记目标，使其承受更高伤害。',type:'mark',power:0,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎'},
-  mend:{name:'缝合祷言',desc:'治疗一名友军。',type:'heal',power:12,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'ally',icon:'✚'},
-  scarlet:{name:'猩红药剂',desc:'投掷腐蚀药剂，施加中毒。',type:'damage',power:0.6,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'poison',chance:100,icon:'◈'},
-  remedy:{name:'清醒剂',desc:'降低一名友军的压力。',type:'relief',power:22,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',icon:'❋'},
-  cinder:{name:'余烬飞弹',desc:'攻击任何敌方位置。',type:'damage',power:1.1,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'✧'},
-  hex:{name:'腐蚀咒印',desc:'伤害目标并附加虚弱。',type:'damage',power:0.65,accuracy:92,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'weak',chance:100,icon:'☽'},
-  solace:{name:'灰烬低语',desc:'抚慰一名友军，但术士承受少量压力。',type:'relief',power:28,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:7,icon:'✺'},
-  bloodlet:{name:'薄暮割裂',desc:'快速划伤目标，造成两回合流血。',type:'damage',power:.85,accuracy:96,caster:[1,2,3],targets:[1,2,3],side:'enemy',status:'bleed',chance:80,icon:'⌁'},
-  puncture:{name:'破影突刺',desc:'精准穿刺任意位置的敌人。',type:'damage',power:1.25,accuracy:92,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'➹'},
-  taunt:{name:'假面佯攻',desc:'标记敌人，为队友制造破绽。',type:'mark',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎'},
-  scourge:{name:'痛苦鞭笞',desc:'重击前排目标并造成流血。',type:'damage',power:.95,accuracy:90,caster:[1,2],targets:[1,2],side:'enemy',status:'bleed',chance:70,icon:'⚔'},
-  atonement:{name:'赎罪吟唱',desc:'大幅减轻队友压力，自己获得少量压力。',type:'relief',power:34,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:9,icon:'✶'},
-  sacrifice:{name:'献血之誓',desc:'消耗自身 5 点生命治疗队友 19 点生命（无法使自己倒下）。',type:'heal',power:19,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfDamage:5,icon:'✚'}
-};
-export const ENEMIES = {
-  thrall:{name:'腐朽侍从',icon:'侍',title:'THRALL',maxHp:22,attack:5,speed:4,armor:0,color:'#8c9e83'},
-  ghoul:{name:'墓穴食尸鬼',icon:'噬',title:'GHOUL',maxHp:27,attack:7,speed:7,armor:0,color:'#a9a08e'},
-  cultist:{name:'盲目修士',icon:'祷',title:'CULTIST',maxHp:24,attack:6,speed:5,armor:1,color:'#b58b97'},
-  guardian:{name:'断剑守卫',icon:'剑',title:'GUARDIAN',maxHp:36,attack:8,speed:2,armor:3,color:'#9a9eaa'},
-  wraith:{name:'无面游魂',icon:'魂',title:'WRAITH',maxHp:20,attack:7,speed:9,armor:0,color:'#91b5bd'},
-  alchemist:{name:'疫病炼金师',icon:'瘴',title:'ALCHEMIST',maxHp:25,attack:6,speed:6,armor:1,color:'#b5ac84'},
-  bonearcher:{name:'骨弓射手',icon:'骸',title:'BONE ARCHER',maxHp:21,attack:8,speed:7,armor:0,color:'#c7b8a3'},
-  banshee:{name:'哀恸女妖',icon:'哀',title:'BANSHEE',maxHp:25,attack:6,speed:8,armor:0,color:'#9bafcb'},
-  butcher:{name:'锈刃屠夫',icon:'屠',title:'BUTCHER',maxHp:44,attack:9,speed:2,armor:2,color:'#bf817a'},
-  herald:{name:'灰烬传令官',icon:'令',title:'HERALD',maxHp:29,attack:6,speed:5,armor:1,color:'#aa98bb'},
-  boss:{name:'噬誓者',icon:'王',title:'THE OATH EATER',maxHp:116,attack:11,speed:5,armor:2,color:'#d4a16c'},
-  mireling:{name:'沼泽潜蛰',icon:'泥',title:'MIRELING',maxHp:27,attack:6,speed:6,armor:0,color:'#9aaf74'},
-  sporewitch:{name:'孢疫巫妪',icon:'菌',title:'SPORE WITCH',maxHp:29,attack:6,speed:5,armor:1,color:'#9bc68e'},
-  bogstalker:{name:'暗沼追猎者',icon:'爪',title:'BOG STALKER',maxHp:32,attack:9,speed:8,armor:0,color:'#799e7b'},
-  leech:{name:'噬血水蛭',icon:'蚀',title:'BLOOD LEECH',maxHp:33,attack:7,speed:4,armor:1,color:'#b6a085'},
-  bogcolossus:{name:'腐根巨像',icon:'根',title:'BOG COLOSSUS',maxHp:53,attack:10,speed:2,armor:3,color:'#a7b58e'},
-  mirequeen:{name:'瘟沼之母',icon:'后',title:'MIRE MATRON',maxHp:126,attack:10,speed:4,armor:2,color:'#a9d291'},
-  emberguard:{name:'烬铁卫兵',icon:'铁',title:'EMBER GUARD',maxHp:37,attack:8,speed:4,armor:4,color:'#c79d75'},
-  slagbeast:{name:'熔渣兽',icon:'熔',title:'SLAG BEAST',maxHp:39,attack:10,speed:3,armor:2,color:'#d08b61'},
-  cinderseer:{name:'炉火占卜师',icon:'瞳',title:'CINDER SEER',maxHp:26,attack:7,speed:7,armor:1,color:'#ddaa72'},
-  smelter:{name:'铁灰熔匠',icon:'锤',title:'SMELTER',maxHp:42,attack:9,speed:2,armor:3,color:'#cb8b6b'},
-  ironreaver:{name:'钢魂猎首',icon:'斧',title:'IRON REAVER',maxHp:58,attack:12,speed:5,armor:3,color:'#df9966'},
-  forgeheart:{name:'永燃炉心',icon:'核',title:'FORGE HEART',maxHp:137,attack:12,speed:4,armor:4,color:'#ef9a55'}
-};
-
-// V0.6 long-form progression: difficulty, traits, combat technique training and new rooms.
-export const DIFFICULTIES={
- pilgrim:{name:'巡礼',icon:'◇',desc:'标准难度，适合熟悉职业和线路。',hp:1,attack:1,stress:0,gold:1,shards:1},
- veteran:{name:'苦修',icon:'⚔',desc:'敌人生命 +20%，攻击 +15%，奖励更多。',hp:1.2,attack:1.15,stress:5,gold:1.25,shards:1.25},
- nightmare:{name:'无光',icon:'☠',desc:'敌人生命 +45%，攻击 +30%，初始压力 +12。',hp:1.45,attack:1.3,stress:12,gold:1.6,shards:1.6}
-};
-
-// V0.7: two mutually exclusive techniques for every original skill.
-// A branch may be selected once the underlying skill reaches level 1.
-export const SKILL_BRANCHES={
- cleave:[{id:'a',name:'破甲誓斩',desc:'忽略目标 3 点护甲',pierce:3},{id:'b',name:'沉重裁决',desc:'伤害倍率 +0.30',power:.30}],
- bulwark:[{id:'a',name:'永恒壁垒',desc:'守护持续时间 +2',duration:2},{id:'b',name:'宁静壁垒',desc:'额外减轻自身 12 压力',relief:12}],
- crush:[{id:'a',name:'震慑冲击',desc:'眩晕概率 +25%',chance:25},{id:'b',name:'碎盾冲击',desc:'忽略目标 3 点护甲',pierce:3}],
- snipe:[{id:'a',name:'鹰眼狙击',desc:'暴击概率 +15%',crit:15},{id:'b',name:'风暴箭矢',desc:'伤害倍率 +0.30',power:.30}],
- dagger:[{id:'a',name:'迅捷突袭',desc:'伤害倍率 +0.25',power:.25},{id:'b',name:'暗影追猎',desc:'命中后附加 2 回合标记',mark:2}],
- mark:[{id:'a',name:'狩猎仪式',desc:'标记持续时间 +2',duration:2},{id:'b',name:'虚弱印记',desc:'同时使敌人虚弱 2 回合',weak:2}],
- mend:[{id:'a',name:'深度缝合',desc:'额外恢复 8 生命',heal:8},{id:'b',name:'净化祷告',desc:'清除中毒和流血',cleanse:true}],
- scarlet:[{id:'a',name:'蔓延疫剂',desc:'中毒持续时间 +2',duration:2},{id:'b',name:'腐蚀浓缩',desc:'伤害倍率 +0.30',power:.30}],
- remedy:[{id:'a',name:'冷静配方',desc:'额外减少 15 压力',relief:15},{id:'b',name:'复苏药剂',desc:'额外回复 6 生命',heal:6}],
- cinder:[{id:'a',name:'穿甲烬火',desc:'忽略目标 3 点护甲',pierce:3},{id:'b',name:'烈焰爆发',desc:'伤害倍率 +0.30',power:.30}],
- hex:[{id:'a',name:'永蚀咒印',desc:'虚弱持续时间 +2',duration:2},{id:'b',name:'侵魂咒印',desc:'伤害倍率 +0.30',power:.30}],
- solace:[{id:'a',name:'深层慰藉',desc:'额外减少 15 压力',relief:15},{id:'b',name:'生命呢喃',desc:'同时治疗目标 6 生命',heal:6}],
- bloodlet:[{id:'a',name:'延续创伤',desc:'流血持续时间 +2',duration:2},{id:'b',name:'迅影割裂',desc:'伤害倍率 +0.30',power:.30}],
- puncture:[{id:'a',name:'透甲穿刺',desc:'忽略目标 4 点护甲',pierce:4},{id:'b',name:'命运刺击',desc:'暴击概率 +15%',crit:15}],
- taunt:[{id:'a',name:'深刻破绽',desc:'标记持续时间 +2',duration:2},{id:'b',name:'扰乱佯攻',desc:'同时使敌人虚弱 2 回合',weak:2}],
- scourge:[{id:'a',name:'深痕鞭笞',desc:'流血持续时间 +2',duration:2},{id:'b',name:'破甲鞭笞',desc:'忽略目标 3 点护甲',pierce:3}],
- atonement:[{id:'a',name:'虔诚救赎',desc:'额外减少 15 压力',relief:15},{id:'b',name:'苦难疗愈',desc:'同时治疗目标 6 生命',heal:6}],
- sacrifice:[{id:'a',name:'生命献祭',desc:'额外治疗 10 生命',heal:10},{id:'b',name:'无血契约',desc:'自身失去生命减少 4',selfDamageReduction:4}]
-};
-export const BRANCH_TRAINING_COST={gold:35,shards:3};
 export function skillBranch(hero,skillId){return SKILL_BRANCHES[skillId]?.find(b=>b.id===hero?.skillBranches?.[skillId])||null;}
 export function chooseSkillBranch(state,heroId,skillId,branchId){
  if(state.phase!=='camp')return false;ensureProgression(state);
@@ -96,18 +26,11 @@ export function chooseSkillBranch(state,heroId,skillId,branchId){
  state.gold-=cost.gold;state.shards-=cost.shards;hero.skillBranches[skillId]=branchId;
  state.history.unshift(`${hero.name} 选择了「${SKILLS[skillId].name}」分支：${branch.name}。`);return true;
 }
-export const TRINKET_SETS={
- sentinel:{name:'守墓誓约',pieces:['iron','seal'],mods:{armor:2,hp:4},effect:'进入战斗获得 1 回合守护'},
- twilight:{name:'暮影之猎',pieces:['fang','thorn'],mods:{attack:2,crit:4},effect:'提高攻击和暴击'},
- sacred:{name:'灰烬祷仪',pieces:['relic','bell'],mods:{healBonus:4,stressResist:8},effect:'开战前压力 -5'},
- pilgrim:{name:'孤灯旅人',pieces:['torch','feather'],mods:{speed:2,hp:3},effect:'提高速度与生命'}
-};
 export function activeTrinketSet(hero,state){
  if(!state?.items)return null;
  const bases=(hero.trinkets||[]).map(id=>state.items.find(i=>i.id===id)?.baseId).filter(Boolean);
  return Object.entries(TRINKET_SETS).find(([,set])=>set.pieces.every(base=>bases.includes(base)))?.[0]||null;
 }
-export const STATUS_LABELS={poison:'中毒',bleed:'流血',stun:'眩晕',weak:'虚弱'};
 export function enemyResistances(type){
  const isUndead=['thrall','ghoul','guardian','wraith','bonearcher','banshee','boss'].includes(type);
  const isMire=['mireling','sporewitch','bogstalker','leech','bogcolossus','mirequeen'].includes(type);
@@ -165,14 +88,6 @@ export function enemyIntent(unit,battle){
  if(['bonearcher','cinderseer','smelter'].includes(type))return {title:'远程压制',detail:'可能袭击后排及低生命目标',level:'warning'};
  return {title:'近战攻击',detail:'倾向攻击前排，实际目标可能变化',level:'normal'};
 }
-export const V08_ROOMS={
- oracle:{title:'盲眼预言者',eyebrow:'特殊房间 · 命运占兆',desc:'白蜡封住了她的眼睛，但她依然知道每个人背负的名字。',choices:[
-  {label:'交换一段痛苦记忆',hint:'全队压力 +6，获得遗物碎片 5–8',kind:'oracle-trade'},
-  {label:'请求安抚与指引',hint:'支付 18 金币，全队压力 −15',kind:'oracle-calm'}]},
- caravan:{title:'断轮商队',eyebrow:'特殊房间 · 流亡旅商',desc:'满载着破损补给的车队停在断桥前，商人开出了危险却诱人的价码。',choices:[
-  {label:'购买战地补给',hint:'支付 24 金币，获得火把 2、绷带 2',kind:'caravan-buy'},
-  {label:'护送商队离开',hint:'小队承受少量压力，获得 20–34 金币',kind:'caravan-escort'}]}
-};
 export function expeditionSummary(state){
  const reports=Array.isArray(state.expeditionReports)?state.expeditionReports:[];
  return {total:reports.length,victories:reports.filter(r=>r.reason==='victory').length,
@@ -181,27 +96,6 @@ export function expeditionSummary(state){
   reports:reports.slice(0,10)};
 }
 
-export const MAX_SKILL_LEVEL=2;
-export const TRAITS={
- steadfast:{name:'意志坚定',kind:'positive',desc:'抗压 +10',mods:{stressResist:10}},
- keeneye:{name:'鹰眼',kind:'positive',desc:'命中 +6',mods:{accuracy:6}},
- hardy:{name:'体质强健',kind:'positive',desc:'最大生命 +6',mods:{hp:6}},
- furious:{name:'好斗',kind:'positive',desc:'攻击 +1',mods:{attack:1}},
- frail:{name:'脆弱',kind:'negative',desc:'最大生命 −4',mods:{hp:-4}},
- anxious:{name:'焦虑',kind:'negative',desc:'抗压 −8',mods:{stressResist:-8}},
- clumsy:{name:'笨拙',kind:'negative',desc:'命中 −5',mods:{accuracy:-5}},
- slow:{name:'迟钝',kind:'negative',desc:'速度 −1',mods:{speed:-1}}
-};
-export const CRISES={
- panic:{name:'恐惧',desc:'每次行动有 25% 的概率畏缩'},
- rage:{name:'狂怒',desc:'攻击增加 2，但命中降低 8'},
- despair:{name:'绝望',desc:'命中下降 12，受到的压力更高'}
-};
-export const SPECIAL_ROOMS={
- shrine:{title:'破晓的祭坛',eyebrow:'特殊房间 · 祭坛',desc:'祭坛盛放着长明的灰火，似乎可以净化疲惫的魂魄。',choices:[{label:'举行净化仪式',hint:'全队减压，但消耗遗物收益',kind:'purge'},{label:'搜寻祭坛底座',hint:'获得碎片并增加压力',kind:'shrine'}]},
- ambush:{title:'传来脚步声的回廊',eyebrow:'特殊房间 · 伏击',desc:'面前的门扉突然合上，阴影中却留下了一条逃生缝隙。',choices:[{label:'突围作战',hint:'遭遇额外精英战；胜利可获得精英战利品',kind:'ambush-fight'},{label:'借夜色绕行',hint:'全队压力 +8，保全资源',kind:'ambush-avoid'}]},
- cache:{title:'密封的遗物秘库',eyebrow:'特殊房间 · 秘库',desc:'墙后藏着远征者遗忘的密室，其中珍宝与机关同在。',choices:[{label:'破坏古老封印',hint:'稀有饰品并承受伤害',kind:'cache-loot'},{label:'拆解陷阱',hint:'获得金币及补给',kind:'cache-safe'}]}
-};
 export function skillLevel(hero,skillId){return Math.max(0,Math.min(MAX_SKILL_LEVEL,hero?.skillLevels?.[skillId]||0));}
 export function skillTrainingCost(hero,skillId){const lv=skillLevel(hero,skillId);return {gold:24+lv*20,shards:2+lv*2};}
 export function trainSkill(state,heroId,skillId){if(state.phase!=='camp')return false;ensureProgression(state);
@@ -225,46 +119,10 @@ function assignHeroGrowth(hero){if(!Array.isArray(hero.traits)||hero.traits.some
  return hero;}
 
 // V0.5 region-based dungeons. Keys are persisted; old V0.4 expeditions default to crypt.
-export const REGIONS={
- crypt:{name:'暮影墓窟',en:'THE SUNKEN CRYPT',short:'墓窟',symbol:'♜',theme:'crypt',desc:'古老誓言与亡者同眠。亡灵、咒术和压力侵蚀。',hazard:'亡者低语：每第 3 回合，一名英雄受到额外压力。',goldMult:1,shardMult:1,
-  enemies:['thrall','ghoul','cultist','guardian','bonearcher','wraith'],elite:['guardian','butcher','cultist'],boss:['boss','cultist','thrall'],eliteTrait:'fortified'},
- mire:{name:'腐潮沼泽',en:'THE BLIGHTED MIRE',short:'沼泽',symbol:'☣',theme:'mire',desc:'被瘴气腐蚀的湿地。毒素、孢子与蚀骨的低语。',hazard:'瘴气弥漫：每第 3 回合，一名英雄被施加中毒。',goldMult:1.2,shardMult:1.25,
-  enemies:['mireling','sporewitch','bogstalker','leech','alchemist','banshee'],elite:['bogcolossus','sporewitch','leech'],boss:['mirequeen','sporewitch','mireling'],eliteTrait:'venomous'},
- forge:{name:'熔烬铸炉',en:'THE CINDER FORGE',short:'铸炉',symbol:'⚒',theme:'forge',desc:'沉睡的铸铁巨炉再度燃烧。高护甲与灼热的连击。',hazard:'余烬灼烧：每第 3 回合，全队受到少量伤害。',goldMult:1.4,shardMult:1.5,
-  enemies:['emberguard','slagbeast','cinderseer','smelter','guardian','herald'],elite:['ironreaver','emberguard','cinderseer'],boss:['forgeheart','emberguard','smelter'],eliteTrait:'relentless'}
-};
-export const ELITE_TRAITS={
- fortified:{name:'铁甲精英',desc:'精英小队额外获得 2 点护甲'},
- venomous:{name:'腐毒精英',desc:'精英攻击有概率施加中毒'},
- relentless:{name:'狂热精英',desc:'精英小队攻击和速度提高'}
-};
-const BOSS_TYPES=['boss','mirequeen','forgeheart'];
-const REGION_EVENTS={
- crypt:{title:'亡者的铭碑',eyebrow:'墓窟异闻',desc:'碑文上记录着逝者的姓名。刻痕仍未干透，石缝里有隐约的祈祷。',choices:[{label:'解读禁忌铭文',hint:'获得遗物碎片，全队承受压力',kind:'shrine'},{label:'向亡者致意',hint:'全队减少压力',kind:'leave'}]},
- mire:{title:'会呼吸的孢子林',eyebrow:'沼泽异闻',desc:'泥水下发出均匀的呼吸，发光的孢子围住了一口古老药箱。',choices:[{label:'采集发光孢子',hint:'获得遗物，但队伍会受伤',kind:'spore'},{label:'点燃驱瘴火把',hint:'消耗 1 支火把，全队降低压力',kind:'purify'}]},
- forge:{title:'熄灭的誓约熔炉',eyebrow:'铸炉异闻',desc:'一座半熄的熔炉仍在呼唤献祭。炉内漂浮着冷却的稀有金属。',choices:[{label:'重启锻造机关',hint:'获得遗物碎片，全队失去少量生命',kind:'smelt'},{label:'搜集余温火种',hint:'补充火把和少量金币',kind:'embers'}]}
-};
 export function regionOf(state){const id=state?.expedition?.region||state?.selectedRegion||'crypt';return REGIONS[id]?id:'crypt';}
 export function selectRegion(state,id){if(state.phase!=='camp'||!REGIONS[id])return false;ensureProgression(state);state.selectedRegion=id;return true;}
 
 // V0.4 settlement progression: additive data, compatible with schemaVersion 1 saves.
-export const BUILDINGS={
- infirmary:{name:'战地医馆',en:'FIELD INFIRMARY',icon:'✚',desc:'治疗生命与压力的效果提高，治疗费用下降。',gold:45,shards:3,bonus:'每级疗伤 +8 生命 / +4 减压，费用 −2 金币'},
- chapel:{name:'烬火礼拜堂',en:'EMBER CHAPEL',icon:'✥',desc:'营地可为英雄减压，远征归来时帮助后备英雄恢复精神。',gold:45,shards:3,bonus:'每级祷告 +10 减压；后备英雄远征后 −6 压力'},
- workshop:{name:'遗物工坊',en:'RELIC WORKSHOP',icon:'⚒',desc:'锻造时减少金币消耗，保留已有武器与护甲等级。',gold:65,shards:4,bonus:'每级锻造消耗 −5 金币'},
- watchtower:{name:'守夜塔',en:'NIGHT WATCH',icon:'♜',desc:'出发携带额外火把，扩大下一段路线的侦察视野。',gold:50,shards:4,bonus:'每级远征额外 +1 火把，提前发现一层房间'}
-};
-export const MAX_BUILDING_LEVEL=3;
-export const EXPEDITION_PLANS={
- cautious:{name:'谨慎行军',icon:'◈',desc:'额外携带 2 支火把和 1 条绷带，带回金币降低 15%。',goldMult:.85,shardMult:1,torches:2,bandages:1,stress:0},
- standard:{name:'标准远征',icon:'✧',desc:'正常物资和收益，适合探索新路线。',goldMult:1,shardMult:1,torches:0,bandages:0,stress:0},
- daring:{name:'孤注一掷',icon:'⚔',desc:'开局损失 2 支火把、全队 +10 压力；成功带回金币 +35%、碎片 +25%。',goldMult:1.35,shardMult:1.25,torches:-2,bandages:0,stress:10}
-};
-export const TALENTS={
- vigor:{name:'坚韧体魄',icon:'⬡',desc:'每级 +5 最大生命',max:2},
- might:{name:'锐锋训练',icon:'⚔',desc:'每级 +1 攻击',max:2},
- resolve:{name:'精神韧性',icon:'✶',desc:'每级 +5 抗压',max:2}
-};
 export function buildingLevel(state,id){return Math.max(0,Math.min(MAX_BUILDING_LEVEL,Number(state.buildings?.[id]||0)));}
 export function buildingCost(state,id){const def=BUILDINGS[id];if(!def)return null;const lv=buildingLevel(state,id);
  return {gold:def.gold+30*lv,shards:def.shards+3*lv};}
@@ -289,41 +147,7 @@ export function allocateTalent(state,id,talentId){if(state.phase!=='camp'||!TALE
  h.maxHp=heroStats(h,state).maxHp;h.hp=Math.min(h.hp,h.maxHp);
  state.history.unshift(`${h.name} 掌握了${TALENTS[talentId].name}（${h.talents[talentId]}级）。`);return true;}
 
-export const HERO_NAMES = ['伊莱恩','维尔','赛勒斯','莫拉'];
-
-export const RECRUIT_NAMES=['莱希','乌诺','海泽尔','希恩','维克托','蕾娜','卡尔文','露西亚','艾斯塔','泰伦','米拉','诺拉','赛温','德林'];
-export const MAX_RESERVES=6;
 // Data-driven trinkets: item instance -> base + 1-2 affixes, equipped in two unique slots.
-export const TRINKET_BASES={
-  ash:{name:'残烬吊坠',icon:'✧',mods:{hp:3}},
-  iron:{name:'锈铁护符',icon:'⬡',mods:{armor:1}},
-  fang:{name:'亡兽利齿',icon:'⌁',mods:{attack:1}},
-  bell:{name:'静默银铃',icon:'✶',mods:{stressResist:5}},
-  feather:{name:'乌鸦羽饰',icon:'➤',mods:{speed:1}},
-  relic:{name:'被遗忘的圣徽',icon:'✥',mods:{healBonus:2}},
-  thorn:{name:'血蔷薇胸针',icon:'❖',mods:{crit:2}},
-  mask:{name:'裂痕面具',icon:'◈',mods:{accuracy:3}},
-  torch:{name:'长明火种',icon:'♨',mods:{stressResist:4,speed:1}},
-  vial:{name:'炼金残液',icon:'✚',mods:{healBonus:4,hp:-2}},
-  crown:{name:'破碎王冠',icon:'♛',mods:{attack:2,stressResist:-4}},
-  seal:{name:'守墓人封蜡',icon:'❖',mods:{armor:1,accuracy:2}}
-};
-export const AFFIXES={
-  keen:{name:'锋锐',mods:{attack:2}},
-  steadfast:{name:'坚忍',mods:{hp:5}},
-  guarded:{name:'守护',mods:{armor:1}},
-  swift:{name:'迅捷',mods:{speed:1}},
-  steady:{name:'精准',mods:{accuracy:4}},
-  vicious:{name:'凶戾',mods:{crit:3}},
-  calm:{name:'宁静',mods:{stressResist:6}},
-  merciful:{name:'慈悲',mods:{healBonus:3}},
-  cursed:{name:'受诅咒的',mods:{attack:3,stressResist:-8}},
-  reckless:{name:'鲁莽的',mods:{crit:5,armor:-1}},
-  ritual:{name:'仪式的',mods:{healBonus:4,speed:-1}},
-  twilight:{name:'黄昏的',mods:{hp:7,accuracy:-3}}
-};
-export const MOD_LABELS={attack:'攻击',hp:'生命',armor:'护甲',speed:'速度',accuracy:'命中',crit:'暴击率',stressResist:'抗压',healBonus:'治疗'};
-export const RARITY_NAMES={common:'普通',rare:'稀有',epic:'史诗'};
 export function trinketMods(item){const mods={};if(!item)return mods;
  const sources=[TRINKET_BASES[item.baseId],...(item.affixes||[]).map(id=>AFFIXES[id])];
  for(const source of sources)for(const [key,value] of Object.entries(source?.mods||{}))mods[key]=(mods[key]||0)+value;
@@ -356,6 +180,8 @@ export function ensureProgression(state){if(!Array.isArray(state.reserveHeroes))
  if(!state.regionVictories||typeof state.regionVictories!=='object')state.regionVictories={};
  for(const id of Object.keys(REGIONS))if(!Number.isInteger(state.regionVictories[id])||state.regionVictories[id]<0)state.regionVictories[id]=0;
  if(state.expedition&&!REGIONS[state.expedition.region])state.expedition.region='crypt';
+ if(state.supplies){for(const k of ['potions','sigils'])if(!Number.isInteger(state.supplies[k])||state.supplies[k]<0)state.supplies[k]=0;}
+ if(state.expedition){for(const k of ['potions','sigils'])if(!Number.isInteger(state.expedition[k])||state.expedition[k]<0)state.expedition[k]=0;for(const n of state.expedition.nodes||[])if(!n.name&&NODE_NAME_POOL[n.type])n.name=NODE_NAME_POOL[n.type][0];}
  if(state.battle){if(!REGIONS[state.battle.region])state.battle.region=state.expedition?.region||'crypt';
    if(!Number.isInteger(state.battle.bossPhase))state.battle.bossPhase=1;}
  
@@ -410,20 +236,6 @@ export function random(state){ let x = (state.rngState >>> 0) || 42; x ^= x << 1
 export function integer(state, min, max){return Math.floor(random(state)*(max-min+1))+min;}
 export function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 // V1.0 achievements are earned from actual campaign state; no external account required.
-export const ACHIEVEMENTS={
- first:{name:'踏入黑暗',desc:'完成首次远征',check:s=>s.expeditions>=1},
- steady:{name:'不屈远征者',desc:'累计完成 5 次远征',check:s=>s.expeditions>=5},
- seasoned:{name:'百炼成钢',desc:'累计完成 15 次远征',check:s=>s.expeditions>=15},
- crypt:{name:'墓窟破晓',desc:'击败暮影墓窟首领',check:s=>(s.regionVictories?.crypt||0)>=1},
- mire:{name:'斩断腐根',desc:'击败腐潮沼泽首领',check:s=>(s.regionVictories?.mire||0)>=1},
- forge:{name:'熄灭炉心',desc:'击败熔烬铸炉首领',check:s=>(s.regionVictories?.forge||0)>=1},
- three:{name:'三地凯歌',desc:'三个地牢均取得首胜',check:s=>['crypt','mire','forge'].every(id=>(s.regionVictories?.[id]||0)>0)},
- recruits:{name:'众志成城',desc:'拥有至少两名后备英雄',check:s=>(s.reserveHeroes?.length||0)>=2},
- architect:{name:'营地复兴',desc:'任意建筑达到三级',check:s=>Object.values(s.buildings||{}).some(lv=>lv>=3)},
- mastery:{name:'技艺臻熟',desc:'至少一个技能达到二级',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>Object.values(h.skillLevels||{}).some(lv=>lv>=2))},
- collector:{name:'遗物守护者',desc:'持有至少十件饰品',check:s=>(s.items?.length||0)>=10},
- veteran:{name:'幸存者',desc:'拥有一名五级英雄',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>h.level>=5)}
-};
 export function unlockAchievements(state){
  if(!state.achievements||typeof state.achievements!=='object'||Array.isArray(state.achievements))state.achievements={};
  const unlocked=[];
@@ -433,7 +245,7 @@ export function unlockAchievements(state){
  return unlocked;
 }
 export function freshGame(seed=Date.now()){
-  const state = {schemaVersion:VERSION, seed:seed>>>0, rngState:(seed>>>0)||42, phase:'camp', day:1, expeditions:0, gold:145, shards:8, buildings:{infirmary:0,chapel:0,workshop:0,watchtower:0}, selectedRegion:'crypt',selectedDifficulty:'pilgrim',regionVictories:{crypt:0,mire:0,forge:0}, expeditionPlan:'standard', expeditionReports:[], defeatStreak:0, achievements:{}, tutorialSeen:false, supplies:{torches:5,bandages:2}, heroes:[], reserveHeroes:[], recruits:[], items:[], nextItemId:1, nextHeroId:4, expedition:null, battle:null, event:null, result:null, history:['营地的篝火重新燃起。灰烬之下，还有誓言。'], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+  const state = {schemaVersion:VERSION, seed:seed>>>0, rngState:(seed>>>0)||42, phase:'camp', day:1, expeditions:0, gold:145, shards:8, buildings:{infirmary:0,chapel:0,workshop:0,watchtower:0}, selectedRegion:'crypt',selectedDifficulty:'pilgrim',regionVictories:{crypt:0,mire:0,forge:0}, expeditionPlan:'standard', expeditionReports:[], defeatStreak:0, achievements:{}, tutorialSeen:false, supplies:{torches:5,bandages:2,potions:1,sigils:0}, heroes:[], reserveHeroes:[], recruits:[], items:[], nextItemId:1, nextHeroId:4, expedition:null, battle:null, event:null, result:null, history:['营地的篝火重新燃起。灰烬之下，还有誓言。'], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
   Object.entries(CLASSES).slice(0,4).forEach(([id,c],i)=>{state.heroes.push({id:`hero-${i}`,classId:id,name:HERO_NAMES[i],rank:i+1,level:1,xp:0,hp:c.maxHp,maxHp:c.maxHp,stress:integer(state,3,12),afflicted:false,gear:{weapon:0,armor:0},talentPoints:0,talents:{vigor:0,might:0,resolve:0},trinkets:[null,null]});});
   state.heroes.forEach(h=>{assignHeroGrowth(h);h.maxHp=heroStats(h,state).maxHp;h.hp=h.maxHp;});state.recruits=recruitOffers(state);return state;
 }
@@ -459,7 +271,8 @@ export function makeDungeon(state){
       nodes.push({id:`${layer}-${row}`,layer,row,type:kind,visited:false});
     }
   }
-  return {region:state.selectedRegion||'crypt',difficulty:state.selectedDifficulty||'pilgrim',nodes,layer:-1,row:0,visited:[],roomsCleared:0,lootGold:0,lootShards:0,lootItems:[],torch:state.supplies.torches,bandages:state.supplies.bandages};
+  for(const n of nodes){const pool=NODE_NAME_POOL[n.type]||NODE_NAME_POOL.battle;n.name=pool[integer(state,0,pool.length-1)];}
+  return {region:state.selectedRegion||'crypt',difficulty:state.selectedDifficulty||'pilgrim',nodes,layer:-1,row:0,visited:[],roomsCleared:0,lootGold:0,lootShards:0,lootItems:[],torch:state.supplies.torches,bandages:state.supplies.bandages,potions:state.supplies.potions||0,sigils:state.supplies.sigils||0};
 }
 export function beginExpedition(state){
   if(state.phase!=='camp')return false;ensureProgression(state);
@@ -694,16 +507,38 @@ export function forgeGear(state,id,kind){
  state.history.unshift(`${h.name} 强化了${kind==='weapon'?'武器':'护甲'}，达到 +${level+1}。`);
  return true;
 }
-export function buySupplies(state,type){if(state.phase!=='camp')return false;const c=type==='torches'?10:type==='bandages'?14:0;if(!c||state.gold<c)return false;state.gold-=c;state.supplies[type]++;return true;}
-export function isValidSave(input){if(!input||typeof input!=='object'||input.schemaVersion!==VERSION||!['camp','map','battle','event','result'].includes(input.phase))return false;
- if(!Number.isInteger(input.gold)||input.gold<0||input.gold>1e9||!Number.isInteger(input.shards)||input.shards<0||input.shards>1e9||!Number.isInteger(input.day)||input.day<1||input.day>100000||!Number.isInteger(input.expeditions)||input.expeditions<0||input.expeditions>100000)return false;
- if(!input.supplies||!['torches','bandages'].every(k=>Number.isInteger(input.supplies[k])&&input.supplies[k]>=0&&input.supplies[k]<=100000))return false;
+export function buySupplies(state,type){if(state.phase!=='camp')return false;const meta=SUPPLY_META[type];if(!meta||state.gold<meta.cost)return false;const cur=state.supplies[type]||0;if(cur>=(MAX_SUPPLIES[type]||99))return false;state.gold-=meta.cost;state.supplies[type]=cur+1;return true;}
+/** Spend one potion on a hero during the expedition map. */
+export function usePotion(state,heroId){if(state.phase!=='map'||!state.expedition||state.expedition.potions<=0)return false;const h=state.heroes.find(h=>h.id===heroId&&h.hp>0&&h.hp<h.maxHp);if(!h)return false;state.expedition.potions--;h.hp=clamp(h.hp+32,0,h.maxHp);state.history.unshift(`${h.name} 使用治疗药剂，恢复大量生命。`);return true;}
+/** Spend one sigil to relieve stress during the expedition map. */
+export function useSigil(state,heroId){if(state.phase!=='map'||!state.expedition||state.expedition.sigils<=0)return false;const h=state.heroes.find(h=>h.id===heroId&&h.hp>0&&h.stress>0);if(!h)return false;state.expedition.sigils--;addStress(h,-18);state.history.unshift(`${h.name} 握紧圣徽，压力消散。`);return true;}
+/** Preview data for the map node detail panel (Phase 3). */
+export function nodePreview(state,id){const ex=state.expedition;if(!ex)return null;const node=ex.nodes.find(n=>n.id===id);if(!node)return null;const region=REGIONS[ex.region]||REGIONS.crypt,diff=DIFFICULTIES[ex.difficulty||'pilgrim'],threat=regionThreatLevel(state,ex.region||'crypt'),scouted=buildingLevel(state,'watchtower')>0&&node.layer<=ex.layer+1+buildingLevel(state,'watchtower');
+ const combat=['battle','elite','boss'].includes(node.type),ambush=node.type==='ambush';
+ let encounters=[];if(combat){const pool=node.type==='elite'?region.elite:node.type==='boss'?region.boss:region.enemies;encounters=pool.slice(0,node.type==='boss'?3:2).map(t=>ENEMIES[t]?.name).filter(Boolean);}else if(ambush){encounters=[...(region.elite||[]).slice(0,1).map(t=>ENEMIES[t]?.name),'可能触发精英战'].filter(Boolean);}else{encounters=[TYPE_PREVIEW[node.type]||'未知遭遇'];}
+ const risk=Math.min(5,Math.max(1,(node.type==='boss'?5:node.type==='elite'?4:node.type==='ambush'?3:node.type==='battle'?2:1)+Math.floor((threat-1)/2)));
+ let power=0;if(combat||ambush){const pool=node.type==='boss'?region.boss:node.type==='elite'||ambush?region.elite:region.enemies;power=pool.slice(0,3).reduce((s,t)=>{const e=ENEMIES[t];return s+(e?Math.round(e.maxHp*.35+e.attack*4+e.armor*6):0)},0);power=Math.round(power*diff.attack*(1+.08*(threat-1))*(node.type==='boss'?1.35:node.type==='elite'?1.15:1));}
+ const rewards=[];if(combat||ambush){rewards.push(`金币 ${node.type==='boss'?120:node.type==='elite'?55:28}–${node.type==='boss'?180:node.type==='elite'?85:46}`);rewards.push(`遗物碎片 ${node.type==='boss'?12:node.type==='elite'?5:2}–${node.type==='boss'?20:node.type==='elite'?9:5}`);if(node.type!=='battle')rewards.push('高概率稀有饰品');}else if(node.type==='treasure'){rewards.push('金币 40–70','饰品或遗物');}else if(node.type==='rest'){rewards.push('全队恢复生命 / 降低压力');}else if(node.type==='supply'){rewards.push('补给物资');}else{rewards.push('未知收益');}
+ return {id:node.id,type:node.type,name:node.name||'未知房间',layer:node.layer,visited:!!node.visited,scouted,encounters,risk,power,rewards};}
+const TYPE_PREVIEW={event:'抉择事件',treasure:'战利品',rest:'休整',supply:'补给',shrine:'祭坛仪式',cache:'机关秘库',oracle:'命运占兆',caravan:'流亡商队'};
+/** Estimated total combat power of the active heroes. */
+export function teamPower(state){return state.heroes.filter(h=>h.hp>0).reduce((s,h)=>{const t=heroStats(h,state);return s+Math.round(t.attack*4+t.armor*6+h.maxHp*.35+t.speed*2)},0);}
+export function isValidSave(input){
+ if(!input||typeof input!=='object'||input.schemaVersion!==VERSION||!['camp','map','battle','event','result'].includes(input.phase))return false;
+ const int=(v,min,max)=>Number.isInteger(v)&&v>=min&&v<=max;
+ const finite=(v,min)=>Number.isFinite(v)&&v>=min;
+ if(!int(input.gold,0,1e9)||!int(input.shards,0,1e9)||!int(input.day,1,100000)||!int(input.expeditions,0,100000)||!int(input.rngState,0,4294967295))return false;
+ if(!input.supplies||!['torches','bandages'].every(k=>int(input.supplies[k],0,100000)))return false;
+ for(const k of ['potions','sigils'])if(input.supplies[k]!==undefined&&!int(input.supplies[k],0,100000))return false;
  if(!Array.isArray(input.history)||input.history.length>50000||input.history.some(x=>typeof x!=='string'||x.length>2000))return false;
- if(input.phase==='battle'&&!input.battle||input.phase==='map'&&!input.expedition||input.phase==='event'&&!input.event||input.phase==='result'&&!input.result)return false;
- if(!Array.isArray(input.heroes)||input.heroes.length!==4||!input.heroes.every(h=>h&&typeof h.id==='string'&&CLASSES[h.classId]&&Number.isFinite(h.hp)&&Number.isFinite(h.stress)&&Number.isFinite(h.maxHp)&&Number.isInteger(h.level)&&h.level>=1&&h.level<=5))return false;
- if(input.reserveHeroes!==undefined&&(!Array.isArray(input.reserveHeroes)||input.reserveHeroes.length>MAX_RESERVES||!input.reserveHeroes.every(h=>h&&CLASSES[h.classId]&&typeof h.id==='string'&&Number.isFinite(h.hp))))return false;
+ if(input.phase==='battle'&&(!input.battle||!Array.isArray(input.battle.heroes)||!Array.isArray(input.battle.enemies)||!Array.isArray(input.battle.order)||!input.expedition))return false;
+ if(input.phase==='map'&&(!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
+ if(input.phase==='event'&&(!input.event||!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
+ if(input.phase==='result'&&!input.result)return false;
+ if(!Array.isArray(input.heroes)||input.heroes.length!==4||!input.heroes.every(h=>h&&typeof h.id==='string'&&CLASSES[h.classId]&&finite(h.hp,0)&&finite(h.stress,0)&&finite(h.maxHp,1)&&int(h.level,1,5)))return false;
+ if(input.reserveHeroes!==undefined&&(!Array.isArray(input.reserveHeroes)||input.reserveHeroes.length>MAX_RESERVES||!input.reserveHeroes.every(h=>h&&CLASSES[h.classId]&&typeof h.id==='string'&&finite(h.hp,0))))return false;
  if(input.items!==undefined&&(!Array.isArray(input.items)||input.items.length>300||!input.items.every(item=>item&&typeof item.id==='string'&&TRINKET_BASES[item.baseId]&&RARITY_NAMES[item.rarity]&&Array.isArray(item.affixes)&&item.affixes.every(id=>AFFIXES[id]))))return false;
- if(input.buildings!==undefined&&(!input.buildings||typeof input.buildings!=='object'||Object.entries(input.buildings).some(([id,lv])=>!BUILDINGS[id]||!Number.isInteger(lv)||lv<0||lv>MAX_BUILDING_LEVEL)))return false;
+ if(input.buildings!==undefined&&(!input.buildings||typeof input.buildings!=='object'||Object.entries(input.buildings).some(([id,lv])=>!BUILDINGS[id]||!int(lv,0,MAX_BUILDING_LEVEL))))return false;
  if(input.expeditionPlan!==undefined&&!EXPEDITION_PLANS[input.expeditionPlan])return false;
  if(input.expedition?.plan!==undefined&&!EXPEDITION_PLANS[input.expedition.plan])return false;
  if(input.selectedRegion!==undefined&&!REGIONS[input.selectedRegion])return false;
@@ -711,24 +546,36 @@ export function isValidSave(input){if(!input||typeof input!=='object'||input.sch
  if(input.expedition?.difficulty!==undefined&&!DIFFICULTIES[input.expedition.difficulty])return false;
  if(input.expedition?.region!==undefined&&!REGIONS[input.expedition.region])return false;
  if(input.battle?.region!==undefined&&!REGIONS[input.battle.region])return false;
- if(input.regionVictories!==undefined&&(!input.regionVictories||typeof input.regionVictories!=='object'||Object.entries(input.regionVictories).some(([id,n])=>!REGIONS[id]||!Number.isInteger(n)||n<0||n>99999)))return false;
- if(input.defeatStreak!==undefined&&(!Number.isInteger(input.defeatStreak)||input.defeatStreak<0||input.defeatStreak>99999))return false;
- if(input.expeditionReports!==undefined&&(!Array.isArray(input.expeditionReports)||input.expeditionReports.length>20||!input.expeditionReports.every(r=>r&&REGIONS[r.region]&&DIFFICULTIES[r.difficulty]&&['victory','retreat','defeat'].includes(r.reason)&&Number.isInteger(r.day)&&r.day>0&&Number.isInteger(r.rooms)&&r.rooms>=0&&Number.isFinite(r.gold)&&r.gold>=0&&Number.isFinite(r.shards)&&r.shards>=0)))return false;
+ if(input.regionVictories!==undefined&&(!input.regionVictories||typeof input.regionVictories!=='object'||Object.entries(input.regionVictories).some(([id,n])=>!REGIONS[id]||!int(n,0,99999))))return false;
+ if(input.defeatStreak!==undefined&&!int(input.defeatStreak,0,99999))return false;
+ if(input.expeditionReports!==undefined&&(!Array.isArray(input.expeditionReports)||input.expeditionReports.length>20||!input.expeditionReports.every(r=>r&&REGIONS[r.region]&&DIFFICULTIES[r.difficulty]&&['victory','retreat','defeat'].includes(r.reason)&&int(r.day,1,100000)&&int(r.rooms,0,1e9)&&finite(r.gold,0)&&finite(r.shards,0))))return false;
  for(const h of [...input.heroes,...(input.reserveHeroes||[])]){
   if(h.traits!==undefined&&(!Array.isArray(h.traits)||h.traits.length>4||!h.traits.every(t=>TRAITS[t])))return false;
   if(h.skillBranches!==undefined&&(!h.skillBranches||typeof h.skillBranches!=='object'||Object.entries(h.skillBranches).some(([id,choice])=>!CLASSES[h.classId].skills.includes(id)||!SKILL_BRANCHES[id]?.some(b=>b.id===choice)||(h.skillLevels?.[id]||0)<1)))return false;
-  if(h.skillLevels!==undefined&&(!h.skillLevels||typeof h.skillLevels!=='object'||Object.entries(h.skillLevels).some(([id,lv])=>!CLASSES[h.classId].skills.includes(id)||!Number.isInteger(lv)||lv<0||lv>MAX_SKILL_LEVEL)))return false;
+  if(h.skillLevels!==undefined&&(!h.skillLevels||typeof h.skillLevels!=='object'||Object.entries(h.skillLevels).some(([id,lv])=>!CLASSES[h.classId].skills.includes(id)||!int(lv,0,MAX_SKILL_LEVEL))))return false;
   if(h.crisis!==undefined&&h.crisis!==null&&!CRISES[h.crisis])return false;
-  if(h.talentPoints!==undefined&&(!Number.isInteger(h.talentPoints)||h.talentPoints<0||h.talentPoints>10))return false;
-  if(h.talents!==undefined&&(!h.talents||typeof h.talents!=='object'||Object.entries(h.talents).some(([id,lv])=>!TALENTS[id]||!Number.isInteger(lv)||lv<0||lv>TALENTS[id].max)))return false;
+  if(h.talentPoints!==undefined&&!int(h.talentPoints,0,10))return false;
+  if(h.talents!==undefined&&(!h.talents||typeof h.talents!=='object'||Object.entries(h.talents).some(([id,lv])=>!TALENTS[id]||!int(lv,0,TALENTS[id].max))))return false;
  }
- if(!Number.isFinite(input.gold)||input.gold<0||!Number.isFinite(input.shards)||input.shards<0||!Number.isInteger(input.rngState))return false;
- if(!input.supplies||!Number.isFinite(input.supplies.torches)||!Number.isFinite(input.supplies.bandages))return false;
- if(input.phase==='battle'&&(!input.battle||!Array.isArray(input.battle.heroes)||!Array.isArray(input.battle.enemies)||!Array.isArray(input.battle.order)||!input.expedition))return false;
- if((input.phase==='map'||input.phase==='event')&&(!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
- if(input.achievements!==undefined&&(!input.achievements||typeof input.achievements!=='object'||Array.isArray(input.achievements)||Object.entries(input.achievements).some(([id,day])=>!ACHIEVEMENTS[id]||!Number.isInteger(day)||day<1||day>100000)))return false;
+ if(input.achievements!==undefined&&(!input.achievements||typeof input.achievements!=='object'||Array.isArray(input.achievements)||Object.entries(input.achievements).some(([id,day])=>!ACHIEVEMENTS[id]||!int(day,1,100000))))return false;
  if(input.tutorialSeen!==undefined&&typeof input.tutorialSeen!=='boolean')return false;
  return true;
 }
 export function skipTurn(state){if(state.phase!=='battle'||currentActor(state)?.side!=='hero')return false;
  const actor=currentActor(state);state.battle.logs.unshift({text:`${actor.name} 选择调整呼吸，跳过行动`,type:'system'});advanceTurn(state);return true;}
+/** Basic attack: 100% attack power, no rank restriction. Phase 1 skill-card action. */
+export function basicAttack(state,targetId){
+ if(state.phase!=='battle')return {ok:false,error:'当前不在战斗中'};
+ const actor=currentActor(state);if(!actor||actor.side!=='hero')return {ok:false,error:'尚未轮到英雄行动'};
+ const b=state.battle,target=[...b.enemies].find(t=>t.id===targetId&&t.hp>0);
+ if(!target)return {ok:false,error:'目标不合法或已倒下'};
+ const acc=clamp(92+(actor.accuracyBonus||0),1,100);
+ if(integer(state,1,100)>acc){log(b,`${actor.name} 的普通攻击未命中`,'system');}
+ else{damage(state,actor,target,1.0,{});log(b,`${actor.name} 对 ${target.name} 发动普通攻击`,'normal');}
+ if(!endCheck(state))advanceTurn(state);
+ return {ok:true};
+}
+/** End the current hero turn without acting. */
+export function endTurn(state){if(state.phase!=='battle'||currentActor(state)?.side!=='hero')return false;
+ const actor=currentActor(state);state.battle.logs.unshift({text:`${actor.name} 结束了回合`,type:'system'});advanceTurn(state);return true;}
+

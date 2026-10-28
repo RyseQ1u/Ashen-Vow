@@ -280,8 +280,197 @@
 @media(max-width:880px){.v10-section{padding:15px}.v10-card-grid{grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.v10-card{padding:14px;min-height:135px}.nav-tabs{gap:3px}.nav-tab{font-size:.79rem;padding:8px 9px}}
 @media(max-width:540px){.v10-card-grid{grid-template-columns:1fr}.v10-tabs{gap:5px}.v10-tabs .btn{padding:6px 8px}}
 
+/* Phase 1 — battle UI aligned to design mockup */
+.initiative-portrait{display:inline-flex;flex-direction:column;align-items:center;gap:3px;min-width:52px;padding:5px 6px;border:1px solid #59493d;border-radius:4px;background:#201b20;color:#bba999;font-size:9px}
+.initiative-portrait svg{width:36px;height:36px;border-radius:3px;background:#2a2430}
+.initiative-portrait i{font-style:normal;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.initiative-portrait.friendly{border-color:#557d78a8}.initiative-portrait.hostile{border-color:#9c564ba8}
+.initiative-portrait.currently{background:#7a5b333d;border-color:#eac384;box-shadow:0 0 10px #c2a06a34}
+.skill-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.skill-card{position:relative;display:flex;flex-direction:column;gap:6px;min-height:118px;text-align:left;border:1px solid #5c4c3e;background:linear-gradient(155deg,#2b242c,#181a1f);color:#e2d0b4;padding:12px 12px 10px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.skill-card:hover:not(:disabled){transform:translateY(-2px);border-color:#c9a76e}
+.skill-card.chosen{border-color:#e8c88c;box-shadow:inset 0 0 0 1px #e8c88c,0 8px 22px #c29a5240}
+.skill-card:disabled{filter:grayscale(.5);opacity:.4;cursor:not-allowed}
+.skill-card-tag{position:absolute;top:8px;right:8px;font:600 10px Arial,sans-serif;letter-spacing:1px;padding:2px 7px;border-radius:3px;border:1px solid}
+.skill-card.cat-damage .skill-card-tag{color:#e8a29a;border-color:#a64c47;background:#4a2525}
+.skill-card.cat-defense .skill-card-tag{color:#b7c9b8;border-color:#77877a;background:#2a352c}
+.skill-card.cat-buff .skill-card-tag{color:#ecd2a2;border-color:#cfac70;background:#4a3b28}
+.skill-card.cat-finisher .skill-card-tag{color:#d9c2f2;border-color:#9b6fc4;background:#33244a}
+.skill-card.cat-attack .skill-card-tag{color:#e8d2a8;border-color:#b58b52;background:#3b2c22}
+.skill-card-art{font-size:26px;color:#e8c18a;line-height:1}
+.skill-card-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.skill-card-body b{font-size:13px;color:#f0ddc0}
+.skill-card-body small{font-size:11px;color:#a99b8c;line-height:1.45}
+.skill-card-body em{font-style:normal;font-size:10px;color:#c5a472}
+.skill-card-meta{font:10px Arial,sans-serif;color:#8f8478;margin-top:3px}
+.skill-card-pips{display:flex;gap:4px;margin-top:auto}
+.skill-card-pips i{width:7px;height:7px;border-radius:50%;background:#443e3c;border:1px solid #685848}
+.skill-card-pips i.filled{background:#d0aa6d;border-color:#d9b77f;box-shadow:0 0 6px #d9a75e58}
+.battle-left-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.battle-hero-panel{display:flex;align-items:center;gap:14px;border:1px solid #6d583f;background:linear-gradient(110deg,#242127,#191a1f);padding:12px 16px}
+.battle-hero-face{width:64px;height:72px;overflow:hidden;flex-shrink:0;border:1px solid #7a6347;background:#2a2430}
+.battle-hero-face svg{width:100%;height:100%}
+.battle-hero-meta{flex:1;min-width:0}
+.battle-hero-name{color:#f0ddc0;font-size:17px}
+.battle-hero-sub{color:#ae9b85;font-size:11px;margin:2px 0 6px}
+.battle-hero-bars{display:flex;flex-direction:column;gap:3px;max-width:260px}
+.bar{height:6px;background:#2a2528;border:1px solid #5c4c40;border-radius:2px;overflow:hidden}
+.bar span{display:block;height:100%;background:#923e38}
+.bar.xp{height:4px}.bar.xp span{background:linear-gradient(90deg,#3f7fd6,#7eb0ef)}
+.battle-hero-nums{display:flex;gap:12px;font-size:11px;color:#b4a596;margin-top:5px}
+.battle-hero-nums b{color:#e4d3b9;font-weight:normal}
+.battle-hero-stats{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#b4a596;margin-top:5px}
+.battle-hero-stats b{color:#e0c59b;font-weight:normal}
+.battle-hero-detail{align-self:flex-start}
+.battle-main-actions{display:flex;gap:10px;margin-top:12px}
+.battle-main-actions .btn{flex:1;min-height:46px;font-size:14px;letter-spacing:2px}
+.battle-main-actions .btn-gold{font-weight:bold}
+.unit-targetable{outline:2px solid #e05545;outline-offset:2px}
+.unit-targetable:before{content:'';position:absolute;inset:-6px;border:2px solid #e05545;border-radius:6px;opacity:.55;pointer-events:none;animation:target-pulse 1.2s ease-in-out infinite}
+@keyframes target-pulse{0%,100%{opacity:.35}50%{opacity:.75}}
+@media(max-width:1040px){.skill-card-grid{grid-template-columns:1fr 1fr}.battle-hero-panel{flex-wrap:wrap}.battle-hero-face{width:52px;height:58px}}
+@media(max-width:650px){.skill-card-grid{grid-template-columns:1fr}.initiative-portrait{min-width:42px}.initiative-portrait svg{width:28px;height:28px}}
+
+/* Phase 2 — camp scene overview */
+.camp-layout{display:grid;grid-template-columns:88px minmax(0,1fr);gap:18px;align-items:start}
+.camp-side-nav{display:flex;flex-direction:column;gap:10px;position:sticky;top:12px}
+.camp-side-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px;border:1px solid #55483e;background:linear-gradient(155deg,#252125,#16171a);color:#aa9b87;cursor:pointer;font-size:12px;letter-spacing:2px}
+.camp-side-item:hover{border-color:#b99d6a;color:#ead3b0}
+.camp-side-item.active{border-color:#cbac73;color:#f5dcae;background:linear-gradient(120deg,#53412b,#29242a);box-shadow:inset 0 1px #e4c38e4a}
+.camp-side-icon{font-size:22px;line-height:1}
+.camp-overview{display:flex;flex-direction:column;gap:16px}
+.camp-scene{position:relative;border:1px solid #5b463e;background:radial-gradient(ellipse at 50% 20%,#67402a48,transparent 46%),linear-gradient(180deg,#242127,#15161b);padding:22px;overflow:hidden}
+.camp-scene-glow{position:absolute;inset:auto 0 0 0;height:120px;background:radial-gradient(ellipse at 50% 100%,#ff793e2c,transparent 70%);pointer-events:none}
+.camp-buildings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.camp-building{display:flex;align-items:center;gap:12px;border:1px solid #786044;background:linear-gradient(140deg,#2e2528,#16191d);padding:14px 16px;position:relative}
+.camp-building-icon{display:grid;place-items:center;width:48px;height:48px;font-size:24px;color:#f2d29a;border:1px solid #8e704f;background:#4e382630;flex-shrink:0}
+.camp-building-body{flex:1;min-width:0}
+.camp-building-name{color:#e9d6b8;font-size:15px}
+.camp-building-name em{font-style:normal;color:#bfa37a;font-size:11px;margin-left:6px}
+.camp-building-desc{color:#ad9c8e;font-size:11px;line-height:1.5;margin:4px 0 6px}
+.camp-building-max{color:#93b39f;font-size:11px}
+.camp-quick-actions{display:flex;gap:10px;margin-top:18px}
+.btn.camp-quick{flex:1;min-height:48px;font-size:14px;letter-spacing:2px}
+.camp-team-strip{border:1px solid #5b4a3c;background:#17191ccc;padding:14px 16px}
+.camp-strip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.camp-strip-note{font-size:11px;color:#84766c}
+.camp-team-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.camp-team-card{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid #514638;background:#1b1c22;padding:10px;cursor:pointer;min-width:0}
+.camp-team-card:hover{border-color:#c9a76e}
+.camp-team-face{width:56px;height:64px;overflow:hidden;flex-shrink:0;background:radial-gradient(ellipse at 50% 80%,color-mix(in srgb,var(--accent),transparent 75%),transparent 70%),#2a2430;border:1px solid #5b4d3b}
+.camp-team-face svg{width:100%;height:100%}
+.camp-team-meta{flex:1;min-width:0}
+.camp-team-meta b{display:block;color:#e4cba8;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-team-meta small{display:block;color:#9f968b;font-size:10px;margin:2px 0 5px}
+.camp-team-nums{font-size:10px;color:#84766c;margin-top:4px}
+.camp-reserve-strip{border:1px solid #514638;background:#17191ccc;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.camp-reserve-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.camp-reserve-chip{display:flex;flex-direction:column;align-items:center;gap:3px;width:56px;border:1px solid #55483e;background:#1b1c22;padding:5px;cursor:pointer;color:#c9b79c;font-size:10px}
+.camp-reserve-chip svg{width:40px;height:40px}
+.camp-reserve-chip.empty{height:64px;justify-content:center;font-size:22px;color:#8e744f;border-style:dashed}
+.camp-depart-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;border:1px solid #8e704f;background:linear-gradient(100deg,#3b2c22,#1c1a1f);padding:16px 22px}
+.camp-depart-info span{color:#f3dfbf;font-size:18px;display:block}
+.camp-depart-info small{color:#b3a495;font-size:12px}
+.btn.camp-depart{min-width:200px;min-height:56px;font-size:20px;letter-spacing:4px}
+@media(max-width:1040px){.camp-layout{grid-template-columns:1fr}.camp-side-nav{flex-direction:row;position:static}.camp-side-item{flex:1;padding:10px 6px}.camp-team-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.camp-buildings{grid-template-columns:1fr}.camp-quick-actions{flex-wrap:wrap}.btn.camp-quick{min-width:calc(50% - 5px)}.camp-depart-bar{flex-direction:column;align-items:stretch}.btn.camp-depart{width:100%}.camp-team-row{grid-template-columns:1fr}}
+
+/* Phase 3 — map node intel + team strip */
+.map-node.selected .node-outer{stroke:#e8c88c;stroke-width:3;filter:drop-shadow(0 0 8px #e8c88c88)}
+.map-node.selected .node-inner{fill:#4a3b2a}
+.map-node.available{cursor:pointer}
+.map-detail{border:1px solid #6d583f;background:linear-gradient(150deg,#242127,#191a1f);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.map-detail.empty{border-style:dashed;opacity:.85}
+.map-detail-name{color:#f0ddc0;font-size:18px;margin:2px 0 0}
+.map-detail-type{color:#c5a472;font-size:12px;letter-spacing:1px}
+.map-detail-row{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#b4a596}
+.map-detail-row>span{color:#8f8478;letter-spacing:1px;font-size:11px}
+.map-detail-row ul{margin:0;padding-left:16px;color:#d6c2a4;line-height:1.6}
+.map-detail-row strong{font-size:14px}
+.risk-skulls{color:#c9564a;font-size:16px;letter-spacing:2px}
+.risk-skulls i{font-style:normal;color:#4a4340}
+.ok-text{color:#8fbf9a}
+.danger-text{color:#d47a6a}
+.map-team-strip{border:1px solid #5b4a3c;background:#17191ccc;padding:14px 16px;margin-top:16px}
+.map-strip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.map-strip-head b{color:#e9d6b8}
+.map-strip-note{font-size:11px;color:#84766c}
+.map-strip-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.map-strip-card{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid #514638;background:#1b1c22;padding:10px;min-width:0}
+.map-strip-face{width:52px;height:60px;overflow:hidden;flex-shrink:0;background:radial-gradient(ellipse at 50% 80%,color-mix(in srgb,var(--accent),transparent 75%),transparent 70%),#2a2430;border:1px solid #5b4d3b}
+.map-strip-face svg{width:100%;height:100%}
+.map-strip-meta{flex:1;min-width:0}
+.map-strip-meta b{display:block;color:#e4cba8;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-strip-meta small{display:block;color:#9f968b;font-size:10px;margin:2px 0 5px}
+.map-strip-nums{font-size:10px;color:#84766c;margin-top:4px}
+.map-strip-actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+@media(max-width:1040px){.map-strip-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.map-strip-row{grid-template-columns:1fr}}
+
+/* Phase 4 — main menu shell */
+.landing-shell{position:relative;z-index:1;width:min(1120px,100%);margin:0 auto;padding:28px 24px 30px;min-height:calc(100vh - 137px);display:flex;flex-direction:column}
+.landing-top{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.landing-brand{text-shadow:0 2px 12px #09080b}
+.landing-profile{display:flex;align-items:center;gap:12px;border:1px solid #6d583f;background:linear-gradient(120deg,#2a2229cc,#17181ccc);padding:10px 16px 10px 10px;backdrop-filter:blur(4px)}
+.profile-orb{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;border:1px solid #c9a76e;background:radial-gradient(circle at 35% 30%,#e8c18a,#7a5b33);color:#241a12;font-weight:bold;font-size:18px;box-shadow:0 0 14px #c2a06a4d}
+.profile-copy b{display:block;color:#f0ddc0;font-size:15px;letter-spacing:1px}
+.profile-copy small{display:block;color:#b3a495;font-size:11px;margin-top:2px}
+.landing-inner{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px 0 12px}
+.landing-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:34px auto 22px;width:min(920px,100%)}
+.landing-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:128px;text-align:left;border:1px solid #5c4c3e;background:linear-gradient(155deg,#2b242cd9,#181a1fd9);color:#e2d0b4;padding:18px 18px 16px;cursor:pointer;transition:transform .16s,border-color .16s,box-shadow .16s}
+.landing-card:hover{transform:translateY(-3px);border-color:#c9a76e;box-shadow:0 12px 28px #c29a5236}
+.landing-card.primary{border-color:#c9a76e;background:linear-gradient(155deg,#4a3626e8,#221c20e8);box-shadow:inset 0 1px #e4c38e4a}
+.landing-card.primary:hover{box-shadow:inset 0 1px #e4c38e4a,0 14px 32px #c29a525c}
+.landing-card-icon{font-size:22px;color:#e8c18a;line-height:1}
+.landing-card b{font-size:16px;color:#f0ddc0;letter-spacing:1px}
+.landing-card small{font-size:11px;color:#a99b8c;line-height:1.55}
+.landing-save-card{position:relative;align-self:flex-start;display:flex;flex-direction:column;gap:6px;min-width:240px;max-width:300px;border:1px solid #6d583f;background:linear-gradient(140deg,#2a2229e8,#17181ce8);padding:14px 16px;backdrop-filter:blur(4px)}
+.save-card-tag{font:600 10px Arial,sans-serif;letter-spacing:2px;color:#c5a472}
+.landing-save-card b{color:#f0ddc0;font-size:15px}
+.landing-save-card p{margin:0;font-size:11px;color:#b3a495}
+.landing-save-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.landing-foot{margin-top:22px;display:flex;justify-content:space-between;gap:12px;font:10px Arial,sans-serif;letter-spacing:1.7px;color:#b2a397a6}
+@media(max-width:1040px){.landing-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.landing-cards{grid-template-columns:1fr}.landing-save-card{max-width:none;width:100%}.landing-foot{flex-direction:column;align-items:flex-start}.landing-profile{width:100%}}
+
+/* Phase 5 — scene art integration */
+.landing-art{background:
+ radial-gradient(circle at 62% 29%,#65474188 0,#49303841 16%,transparent 45%),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwNzA4MGQiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iIzFiMTUyMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzJjMWMxYyIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0ibW9vbiI+PHN0b3Agc3RvcC1jb2xvcj0iI2YyZGNiNCIgc3RvcC1vcGFjaXR5PSIuNzIiLz48c3RvcCBvZmZzZXQ9Ii4zOCIgc3RvcC1jb2xvcj0iI2M0OWE2ZSIgc3RvcC1vcGFjaXR5PSIuMjgiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjNDlhNmUiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iZ2xvdyI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmOGE0NSIgc3RvcC1vcGFjaXR5PSIuMzUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjhhNDUiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iaGlsbCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMTkxNDFjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGIwYTBmIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJzdG9uZSIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMTQxMjFhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDcwNzBiIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1ciI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTYiLz48L2ZpbHRlcj4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9InVybCgjc2t5KSIvPgo8Y2lyY2xlIGN4PSIxMTgwIiBjeT0iMTcwIiByPSIxNTAiIGZpbGw9InVybCgjbW9vbikiLz4KPGNpcmNsZSBjeD0iMTE4MCIgY3k9IjE3MCIgcj0iNDIiIGZpbGw9IiNlZmQ5YjIiIG9wYWNpdHk9Ii41NSIvPgo8ZyBmaWxsPSIjMGUwYzEzIiBvcGFjaXR5PSIuODUiPgo8cGF0aCBkPSJNMCA0NzAgTDEyMCAzNjAgTDIzMCA0NzAgTDM0MCAzMjAgTDQ3MCA0NzAgTDU4MCAzOTAgTDcwMCA0NzAgTDgyMCAzNDAgTDk2MCA0NzAgTDEwODAgMzgwIEwxMjIwIDQ3MCBMMTM0MCAzNTAgTDE0ODAgNDcwIEwxNjAwIDQwMCBMMTYwMCA2NDAgTDAgNjQwIFoiLz4KPC9nPgo8cGF0aCBmaWxsPSJ1cmwoI2hpbGwpIiBkPSJNMCA1MzAgQzIwMCA0NzAgMzIwIDUyMCA0ODAgNTAwIEM2NDAgNDgwIDc2MCA1NDAgOTIwIDUxMCBDMTA4MCA0ODAgMTI0MCA1MzAgMTQwMCA1MDAgQzE1MDAgNDg1IDE1NjAgNTA1IDE2MDAgNDk1IEwxNjAwIDY0MCBMMCA2NDAgWiIvPgo8ZyBmaWxsPSJ1cmwoI3N0b25lKSI+CjxwYXRoIGQ9Ik0yNTAgMjUwIGg3MCB2MjAgaDE0IHYtNDAgaDIyIHY0MCBoMTQgdjMyMCBoLTEzNCB6Ii8+CjxwYXRoIGQ9Ik0zNDAgMzEwIGg1NCB2MTYgaDEyIHYtMzAgaDE4IHYzMCBoMTIgdjI2MCBoLTk2IHoiLz4KPHBhdGggZD0iTTEyNDAgMjEwIGg4MiB2MjQgaDE2IHYtNDggaDI2IHY0OCBoMTYgdjM3MCBoLTE1NiB6Ii8+CjxwYXRoIGQ9Ik0xMTQwIDMyMCBoNTAgdjE0IGgxMSB2LTI4IGgxNiB2MjggaDExIHYyNDAgaC05OCB6Ii8+CjwvZz4KPGcgZmlsbD0iI2MyN2E0MiIgb3BhY2l0eT0iLjg1Ij48cmVjdCB4PSIyODIiIHk9IjMzMCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjE4IiByeD0iMiIvPjxyZWN0IHg9IjI4MiIgeT0iMzkwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTgiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iMzAwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iMzcwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iNDQwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PC9nPgo8ZWxsaXBzZSBjeD0iODAwIiBjeT0iNTYwIiByeD0iMjYwIiByeT0iNzAiIGZpbGw9InVybCgjZ2xvdykiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8cGF0aCBkPSJNNzYwIDU2MCBRODAwIDUxMCA4NDAgNTYwIFE4MDAgNTQ1IDc2MCA1NjAiIGZpbGw9IiNmZjlhNTIiIG9wYWNpdHk9Ii41Ii8+CjxnIGZpbGw9IiNlOGIwN2EiIG9wYWNpdHk9Ii41NSI+PGNpcmNsZSBjeD0iODAwIiBjeT0iNTAwIiByPSIyLjUiLz48Y2lyY2xlIGN4PSI3NzgiIGN5PSI0NzAiIHI9IjEuOCIvPjxjaXJjbGUgY3g9IjgzMCIgY3k9IjQ1NSIgcj0iMiIvPjxjaXJjbGUgY3g9Ijc1NiIgY3k9IjQzMCIgcj0iMS40Ii8+PGNpcmNsZSBjeD0iODU2IiBjeT0iNDE1IiByPSIxLjYiLz48Y2lyY2xlIGN4PSI4MTAiIGN5PSIzOTUiIHI9IjEuMiIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjUyMCIgcj0iMS41Ii8+PGNpcmNsZSBjeD0iOTEwIiBjeT0iNTA1IiByPSIxLjciLz48L2c+CjxnIGZpbGw9IiNmMGQyYTgiIG9wYWNpdHk9Ii40Ij48Y2lyY2xlIGN4PSIxODAiIGN5PSIxMjAiIHI9IjEuNiIvPjxjaXJjbGUgY3g9IjQyMCIgY3k9IjgwIiByPSIxLjIiLz48Y2lyY2xlIGN4PSI2NDAiIGN5PSIxNTAiIHI9IjEuNCIvPjxjaXJjbGUgY3g9Ijk4MCIgY3k9Ijk1IiByPSIxLjUiLz48Y2lyY2xlIGN4PSIxNDIwIiBjeT0iMTMwIiByPSIxLjMiLz48Y2lyY2xlIGN4PSIxNTIwIiBjeT0iMjIwIiByPSIxLjEiLz48L2c+Cjwvc3ZnPgo=') center center / cover no-repeat,
+ linear-gradient(0deg,#08090c 0%,#1e181e 39%,#30262a 90%)}
+.camp-scene{background:
+ radial-gradient(ellipse at 50% 20%,#67402a48,transparent 46%),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwZDBiMTIiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMjIxODIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmUyMDE4Ii8+PC9saW5lYXJHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJmaXJlIj48c3RvcCBzdG9wLWNvbG9yPSIjZmZiMDY2IiBzdG9wLW9wYWNpdHk9Ii43Ii8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiNlMDZhMmUiIHN0b3Atb3BhY2l0eT0iLjI4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZTA2YTJlIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9InRlbnQiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzJjMjIyNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEyMGYxNCIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JvdW5kIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMzYTJhMWUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNDBmMTAiLz48L2xpbmVhckdyYWRpZW50Pgo8ZmlsdGVyIGlkPSJibHVyIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxNCIvPjwvZmlsdGVyPgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjY0MCIgZmlsbD0idXJsKCNza3kpIi8+CjxwYXRoIGQ9Ik0wIDMwMCBMMTgwIDIyMCBMMzIwIDMwMCBMNTAwIDE4MCBMNjgwIDMwMCBMODYwIDIwMCBMMTA0MCAzMDAgTDEyMjAgMTkwIEwxNDAwIDMwMCBMMTYwMCAyMzAgTDE2MDAgNjQwIEwwIDY0MCBaIiBmaWxsPSIjMTIwZTE0IiBvcGFjaXR5PSIuOCIvPgo8cGF0aCBmaWxsPSJ1cmwoI2dyb3VuZCkiIGQ9Ik0wIDQyMCBDMjYwIDM4MCA0MjAgNDMwIDY0MCA0MTAgQzg2MCAzOTAgMTA0MCA0NDAgMTI2MCA0MTUgQzE0MjAgMzk4IDE1MjAgNDI1IDE2MDAgNDE1IEwxNjAwIDY0MCBMMCA2NDAgWiIvPgo8ZyBmaWxsPSJ1cmwoI3RlbnQpIj4KPHBhdGggZD0iTTE4MCA0NzAgTDI4MCAzMzAgTDM4MCA0NzAgWiIvPjxwYXRoIGQ9Ik0yNjAgNDcwIEwzNDAgMzYwIEw0MjAgNDcwIFoiLz4KPHBhdGggZD0iTTExODAgNDY1IEwxMjkwIDMyMCBMMTQwMCA0NjUgWiIvPjxwYXRoIGQ9Ik0xMTAwIDQ2NSBMMTE5MCAzNTUgTDEyODAgNDY1IFoiLz4KPC9nPgo8ZyBzdHJva2U9IiMwYzBhMGUiIHN0cm9rZS13aWR0aD0iNyIgb3BhY2l0eT0iLjkiPgo8cGF0aCBkPSJNNjAgNDcwIEw2MCAzNjAgTTEwMCA0NzAgTDEwMCAzNDAgTTE0MCA0NzAgTDE0MCAzNzAgTTE0ODAgNDcwIEwxNDgwIDM1NSBNMTUyMCA0NzAgTDE1MjAgMzQwIE0xNTYwIDQ3MCBMMTU2MCAzNjUiLz4KPC9nPgo8ZWxsaXBzZSBjeD0iODAwIiBjeT0iNTAwIiByeD0iMzAwIiByeT0iMTEwIiBmaWxsPSJ1cmwoI2ZpcmUpIiBmaWx0ZXI9InVybCgjYmx1cikiLz4KPGc+CjxwYXRoIGQ9Ik03NjAgNTIwIFE4MDAgNDMwIDg0MCA1MjAgUTgwMCA1MDAgNzYwIDUyMCIgZmlsbD0iI2ZmOGMzZSIgb3BhY2l0eT0iLjg1Ii8+CjxwYXRoIGQ9Ik03NzggNTE1IFE4MDAgNDYwIDgyMiA1MTUgUTgwMCA1MDIgNzc4IDUxNSIgZmlsbD0iI2ZmZDA4YSIgb3BhY2l0eT0iLjkiLz4KPC9nPgo8ZyBzdHJva2U9IiMyYTFjMTQiIHN0cm9rZS13aWR0aD0iOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48cGF0aCBkPSJNNzIwIDU0NSBMODgwIDU0NSIvPjxwYXRoIGQ9Ik03NDAgNTM1IEw4NjAgNTU1Ii8+PHBhdGggZD0iTTc0MCA1NTUgTDg2MCA1MzUiLz48L2c+CjxnIGZpbGw9IiM2YjUzNDAiPjxyZWN0IHg9IjY0MCIgeT0iNTAwIiB3aWR0aD0iNzAiIGhlaWdodD0iMTQiIHJ4PSIzIi8+PHJlY3QgeD0iODkwIiB5PSI1MDUiIHdpZHRoPSI3MCIgaGVpZ2h0PSIxNCIgcng9IjMiLz48cmVjdCB4PSI1MDAiIHk9IjUyMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjEyIiByeD0iMyIvPjwvZz4KPGcgZmlsbD0iIzdhNmE1NSIgb3BhY2l0eT0iLjkiPjxyZWN0IHg9IjQ3MCIgeT0iNDk1IiB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHJ4PSIzIi8+PHJlY3QgeD0iMTA4MCIgeT0iNTAwIiB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHJ4PSIzIi8+PC9nPgo8ZyBmaWxsPSIjZmZjYThhIiBvcGFjaXR5PSIuNiI+PGNpcmNsZSBjeD0iODAwIiBjeT0iNDMwIiByPSIyLjQiLz48Y2lyY2xlIGN4PSI3NzUiIGN5PSIzOTUiIHI9IjEuOCIvPjxjaXJjbGUgY3g9IjgzNSIgY3k9IjM4MCIgcj0iMiIvPjxjaXJjbGUgY3g9Ijc1MCIgY3k9IjM1MCIgcj0iMS40Ii8+PGNpcmNsZSBjeD0iODYwIiBjeT0iMzM1IiByPSIxLjYiLz48Y2lyY2xlIGN4PSI4MTAiIGN5PSIzMTAiIHI9IjEuMiIvPjxjaXJjbGUgY3g9IjcyMCIgY3k9IjQyMCIgcj0iMS41Ii8+PGNpcmNsZSBjeD0iODkwIiBjeT0iNDA1IiByPSIxLjciLz48L2c+CjxnIGZpbGw9IiNmMGQyYTgiIG9wYWNpdHk9Ii4zIj48Y2lyY2xlIGN4PSIzMDAiIGN5PSIxMjAiIHI9IjEuNSIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjkwIiByPSIxLjIiLz48Y2lyY2xlIGN4PSIxMTAwIiBjeT0iMTMwIiByPSIxLjQiLz48Y2lyY2xlIGN4PSIxNDUwIiBjeT0iMTAwIiByPSIxLjIiLz48L2c+Cjwvc3ZnPgo=') center 70% / cover no-repeat,
+ linear-gradient(180deg,#242127,#15161b)}
+.map-view .map-panel{background:
+ linear-gradient(150deg,#242127cc,#191a1fcc),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwNjBhMTIiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iIzE0MWMyOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFjMjAxOCIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iZm9nIj48c3RvcCBzdG9wLWNvbG9yPSIjOGFhMGI4IiBzdG9wLW9wYWNpdHk9Ii4xOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzhhYTBiOCIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJzdG9uZSIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMWEyMDI4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGEwZDEyIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1ciI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTgiLz48L2ZpbHRlcj4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9InVybCgjc2t5KSIvPgo8ZWxsaXBzZSBjeD0iNDAwIiBjeT0iMjIwIiByeD0iMzIwIiByeT0iMTgwIiBmaWxsPSJ1cmwoI2ZvZykiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8ZWxsaXBzZSBjeD0iMTIwMCIgY3k9IjI2MCIgcng9IjM2MCIgcnk9IjIwMCIgZmlsbD0idXJsKCNmb2cpIiBmaWx0ZXI9InVybCgjYmx1cikiLz4KPGcgZmlsbD0idXJsKCNzdG9uZSkiIG9wYWNpdHk9Ii45MiI+CjxwYXRoIGQ9Ik02MCAyMDAgaDkwIHYzMCBoMjAgdi02MCBoMjggdjYwIGgyMCB2MzgwIGgtMTc4IHoiLz4KPHBhdGggZD0iTTI4MCAyODAgaDcwIHYyMiBoMTYgdi00NiBoMjIgdjQ2IGgxNiB2MzAwIGgtMTQ0IHoiLz4KPHBhdGggZD0iTTEzODAgMTcwIGgxMDAgdjM0IGgyMiB2LTcwIGgzMCB2NzAgaDIyIHY0MjAgaC0xOTYgeiIvPgo8cGF0aCBkPSJNMTE4MCAzMDAgaDY0IHYxOCBoMTQgdi00MCBoMjAgdjQwIGgxNCB2MjgwIGgtMTMyIHoiLz4KPC9nPgo8ZyBmaWxsPSIjMmEzMDM4IiBvcGFjaXR5PSIuOCI+PHJlY3QgeD0iMTAwIiB5PSIzMDAiIHdpZHRoPSIyNCIgaGVpZ2h0PSI0MCIgcng9IjMiLz48cmVjdCB4PSIxMDAiIHk9IjM4MCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjQwIiByeD0iMyIvPjxyZWN0IHg9IjE0MzIiIHk9IjI5MCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQyIiByeD0iMyIvPjxyZWN0IHg9IjE0MzIiIHk9IjM4MCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQyIiByeD0iMyIvPjxyZWN0IHg9IjE0MzIiIHk9IjQ3MCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQyIiByeD0iMyIvPjwvZz4KPHBhdGggZD0iTTAgNTIwIEMyMDAgNDgwIDQwMCA1NDAgNjAwIDUxMCBDODAwIDQ4MCAxMDAwIDU1MCAxMjAwIDUxNSBDMTQwMCA0ODUgMTUyMCA1MzAgMTYwMCA1MTAgTDE2MDAgNjQwIEwwIDY0MCBaIiBmaWxsPSIjMGEwZTE0Ii8+CjxnIGZpbGw9IiM1YTRhMzgiIG9wYWNpdHk9Ii41NSI+PGNpcmNsZSBjeD0iNTIwIiBjeT0iNDgwIiByPSIzIi8+PGNpcmNsZSBjeD0iNTYwIiBjeT0iNTAwIiByPSIyIi8+PGNpcmNsZSBjeD0iOTgwIiBjeT0iNDkwIiByPSIyLjUiLz48Y2lyY2xlIGN4PSIxMDQwIiBjeT0iNTA1IiByPSIyIi8+PC9nPgo8ZyBmaWxsPSIjYzhiODlhIiBvcGFjaXR5PSIuMjUiPjxjaXJjbGUgY3g9IjM0MCIgY3k9IjE0MCIgcj0iMS41Ii8+PGNpcmNsZSBjeD0iODIwIiBjeT0iMTAwIiByPSIxLjIiLz48Y2lyY2xlIGN4PSIxMTAwIiBjeT0iMTYwIiByPSIxLjQiLz48L2c+Cjwvc3ZnPgo=') center center / cover no-repeat}
+.map-view.region-mire .map-panel{background:
+ linear-gradient(150deg,#1d2d22cc,#121b1acc),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwNzE0MGYiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMWMzNDI4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTIyMDE4Ii8+PC9saW5lYXJHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJzcG9yZSI+PHN0b3Agc3RvcC1jb2xvcj0iIzlmZDg4YSIgc3RvcC1vcGFjaXR5PSIuMyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzlmZDg4YSIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJtdWQiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzJjNDQzNCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlMTgxMiIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9ImJsdXIiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjE2Ii8+PC9maWx0ZXI+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjE2MDAiIGhlaWdodD0iNjQwIiBmaWxsPSJ1cmwoI3NreSkiLz4KPGVsbGlwc2UgY3g9IjUwMCIgY3k9IjI2MCIgcng9IjI4MCIgcnk9IjE3MCIgZmlsbD0idXJsKCNzcG9yZSkiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8ZWxsaXBzZSBjeD0iMTE1MCIgY3k9IjMwMCIgcng9IjMyMCIgcnk9IjE5MCIgZmlsbD0idXJsKCNzcG9yZSkiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8ZyBmaWxsPSIjMGYyMjE4IiBvcGFjaXR5PSIuOSI+CjxwYXRoIGQ9Ik0wIDM4MCBDMTIwIDMwMCAxODAgMzQwIDI2MCAyODAgQzMyMCAyMzUgMzgwIDMwMCA0NDAgMjYwIEM1MDAgMjIwIDU0MCAzMDAgNjAwIDI3MCBMNjAwIDY0MCBMMCA2NDAgWiIvPgo8cGF0aCBkPSJNMTAwMCAzMjAgQzEwODAgMjUwIDExNDAgMzAwIDEyMjAgMjQwIEMxMzAwIDE4NSAxMzYwIDI4MCAxNDQwIDIzMCBDMTUwMCAxOTUgMTU2MCAyNjAgMTYwMCAyNDAgTDE2MDAgNjQwIEwxMDAwIDY0MCBaIi8+CjwvZz4KPGcgc3Ryb2tlPSIjMWEzMjI0IiBzdHJva2Utd2lkdGg9IjEyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii44NSI+CjxwYXRoIGQ9Ik0xNjAgNDIwIEMxNTAgMzIwIDE4MCAyNjAgMTcwIDIwMCIvPjxwYXRoIGQ9Ik0yNDAgNDMwIEMyNTUgMzMwIDIzMCAyNzAgMjUwIDIxMCIvPjxwYXRoIGQ9Ik0xMzgwIDQwMCBDMTM3MCAzMDAgMTQwMCAyNTAgMTM5MCAxOTAiLz48cGF0aCBkPSJNMTQ2MCA0MTUgQzE0ODAgMzIwIDE0NTAgMjY1IDE0NzUgMjA1Ii8+CjwvZz4KPGcgZmlsbD0iIzZmYmY2YSIgb3BhY2l0eT0iLjc1Ij4KPGVsbGlwc2UgY3g9IjE3MCIgY3k9IjE5NSIgcng9IjIyIiByeT0iMzAiLz48ZWxsaXBzZSBjeD0iMjUyIiBjeT0iMjA1IiByeD0iMjAiIHJ5PSIyOCIvPjxlbGxpcHNlIGN4PSIxMzkyIiBjeT0iMTg1IiByeD0iMjIiIHJ5PSIzMCIvPjxlbGxpcHNlIGN4PSIxNDc4IiBjeT0iMjAwIiByeD0iMjAiIHJ5PSIyOCIvPgo8ZWxsaXBzZSBjeD0iNjQwIiBjeT0iMjQwIiByeD0iMTQiIHJ5PSIxOCIvPjxlbGxpcHNlIGN4PSI5MDAiIGN5PSIyNjAiIHJ4PSIxMiIgcnk9IjE2Ii8+PGVsbGlwc2UgY3g9Ijc2MCIgY3k9IjIxMCIgcng9IjEwIiByeT0iMTQiLz4KPC9nPgo8cGF0aCBkPSJNMCA1MDAgQzIyMCA0NjAgNDIwIDUzMCA2NDAgNTAwIEM4NjAgNDcwIDEwODAgNTQ1IDEzMDAgNTA1IEMxNDUwIDQ4MCAxNTQwIDUyMCAxNjAwIDUwNSBMMTYwMCA2NDAgTDAgNjQwIFoiIGZpbGw9InVybCgjbXVkKSIvPgo8ZWxsaXBzZSBjeD0iODAwIiBjeT0iNTYwIiByeD0iNzIwIiByeT0iODAiIGZpbGw9IiMzZDZhNGMiIG9wYWNpdHk9Ii4xNCIgZmlsdGVyPSJ1cmwoI2JsdXIpIi8+CjxnIGZpbGw9IiNiOGU4OWMiIG9wYWNpdHk9Ii41Ij48Y2lyY2xlIGN4PSI0MjAiIGN5PSIzNjAiIHI9IjIiLz48Y2lyY2xlIGN4PSI1MjAiIGN5PSIzMDAiIHI9IjEuNSIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjM0MCIgcj0iMS44Ii8+PGNpcmNsZSBjeD0iMTEwMCIgY3k9IjMyMCIgcj0iMS42Ii8+PGNpcmNsZSBjeD0iMTI1MCIgY3k9IjM2MCIgcj0iMiIvPjwvZz4KPC9zdmc+Cg==') center center / cover no-repeat}
+.map-view.region-forge .map-panel{background:
+ linear-gradient(150deg,#34221bcc,#17171bcc),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMxMjA4MGEiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMmMxMjEwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWEwYzBjIi8+PC9saW5lYXJHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJoZWF0Ij48c3RvcCBzdG9wLWNvbG9yPSIjZmY3YTMzIiBzdG9wLW9wYWNpdHk9Ii40NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmN2EzMyIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJtZXRhbCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMmExYzE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGMwODA4Ii8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1ciI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTgiLz48L2ZpbHRlcj4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9InVybCgjc2t5KSIvPgo8ZWxsaXBzZSBjeD0iODAwIiBjeT0iMzAwIiByeD0iNDgwIiByeT0iMjQwIiBmaWxsPSJ1cmwoI2hlYXQpIiBmaWx0ZXI9InVybCgjYmx1cikiLz4KPGcgZmlsbD0idXJsKCNtZXRhbCkiPgo8cGF0aCBkPSJNMTIwIDIyMCBoMjAwIHY0MCBoMzAgdi04MCBoNDAgdjgwIGgzMCB2MzYwIGgtMzIwIHoiLz4KPHBhdGggZD0iTTEyMjAgMTgwIGgyMjAgdjQ0IGgzNCB2LTkwIGg0NCB2OTAgaDM0IHY0MjAgaC0zNjIgeiIvPgo8cmVjdCB4PSI1MjAiIHk9IjMwMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIyODAiIHJ4PSI4Ii8+CjxyZWN0IHg9Ijk2MCIgeT0iMjgwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjMwMCIgcng9IjgiLz4KPC9nPgo8ZyBmaWxsPSIjMWEwZTBjIj48cmVjdCB4PSIxNzAiIHk9IjMyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjYwIiByeD0iNCIvPjxyZWN0IHg9IjE3MCIgeT0iNDIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNjAiIHJ4PSI0Ii8+PHJlY3QgeD0iMTI5MCIgeT0iMzAwIiB3aWR0aD0iNDQiIGhlaWdodD0iNjQiIHJ4PSI0Ii8+PHJlY3QgeD0iMTI5MCIgeT0iNDEwIiB3aWR0aD0iNDQiIGhlaWdodD0iNjQiIHJ4PSI0Ii8+PHJlY3QgeD0iMTI5MCIgeT0iNTIwIiB3aWR0aD0iNDQiIGhlaWdodD0iNjQiIHJ4PSI0Ii8+PC9nPgo8ZyBmaWxsPSIjZmY4YTNjIiBvcGFjaXR5PSIuOCI+PHJlY3QgeD0iMTc4IiB5PSIzMzIiIHdpZHRoPSIyNCIgaGVpZ2h0PSIzNiIgcng9IjMiLz48cmVjdCB4PSIxNzgiIHk9IjQzMiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjM2IiByeD0iMyIvPjxyZWN0IHg9IjEzMDAiIHk9IjMxNCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM4IiByeD0iMyIvPjxyZWN0IHg9IjEzMDAiIHk9IjQyNCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM4IiByeD0iMyIvPjxyZWN0IHg9IjEzMDAiIHk9IjUzNCIgd2lkdGg9IjI2IiBoZWlnaHQ9IjM4IiByeD0iMyIvPjxyZWN0IHg9IjU1NSIgeT0iMzgwIiB3aWR0aD0iNTAiIGhlaWdodD0iODAiIHJ4PSI2Ii8+PHJlY3QgeD0iOTk4IiB5PSIzNzAiIHdpZHRoPSI1NCIgaGVpZ2h0PSI5MCIgcng9IjYiLz48L2c+CjxwYXRoIGQ9Ik0wIDU0MCBDMjIwIDUwMCA0MjAgNTcwIDY0MCA1MzUgQzg2MCA1MDAgMTA4MCA1ODAgMTMwMCA1NDAgQzE0NTAgNTE1IDE1NDAgNTU1IDE2MDAgNTQwIEwxNjAwIDY0MCBMMCA2NDAgWiIgZmlsbD0iIzE3MGMwYyIvPgo8ZyBmaWxsPSIjZmZiMDY2IiBvcGFjaXR5PSIuNyI+PGNpcmNsZSBjeD0iODAwIiBjeT0iMjYwIiByPSIzIi8+PGNpcmNsZSBjeD0iNzYwIiBjeT0iMjEwIiByPSIyLjIiLz48Y2lyY2xlIGN4PSI4NTAiIGN5PSIxOTUiIHI9IjIuNSIvPjxjaXJjbGUgY3g9IjcyMCIgY3k9IjE2NSIgcj0iMS42Ii8+PGNpcmNsZSBjeD0iODkwIiBjeT0iMTUwIiByPSIxLjgiLz48Y2lyY2xlIGN4PSI4MTAiIGN5PSIxMjAiIHI9IjEuMyIvPjxjaXJjbGUgY3g9IjY0MCIgY3k9IjI0MCIgcj0iMS44Ii8+PGNpcmNsZSBjeD0iOTgwIiBjeT0iMjMwIiByPSIyIi8+PC9nPgo8ZyBmaWxsPSIjZThjNGEwIiBvcGFjaXR5PSIuMjgiPjxjaXJjbGUgY3g9IjMwMCIgY3k9IjExMCIgcj0iMS40Ii8+PGNpcmNsZSBjeD0iNjAwIiBjeT0iODAiIHI9IjEuMSIvPjxjaXJjbGUgY3g9IjExMDAiIGN5PSIxMjAiIHI9IjEuMyIvPjxjaXJjbGUgY3g9IjE0NTAiIGN5PSI5NSIgcj0iMS4xIi8+PC9nPgo8L3N2Zz4K') center center / cover no-repeat}
+.event-chamber{background:
+ radial-gradient(circle at 50% 30%,#67402a48,transparent 46%),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwYjA5MTAiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMWQxNjI0Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMjIxODEyIi8+PC9saW5lYXJHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJoYWxvIj48c3RvcCBzdG9wLWNvbG9yPSIjZThjMThhIiBzdG9wLW9wYWNpdHk9Ii4zMiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2U4YzE4YSIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ3YWxsIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMxYzE3MjAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYzBhMTAiLz48L2xpbmVhckdyYWRpZW50Pgo8ZmlsdGVyIGlkPSJibHVyIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxNiIvPjwvZmlsdGVyPgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjY0MCIgZmlsbD0idXJsKCNza3kpIi8+CjxlbGxpcHNlIGN4PSI4MDAiIGN5PSIyNDAiIHJ4PSIzMDAiIHJ5PSIyMDAiIGZpbGw9InVybCgjaGFsbykiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8ZyBmaWxsPSJ1cmwoI3dhbGwpIj4KPHBhdGggZD0iTTIyMCAxNjAgaDE0MCB2NDIwIGgtMTYwIHYtNDAwIGgyMCB6Ii8+CjxwYXRoIGQ9Ik0xMjQwIDE2MCBoMTQwIHYyMCBoMjAgdjQwMCBoLTE2MCB6Ii8+CjxyZWN0IHg9IjQyMCIgeT0iMjIwIiB3aWR0aD0iNzYwIiBoZWlnaHQ9IjM2MCIgcng9IjYiLz4KPC9nPgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiM0YTNjMmUiIHN0cm9rZS13aWR0aD0iMyIgb3BhY2l0eT0iLjgiPgo8cmVjdCB4PSI0NjAiIHk9IjI2MCIgd2lkdGg9IjY4MCIgaGVpZ2h0PSIyODAiLz4KPGNpcmNsZSBjeD0iODAwIiBjeT0iNDAwIiByPSI5MCIvPjxjaXJjbGUgY3g9IjgwMCIgY3k9IjQwMCIgcj0iNjAiLz4KPC9nPgo8ZyBmaWxsPSIjMmEyMjE4Ij48cmVjdCB4PSI3MDAiIHk9IjM4MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI0MCIgcng9IjQiLz48L2c+CjxwYXRoIGQ9Ik0wIDU2MCBDMjQwIDUyMCA0NjAgNTkwIDcwMCA1NTUgQzk0MCA1MjAgMTE4MCA2MDAgMTQyMCA1NjAgQzE1MjAgNTQ1IDE1NzAgNTc1IDE2MDAgNTYwIEwxNjAwIDY0MCBMMCA2NDAgWiIgZmlsbD0iIzBkMGIxMCIvPgo8ZyBmaWxsPSIjZThiMDdhIiBvcGFjaXR5PSIuNTUiPjxjaXJjbGUgY3g9IjgwMCIgY3k9IjMwMCIgcj0iMi40Ii8+PGNpcmNsZSBjeD0iNzcwIiBjeT0iMjY1IiByPSIxLjgiLz48Y2lyY2xlIGN4PSI4MzUiIGN5PSIyNTUiIHI9IjIiLz48Y2lyY2xlIGN4PSI3NDUiIGN5PSIyMzAiIHI9IjEuNCIvPjxjaXJjbGUgY3g9Ijg2NSIgY3k9IjIyMCIgcj0iMS42Ii8+PGNpcmNsZSBjeD0iODEwIiBjeT0iMTk1IiByPSIxLjIiLz48L2c+CjxnIGZpbGw9IiNjOGI4OWEiIG9wYWNpdHk9Ii4yMiI+PGNpcmNsZSBjeD0iMzQwIiBjeT0iMTEwIiByPSIxLjMiLz48Y2lyY2xlIGN4PSI2NDAiIGN5PSI4NSIgcj0iMSIvPjxjaXJjbGUgY3g9IjEwNDAiIGN5PSIxMTUiIHI9IjEuMiIvPjxjaXJjbGUgY3g9IjEzODAiIGN5PSI5NSIgcj0iMSIvPjwvZz4KPC9zdmc+Cg==') center center / cover no-repeat,
+ linear-gradient(180deg,#242127,#15161b)}
+.result-view{background:
+ radial-gradient(ellipse at 50% 20%,#8a603838,transparent 50%),
+ url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAwIDY0MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwNzA4MGQiLz48c3RvcCBvZmZzZXQ9Ii40MiIgc3RvcC1jb2xvcj0iIzFiMTUyMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzJjMWMxYyIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0ibW9vbiI+PHN0b3Agc3RvcC1jb2xvcj0iI2YyZGNiNCIgc3RvcC1vcGFjaXR5PSIuNzIiLz48c3RvcCBvZmZzZXQ9Ii4zOCIgc3RvcC1jb2xvcj0iI2M0OWE2ZSIgc3RvcC1vcGFjaXR5PSIuMjgiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjNDlhNmUiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0iZ2xvdyI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmOGE0NSIgc3RvcC1vcGFjaXR5PSIuMzUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjhhNDUiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iaGlsbCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMTkxNDFjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGIwYTBmIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJzdG9uZSIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMTQxMjFhIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDcwNzBiIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1ciI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTYiLz48L2ZpbHRlcj4KPC9kZWZzPgo8cmVjdCB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI2NDAiIGZpbGw9InVybCgjc2t5KSIvPgo8Y2lyY2xlIGN4PSIxMTgwIiBjeT0iMTcwIiByPSIxNTAiIGZpbGw9InVybCgjbW9vbikiLz4KPGNpcmNsZSBjeD0iMTE4MCIgY3k9IjE3MCIgcj0iNDIiIGZpbGw9IiNlZmQ5YjIiIG9wYWNpdHk9Ii41NSIvPgo8ZyBmaWxsPSIjMGUwYzEzIiBvcGFjaXR5PSIuODUiPgo8cGF0aCBkPSJNMCA0NzAgTDEyMCAzNjAgTDIzMCA0NzAgTDM0MCAzMjAgTDQ3MCA0NzAgTDU4MCAzOTAgTDcwMCA0NzAgTDgyMCAzNDAgTDk2MCA0NzAgTDEwODAgMzgwIEwxMjIwIDQ3MCBMMTM0MCAzNTAgTDE0ODAgNDcwIEwxNjAwIDQwMCBMMTYwMCA2NDAgTDAgNjQwIFoiLz4KPC9nPgo8cGF0aCBmaWxsPSJ1cmwoI2hpbGwpIiBkPSJNMCA1MzAgQzIwMCA0NzAgMzIwIDUyMCA0ODAgNTAwIEM2NDAgNDgwIDc2MCA1NDAgOTIwIDUxMCBDMTA4MCA0ODAgMTI0MCA1MzAgMTQwMCA1MDAgQzE1MDAgNDg1IDE1NjAgNTA1IDE2MDAgNDk1IEwxNjAwIDY0MCBMMCA2NDAgWiIvPgo8ZyBmaWxsPSJ1cmwoI3N0b25lKSI+CjxwYXRoIGQ9Ik0yNTAgMjUwIGg3MCB2MjAgaDE0IHYtNDAgaDIyIHY0MCBoMTQgdjMyMCBoLTEzNCB6Ii8+CjxwYXRoIGQ9Ik0zNDAgMzEwIGg1NCB2MTYgaDEyIHYtMzAgaDE4IHYzMCBoMTIgdjI2MCBoLTk2IHoiLz4KPHBhdGggZD0iTTEyNDAgMjEwIGg4MiB2MjQgaDE2IHYtNDggaDI2IHY0OCBoMTYgdjM3MCBoLTE1NiB6Ii8+CjxwYXRoIGQ9Ik0xMTQwIDMyMCBoNTAgdjE0IGgxMSB2LTI4IGgxNiB2MjggaDExIHYyNDAgaC05OCB6Ii8+CjwvZz4KPGcgZmlsbD0iI2MyN2E0MiIgb3BhY2l0eT0iLjg1Ij48cmVjdCB4PSIyODIiIHk9IjMzMCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjE4IiByeD0iMiIvPjxyZWN0IHg9IjI4MiIgeT0iMzkwIiB3aWR0aD0iMTIiIGhlaWdodD0iMTgiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iMzAwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iMzcwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PHJlY3QgeD0iMTI4MiIgeT0iNDQwIiB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHJ4PSIyIi8+PC9nPgo8ZWxsaXBzZSBjeD0iODAwIiBjeT0iNTYwIiByeD0iMjYwIiByeT0iNzAiIGZpbGw9InVybCgjZ2xvdykiIGZpbHRlcj0idXJsKCNibHVyKSIvPgo8cGF0aCBkPSJNNzYwIDU2MCBRODAwIDUxMCA4NDAgNTYwIFE4MDAgNTQ1IDc2MCA1NjAiIGZpbGw9IiNmZjlhNTIiIG9wYWNpdHk9Ii41Ii8+CjxnIGZpbGw9IiNlOGIwN2EiIG9wYWNpdHk9Ii41NSI+PGNpcmNsZSBjeD0iODAwIiBjeT0iNTAwIiByPSIyLjUiLz48Y2lyY2xlIGN4PSI3NzgiIGN5PSI0NzAiIHI9IjEuOCIvPjxjaXJjbGUgY3g9IjgzMCIgY3k9IjQ1NSIgcj0iMiIvPjxjaXJjbGUgY3g9Ijc1NiIgY3k9IjQzMCIgcj0iMS40Ii8+PGNpcmNsZSBjeD0iODU2IiBjeT0iNDE1IiByPSIxLjYiLz48Y2lyY2xlIGN4PSI4MTAiIGN5PSIzOTUiIHI9IjEuMiIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjUyMCIgcj0iMS41Ii8+PGNpcmNsZSBjeD0iOTEwIiBjeT0iNTA1IiByPSIxLjciLz48L2c+CjxnIGZpbGw9IiNmMGQyYTgiIG9wYWNpdHk9Ii40Ij48Y2lyY2xlIGN4PSIxODAiIGN5PSIxMjAiIHI9IjEuNiIvPjxjaXJjbGUgY3g9IjQyMCIgY3k9IjgwIiByPSIxLjIiLz48Y2lyY2xlIGN4PSI2NDAiIGN5PSIxNTAiIHI9IjEuNCIvPjxjaXJjbGUgY3g9Ijk4MCIgY3k9Ijk1IiByPSIxLjUiLz48Y2lyY2xlIGN4PSIxNDIwIiBjeT0iMTMwIiByPSIxLjMiLz48Y2lyY2xlIGN4PSIxNTIwIiBjeT0iMjIwIiByPSIxLjEiLz48L2c+Cjwvc3ZnPgo=') center 70% / cover no-repeat}
+
+/* Phase 5 — skill card faces by category */
+.skill-card:before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;background:radial-gradient(ellipse 120% 80% at 100% 0%,var(--cat-glow,#c29a5232),transparent 60%)}
+.skill-card.cat-damage{--cat-glow:#e8a29a2e}.skill-card.cat-damage:before{background:radial-gradient(ellipse 120% 80% at 100% 0%,#e8a29a2e,transparent 60%),repeating-linear-gradient(115deg,transparent 0 22px,#e8a29a0a 22px 24px)}
+.skill-card.cat-defense{--cat-glow:#b7c9b82c}.skill-card.cat-defense:before{background:radial-gradient(ellipse 120% 80% at 100% 0%,#b7c9b82c,transparent 60%),repeating-linear-gradient(160deg,transparent 0 18px,#b7c9b80a 18px 20px)}
+.skill-card.cat-buff{--cat-glow:#ecd2a22c}.skill-card.cat-buff:before{background:radial-gradient(ellipse 120% 80% at 100% 0%,#ecd2a22c,transparent 60%),radial-gradient(circle at 88% 18%,#ecd2a222 0 6px,transparent 7px)}
+.skill-card.cat-finisher{--cat-glow:#d9c2f22c}.skill-card.cat-finisher:before{background:radial-gradient(ellipse 120% 80% at 100% 0%,#d9c2f22c,transparent 60%),conic-gradient(from 210deg at 90% 12%,#d9c2f21c 0 24deg,transparent 24deg 60deg,#d9c2f212 60deg 84deg,transparent 84deg)}
+.skill-card.cat-attack{--cat-glow:#e8d2a82c}.skill-card.cat-attack:before{background:radial-gradient(ellipse 120% 80% at 100% 0%,#e8d2a82c,transparent 60%),repeating-conic-gradient(from 0deg at 88% 16%,#e8d2a812 0 8deg,transparent 8deg 24deg)}
+.skill-card-body b{position:relative}.skill-card-art{position:relative}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
-// 灰烬誓约 / Ashen Vow — deterministic, browser-independent game rules.
+// Static game data tables extracted from engine.js (Phase 0 refactor).
+// No runtime logic — import-safe constants only.
 const VERSION = 1;
 const CLASSES = {
   warden: { name:'灰盾卫士', title:'THE WARDEN', icon:'盾', color:'#d6b88b', maxHp:48, attack:7, speed:3, armor:3, lore:'沉默的壁垒。誓言从未被赦免。', skills:['cleave','bulwark','crush'] },
@@ -292,24 +481,24 @@ const CLASSES = {
   penitent: { name:'忏悔行者', title:'THE PENITENT', icon:'罪', color:'#c99082', maxHp:43, attack:7, speed:4, armor:2, lore:'痛苦不能赎罪，但能教会人活下去。', skills:['scourge','atonement','sacrifice'] }
 };
 const SKILLS = {
-  cleave:{name:'断誓斩',desc:'向敌方前排挥出沉重一击。',type:'damage',power:1.2,accuracy:92,caster:[1,2],targets:[1,2],side:'enemy',icon:'⚔'},
-  bulwark:{name:'铁壁誓言',desc:'自身获得 2 回合护卫，并减轻压力。',type:'guard',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'self',icon:'⬡'},
-  crush:{name:'碎骨冲击',desc:'对敌方前排造成伤害，有概率眩晕。',type:'damage',power:0.8,accuracy:88,caster:[1,2],targets:[1,2],side:'enemy',status:'stun',chance:35,icon:'✦'},
-  snipe:{name:'夜幕穿心',desc:'狙击中后排敌人，造成高额伤害。',type:'damage',power:1.4,accuracy:90,caster:[2,3,4],targets:[2,3,4],side:'enemy',icon:'➤'},
-  dagger:{name:'隐刃',desc:'突袭前排，造成快速伤害。',type:'damage',power:0.9,accuracy:97,caster:[1,2,3],targets:[1,2],side:'enemy',icon:'⌁'},
-  mark:{name:'猎影标记',desc:'标记目标，使其承受更高伤害。',type:'mark',power:0,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎'},
-  mend:{name:'缝合祷言',desc:'治疗一名友军。',type:'heal',power:12,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'ally',icon:'✚'},
-  scarlet:{name:'猩红药剂',desc:'投掷腐蚀药剂，施加中毒。',type:'damage',power:0.6,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'poison',chance:100,icon:'◈'},
-  remedy:{name:'清醒剂',desc:'降低一名友军的压力。',type:'relief',power:22,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',icon:'❋'},
-  cinder:{name:'余烬飞弹',desc:'攻击任何敌方位置。',type:'damage',power:1.1,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'✧'},
-  hex:{name:'腐蚀咒印',desc:'伤害目标并附加虚弱。',type:'damage',power:0.65,accuracy:92,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'weak',chance:100,icon:'☽'},
-  solace:{name:'灰烬低语',desc:'抚慰一名友军，但术士承受少量压力。',type:'relief',power:28,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:7,icon:'✺'},
-  bloodlet:{name:'薄暮割裂',desc:'快速划伤目标，造成两回合流血。',type:'damage',power:.85,accuracy:96,caster:[1,2,3],targets:[1,2,3],side:'enemy',status:'bleed',chance:80,icon:'⌁'},
-  puncture:{name:'破影突刺',desc:'精准穿刺任意位置的敌人。',type:'damage',power:1.25,accuracy:92,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'➹'},
-  taunt:{name:'假面佯攻',desc:'标记敌人，为队友制造破绽。',type:'mark',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎'},
-  scourge:{name:'痛苦鞭笞',desc:'重击前排目标并造成流血。',type:'damage',power:.95,accuracy:90,caster:[1,2],targets:[1,2],side:'enemy',status:'bleed',chance:70,icon:'⚔'},
-  atonement:{name:'赎罪吟唱',desc:'大幅减轻队友压力，自己获得少量压力。',type:'relief',power:34,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:9,icon:'✶'},
-  sacrifice:{name:'献血之誓',desc:'消耗自身 5 点生命治疗队友 19 点生命（无法使自己倒下）。',type:'heal',power:19,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfDamage:5,icon:'✚'}
+  cleave:{name:'断誓斩',desc:'向敌方前排挥出沉重一击。',type:'damage',power:1.2,accuracy:92,caster:[1,2],targets:[1,2],side:'enemy',icon:'⚔',category:'damage'},
+  bulwark:{name:'铁壁誓言',desc:'自身获得 2 回合护卫，并减轻压力。',type:'guard',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'self',icon:'⬡',category:'defense'},
+  crush:{name:'碎骨冲击',desc:'对敌方前排造成伤害，有概率眩晕。',type:'damage',power:0.8,accuracy:88,caster:[1,2],targets:[1,2],side:'enemy',status:'stun',chance:35,icon:'✦',category:'finisher'},
+  snipe:{name:'夜幕穿心',desc:'狙击中后排敌人，造成高额伤害。',type:'damage',power:1.4,accuracy:90,caster:[2,3,4],targets:[2,3,4],side:'enemy',icon:'➤',category:'finisher'},
+  dagger:{name:'隐刃',desc:'突袭前排，造成快速伤害。',type:'damage',power:0.9,accuracy:97,caster:[1,2,3],targets:[1,2],side:'enemy',icon:'⌁',category:'damage'},
+  mark:{name:'猎影标记',desc:'标记目标，使其承受更高伤害。',type:'mark',power:0,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎',category:'buff'},
+  mend:{name:'缝合祷言',desc:'治疗一名友军。',type:'heal',power:12,accuracy:100,caster:[2,3,4],targets:[1,2,3,4],side:'ally',icon:'✚',category:'buff'},
+  scarlet:{name:'猩红药剂',desc:'投掷腐蚀药剂，施加中毒。',type:'damage',power:0.6,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'poison',chance:100,icon:'◈',category:'damage'},
+  remedy:{name:'清醒剂',desc:'降低一名友军的压力。',type:'relief',power:22,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',icon:'❋',category:'finisher'},
+  cinder:{name:'余烬飞弹',desc:'攻击任何敌方位置。',type:'damage',power:1.1,accuracy:93,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',icon:'✧',category:'damage'},
+  hex:{name:'腐蚀咒印',desc:'伤害目标并附加虚弱。',type:'damage',power:0.65,accuracy:92,caster:[2,3,4],targets:[1,2,3,4],side:'enemy',status:'weak',chance:100,icon:'☽',category:'finisher'},
+  solace:{name:'灰烬低语',desc:'抚慰一名友军，但术士承受少量压力。',type:'relief',power:28,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:7,icon:'✺',category:'buff'},
+  bloodlet:{name:'薄暮割裂',desc:'快速划伤目标，造成两回合流血。',type:'damage',power:.85,accuracy:96,caster:[1,2,3],targets:[1,2,3],side:'enemy',status:'bleed',chance:80,icon:'⌁',category:'damage'},
+  puncture:{name:'破影突刺',desc:'精准穿刺任意位置的敌人。',type:'damage',power:1.25,accuracy:92,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'➹',category:'finisher'},
+  taunt:{name:'假面佯攻',desc:'标记敌人，为队友制造破绽。',type:'mark',power:0,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'enemy',icon:'◎',category:'defense'},
+  scourge:{name:'痛苦鞭笞',desc:'重击前排目标并造成流血。',type:'damage',power:.95,accuracy:90,caster:[1,2],targets:[1,2],side:'enemy',status:'bleed',chance:70,icon:'⚔',category:'damage'},
+  atonement:{name:'赎罪吟唱',desc:'大幅减轻队友压力，自己获得少量压力。',type:'relief',power:34,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfStress:9,icon:'✶',category:'finisher'},
+  sacrifice:{name:'献血之誓',desc:'消耗自身 5 点生命治疗队友 19 点生命（无法使自己倒下）。',type:'heal',power:19,accuracy:100,caster:[1,2,3,4],targets:[1,2,3,4],side:'ally',selfDamage:5,icon:'✚',category:'buff'}
 };
 const ENEMIES = {
   thrall:{name:'腐朽侍从',icon:'侍',title:'THRALL',maxHp:22,attack:5,speed:4,armor:0,color:'#8c9e83'},
@@ -367,6 +556,155 @@ const SKILL_BRANCHES={
  sacrifice:[{id:'a',name:'生命献祭',desc:'额外治疗 10 生命',heal:10},{id:'b',name:'无血契约',desc:'自身失去生命减少 4',selfDamageReduction:4}]
 };
 const BRANCH_TRAINING_COST={gold:35,shards:3};
+const TRINKET_SETS={
+ sentinel:{name:'守墓誓约',pieces:['iron','seal'],mods:{armor:2,hp:4},effect:'进入战斗获得 1 回合守护'},
+ twilight:{name:'暮影之猎',pieces:['fang','thorn'],mods:{attack:2,crit:4},effect:'提高攻击和暴击'},
+ sacred:{name:'灰烬祷仪',pieces:['relic','bell'],mods:{healBonus:4,stressResist:8},effect:'开战前压力 -5'},
+ pilgrim:{name:'孤灯旅人',pieces:['torch','feather'],mods:{speed:2,hp:3},effect:'提高速度与生命'}
+};
+const SKILL_CATEGORY_LABELS={damage:'伤害',defense:'防御',buff:'增益',finisher:'终结'};
+const STATUS_LABELS={poison:'中毒',bleed:'流血',stun:'眩晕',weak:'虚弱'};
+
+const MAX_SUPPLIES={torches:12,bandages:8,potions:6,sigils:4};
+const SUPPLY_META={
+ torches:{name:'火把',icon:'♨',cost:10,desc:'照亮前路。火把耗尽后，每进入一间房间全队压力上升。'},
+ bandages:{name:'绷带',icon:'✚',cost:14,desc:'地图上使用，恢复 14 点生命。'},
+ potions:{name:'治疗药剂',icon:'⚗',cost:22,desc:'地图上使用，恢复 32 点生命。'},
+ sigils:{name:'圣徽',icon:'✥',cost:26,desc:'地图上使用，单名英雄压力 −18。'}
+};
+const NODE_NAME_POOL={
+ battle:['断誓回廊','灰烬阶梯','亡骨集会所','无光甬道','碎剑大厅','回声长廊','葬火前厅'],
+ elite:['守誓者刑场','黑铁审判席','噬骨祭台','余烬决斗场','无名殉道堂'],
+ boss:['噬誓者王座','深渊之喉','灰烬王座','誓约终结处'],
+ event:['低语碑林','迷雾岔路','遗忘祈祷室','血痕壁画廊','沉默守望处'],
+ treasure:['陪葬宝库','锈蚀金库','殉誓者遗物室','秘藏侧室'],
+ rest:['灰烬篝火','避风石室','旅人歇脚处','残破圣所'],
+ supply:['废弃营帐','征用仓库','补给中转站','遗落辎重处'],
+ shrine:['破晓祭坛','灰火神龛','净化圣堂','誓言残碑'],
+ ambush:['伏击回廊','断后夹道','阴影门厅','坍塌甬道'],
+ cache:['遗物秘库','封印密室','守誓者金库','机关藏宝间'],
+ oracle:['占兆祭坛','盲眼圣所','命运圆厅','星火预言台'],
+ caravan:['断桥商栈','流亡商队','废驿交易点','行商歇脚处']
+};
+const V08_ROOMS={
+ oracle:{title:'盲眼预言者',eyebrow:'特殊房间 · 命运占兆',desc:'白蜡封住了她的眼睛，但她依然知道每个人背负的名字。',choices:[
+  {label:'交换一段痛苦记忆',hint:'全队压力 +6，获得遗物碎片 5–8',kind:'oracle-trade'},
+  {label:'请求安抚与指引',hint:'支付 18 金币，全队压力 −15',kind:'oracle-calm'}]},
+ caravan:{title:'断轮商队',eyebrow:'特殊房间 · 流亡旅商',desc:'满载着破损补给的车队停在断桥前，商人开出了危险却诱人的价码。',choices:[
+  {label:'购买战地补给',hint:'支付 24 金币，获得火把 2、绷带 2',kind:'caravan-buy'},
+  {label:'护送商队离开',hint:'小队承受少量压力，获得 20–34 金币',kind:'caravan-escort'}]}
+};
+const MAX_SKILL_LEVEL=2;
+const TRAITS={
+ steadfast:{name:'意志坚定',kind:'positive',desc:'抗压 +10',mods:{stressResist:10}},
+ keeneye:{name:'鹰眼',kind:'positive',desc:'命中 +6',mods:{accuracy:6}},
+ hardy:{name:'体质强健',kind:'positive',desc:'最大生命 +6',mods:{hp:6}},
+ furious:{name:'好斗',kind:'positive',desc:'攻击 +1',mods:{attack:1}},
+ frail:{name:'脆弱',kind:'negative',desc:'最大生命 −4',mods:{hp:-4}},
+ anxious:{name:'焦虑',kind:'negative',desc:'抗压 −8',mods:{stressResist:-8}},
+ clumsy:{name:'笨拙',kind:'negative',desc:'命中 −5',mods:{accuracy:-5}},
+ slow:{name:'迟钝',kind:'negative',desc:'速度 −1',mods:{speed:-1}}
+};
+const CRISES={
+ panic:{name:'恐惧',desc:'每次行动有 25% 的概率畏缩'},
+ rage:{name:'狂怒',desc:'攻击增加 2，但命中降低 8'},
+ despair:{name:'绝望',desc:'命中下降 12，受到的压力更高'}
+};
+const SPECIAL_ROOMS={
+ shrine:{title:'破晓的祭坛',eyebrow:'特殊房间 · 祭坛',desc:'祭坛盛放着长明的灰火，似乎可以净化疲惫的魂魄。',choices:[{label:'举行净化仪式',hint:'全队减压，但消耗遗物收益',kind:'purge'},{label:'搜寻祭坛底座',hint:'获得碎片并增加压力',kind:'shrine'}]},
+ ambush:{title:'传来脚步声的回廊',eyebrow:'特殊房间 · 伏击',desc:'面前的门扉突然合上，阴影中却留下了一条逃生缝隙。',choices:[{label:'突围作战',hint:'遭遇额外精英战；胜利可获得精英战利品',kind:'ambush-fight'},{label:'借夜色绕行',hint:'全队压力 +8，保全资源',kind:'ambush-avoid'}]},
+ cache:{title:'密封的遗物秘库',eyebrow:'特殊房间 · 秘库',desc:'墙后藏着远征者遗忘的密室，其中珍宝与机关同在。',choices:[{label:'破坏古老封印',hint:'稀有饰品并承受伤害',kind:'cache-loot'},{label:'拆解陷阱',hint:'获得金币及补给',kind:'cache-safe'}]}
+};
+const REGIONS={
+ crypt:{name:'暮影墓窟',en:'THE SUNKEN CRYPT',short:'墓窟',symbol:'♜',theme:'crypt',desc:'古老誓言与亡者同眠。亡灵、咒术和压力侵蚀。',hazard:'亡者低语：每第 3 回合，一名英雄受到额外压力。',goldMult:1,shardMult:1,
+  enemies:['thrall','ghoul','cultist','guardian','bonearcher','wraith'],elite:['guardian','butcher','cultist'],boss:['boss','cultist','thrall'],eliteTrait:'fortified'},
+ mire:{name:'腐潮沼泽',en:'THE BLIGHTED MIRE',short:'沼泽',symbol:'☣',theme:'mire',desc:'被瘴气腐蚀的湿地。毒素、孢子与蚀骨的低语。',hazard:'瘴气弥漫：每第 3 回合，一名英雄被施加中毒。',goldMult:1.2,shardMult:1.25,
+  enemies:['mireling','sporewitch','bogstalker','leech','alchemist','banshee'],elite:['bogcolossus','sporewitch','leech'],boss:['mirequeen','sporewitch','mireling'],eliteTrait:'venomous'},
+ forge:{name:'熔烬铸炉',en:'THE CINDER FORGE',short:'铸炉',symbol:'⚒',theme:'forge',desc:'沉睡的铸铁巨炉再度燃烧。高护甲与灼热的连击。',hazard:'余烬灼烧：每第 3 回合，全队受到少量伤害。',goldMult:1.4,shardMult:1.5,
+  enemies:['emberguard','slagbeast','cinderseer','smelter','guardian','herald'],elite:['ironreaver','emberguard','cinderseer'],boss:['forgeheart','emberguard','smelter'],eliteTrait:'relentless'}
+};
+const ELITE_TRAITS={
+ fortified:{name:'铁甲精英',desc:'精英小队额外获得 2 点护甲'},
+ venomous:{name:'腐毒精英',desc:'精英攻击有概率施加中毒'},
+ relentless:{name:'狂热精英',desc:'精英小队攻击和速度提高'}
+};
+const BOSS_TYPES=['boss','mirequeen','forgeheart'];
+const REGION_EVENTS={
+ crypt:{title:'亡者的铭碑',eyebrow:'墓窟异闻',desc:'碑文上记录着逝者的姓名。刻痕仍未干透，石缝里有隐约的祈祷。',choices:[{label:'解读禁忌铭文',hint:'获得遗物碎片，全队承受压力',kind:'shrine'},{label:'向亡者致意',hint:'全队减少压力',kind:'leave'}]},
+ mire:{title:'会呼吸的孢子林',eyebrow:'沼泽异闻',desc:'泥水下发出均匀的呼吸，发光的孢子围住了一口古老药箱。',choices:[{label:'采集发光孢子',hint:'获得遗物，但队伍会受伤',kind:'spore'},{label:'点燃驱瘴火把',hint:'消耗 1 支火把，全队降低压力',kind:'purify'}]},
+ forge:{title:'熄灭的誓约熔炉',eyebrow:'铸炉异闻',desc:'一座半熄的熔炉仍在呼唤献祭。炉内漂浮着冷却的稀有金属。',choices:[{label:'重启锻造机关',hint:'获得遗物碎片，全队失去少量生命',kind:'smelt'},{label:'搜集余温火种',hint:'补充火把和少量金币',kind:'embers'}]}
+};
+const BUILDINGS={
+ infirmary:{name:'战地医馆',en:'FIELD INFIRMARY',icon:'✚',desc:'治疗生命与压力的效果提高，治疗费用下降。',gold:45,shards:3,bonus:'每级疗伤 +8 生命 / +4 减压，费用 −2 金币'},
+ chapel:{name:'烬火礼拜堂',en:'EMBER CHAPEL',icon:'✥',desc:'营地可为英雄减压，远征归来时帮助后备英雄恢复精神。',gold:45,shards:3,bonus:'每级祷告 +10 减压；后备英雄远征后 −6 压力'},
+ workshop:{name:'遗物工坊',en:'RELIC WORKSHOP',icon:'⚒',desc:'锻造时减少金币消耗，保留已有武器与护甲等级。',gold:65,shards:4,bonus:'每级锻造消耗 −5 金币'},
+ watchtower:{name:'守夜塔',en:'NIGHT WATCH',icon:'♜',desc:'出发携带额外火把，扩大下一段路线的侦察视野。',gold:50,shards:4,bonus:'每级远征额外 +1 火把，提前发现一层房间'}
+};
+const MAX_BUILDING_LEVEL=3;
+const EXPEDITION_PLANS={
+ cautious:{name:'谨慎行军',icon:'◈',desc:'额外携带 2 支火把和 1 条绷带，带回金币降低 15%。',goldMult:.85,shardMult:1,torches:2,bandages:1,stress:0},
+ standard:{name:'标准远征',icon:'✧',desc:'正常物资和收益，适合探索新路线。',goldMult:1,shardMult:1,torches:0,bandages:0,stress:0},
+ daring:{name:'孤注一掷',icon:'⚔',desc:'开局损失 2 支火把、全队 +10 压力；成功带回金币 +35%、碎片 +25%。',goldMult:1.35,shardMult:1.25,torches:-2,bandages:0,stress:10}
+};
+const TALENTS={
+ vigor:{name:'坚韧体魄',icon:'⬡',desc:'每级 +5 最大生命',max:2},
+ might:{name:'锐锋训练',icon:'⚔',desc:'每级 +1 攻击',max:2},
+ resolve:{name:'精神韧性',icon:'✶',desc:'每级 +5 抗压',max:2}
+};
+const HERO_NAMES = ['伊莱恩','维尔','赛勒斯','莫拉'];
+
+const RECRUIT_NAMES=['莱希','乌诺','海泽尔','希恩','维克托','蕾娜','卡尔文','露西亚','艾斯塔','泰伦','米拉','诺拉','赛温','德林'];
+const MAX_RESERVES=6;
+const TRINKET_BASES={
+  ash:{name:'残烬吊坠',icon:'✧',mods:{hp:3}},
+  iron:{name:'锈铁护符',icon:'⬡',mods:{armor:1}},
+  fang:{name:'亡兽利齿',icon:'⌁',mods:{attack:1}},
+  bell:{name:'静默银铃',icon:'✶',mods:{stressResist:5}},
+  feather:{name:'乌鸦羽饰',icon:'➤',mods:{speed:1}},
+  relic:{name:'被遗忘的圣徽',icon:'✥',mods:{healBonus:2}},
+  thorn:{name:'血蔷薇胸针',icon:'❖',mods:{crit:2}},
+  mask:{name:'裂痕面具',icon:'◈',mods:{accuracy:3}},
+  torch:{name:'长明火种',icon:'♨',mods:{stressResist:4,speed:1}},
+  vial:{name:'炼金残液',icon:'✚',mods:{healBonus:4,hp:-2}},
+  crown:{name:'破碎王冠',icon:'♛',mods:{attack:2,stressResist:-4}},
+  seal:{name:'守墓人封蜡',icon:'❖',mods:{armor:1,accuracy:2}}
+};
+const AFFIXES={
+  keen:{name:'锋锐',mods:{attack:2}},
+  steadfast:{name:'坚忍',mods:{hp:5}},
+  guarded:{name:'守护',mods:{armor:1}},
+  swift:{name:'迅捷',mods:{speed:1}},
+  steady:{name:'精准',mods:{accuracy:4}},
+  vicious:{name:'凶戾',mods:{crit:3}},
+  calm:{name:'宁静',mods:{stressResist:6}},
+  merciful:{name:'慈悲',mods:{healBonus:3}},
+  cursed:{name:'受诅咒的',mods:{attack:3,stressResist:-8}},
+  reckless:{name:'鲁莽的',mods:{crit:5,armor:-1}},
+  ritual:{name:'仪式的',mods:{healBonus:4,speed:-1}},
+  twilight:{name:'黄昏的',mods:{hp:7,accuracy:-3}}
+};
+const MOD_LABELS={attack:'攻击',hp:'生命',armor:'护甲',speed:'速度',accuracy:'命中',crit:'暴击率',stressResist:'抗压',healBonus:'治疗'};
+const RARITY_NAMES={common:'普通',rare:'稀有',epic:'史诗'};
+const ACHIEVEMENTS={
+ first:{name:'踏入黑暗',desc:'完成首次远征',check:s=>s.expeditions>=1},
+ steady:{name:'不屈远征者',desc:'累计完成 5 次远征',check:s=>s.expeditions>=5},
+ seasoned:{name:'百炼成钢',desc:'累计完成 15 次远征',check:s=>s.expeditions>=15},
+ crypt:{name:'墓窟破晓',desc:'击败暮影墓窟首领',check:s=>(s.regionVictories?.crypt||0)>=1},
+ mire:{name:'斩断腐根',desc:'击败腐潮沼泽首领',check:s=>(s.regionVictories?.mire||0)>=1},
+ forge:{name:'熄灭炉心',desc:'击败熔烬铸炉首领',check:s=>(s.regionVictories?.forge||0)>=1},
+ three:{name:'三地凯歌',desc:'三个地牢均取得首胜',check:s=>['crypt','mire','forge'].every(id=>(s.regionVictories?.[id]||0)>0)},
+ recruits:{name:'众志成城',desc:'拥有至少两名后备英雄',check:s=>(s.reserveHeroes?.length||0)>=2},
+ architect:{name:'营地复兴',desc:'任意建筑达到三级',check:s=>Object.values(s.buildings||{}).some(lv=>lv>=3)},
+ mastery:{name:'技艺臻熟',desc:'至少一个技能达到二级',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>Object.values(h.skillLevels||{}).some(lv=>lv>=2))},
+ collector:{name:'遗物守护者',desc:'持有至少十件饰品',check:s=>(s.items?.length||0)>=10},
+ veteran:{name:'幸存者',desc:'拥有一名五级英雄',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>h.level>=5)}
+};
+
+
+// Ashen Vow engine — rules layer. Static tables live in ./data/tables.js
+
+
+// 灰烬誓约 / Ashen Vow — deterministic, browser-independent game rules.
 function skillBranch(hero,skillId){return SKILL_BRANCHES[skillId]?.find(b=>b.id===hero?.skillBranches?.[skillId])||null;}
 function chooseSkillBranch(state,heroId,skillId,branchId){
  if(state.phase!=='camp')return false;ensureProgression(state);
@@ -379,18 +717,11 @@ function chooseSkillBranch(state,heroId,skillId,branchId){
  state.gold-=cost.gold;state.shards-=cost.shards;hero.skillBranches[skillId]=branchId;
  state.history.unshift(`${hero.name} 选择了「${SKILLS[skillId].name}」分支：${branch.name}。`);return true;
 }
-const TRINKET_SETS={
- sentinel:{name:'守墓誓约',pieces:['iron','seal'],mods:{armor:2,hp:4},effect:'进入战斗获得 1 回合守护'},
- twilight:{name:'暮影之猎',pieces:['fang','thorn'],mods:{attack:2,crit:4},effect:'提高攻击和暴击'},
- sacred:{name:'灰烬祷仪',pieces:['relic','bell'],mods:{healBonus:4,stressResist:8},effect:'开战前压力 -5'},
- pilgrim:{name:'孤灯旅人',pieces:['torch','feather'],mods:{speed:2,hp:3},effect:'提高速度与生命'}
-};
 function activeTrinketSet(hero,state){
  if(!state?.items)return null;
  const bases=(hero.trinkets||[]).map(id=>state.items.find(i=>i.id===id)?.baseId).filter(Boolean);
  return Object.entries(TRINKET_SETS).find(([,set])=>set.pieces.every(base=>bases.includes(base)))?.[0]||null;
 }
-const STATUS_LABELS={poison:'中毒',bleed:'流血',stun:'眩晕',weak:'虚弱'};
 function enemyResistances(type){
  const isUndead=['thrall','ghoul','guardian','wraith','bonearcher','banshee','boss'].includes(type);
  const isMire=['mireling','sporewitch','bogstalker','leech','bogcolossus','mirequeen'].includes(type);
@@ -448,14 +779,6 @@ function enemyIntent(unit,battle){
  if(['bonearcher','cinderseer','smelter'].includes(type))return {title:'远程压制',detail:'可能袭击后排及低生命目标',level:'warning'};
  return {title:'近战攻击',detail:'倾向攻击前排，实际目标可能变化',level:'normal'};
 }
-const V08_ROOMS={
- oracle:{title:'盲眼预言者',eyebrow:'特殊房间 · 命运占兆',desc:'白蜡封住了她的眼睛，但她依然知道每个人背负的名字。',choices:[
-  {label:'交换一段痛苦记忆',hint:'全队压力 +6，获得遗物碎片 5–8',kind:'oracle-trade'},
-  {label:'请求安抚与指引',hint:'支付 18 金币，全队压力 −15',kind:'oracle-calm'}]},
- caravan:{title:'断轮商队',eyebrow:'特殊房间 · 流亡旅商',desc:'满载着破损补给的车队停在断桥前，商人开出了危险却诱人的价码。',choices:[
-  {label:'购买战地补给',hint:'支付 24 金币，获得火把 2、绷带 2',kind:'caravan-buy'},
-  {label:'护送商队离开',hint:'小队承受少量压力，获得 20–34 金币',kind:'caravan-escort'}]}
-};
 function expeditionSummary(state){
  const reports=Array.isArray(state.expeditionReports)?state.expeditionReports:[];
  return {total:reports.length,victories:reports.filter(r=>r.reason==='victory').length,
@@ -464,27 +787,6 @@ function expeditionSummary(state){
   reports:reports.slice(0,10)};
 }
 
-const MAX_SKILL_LEVEL=2;
-const TRAITS={
- steadfast:{name:'意志坚定',kind:'positive',desc:'抗压 +10',mods:{stressResist:10}},
- keeneye:{name:'鹰眼',kind:'positive',desc:'命中 +6',mods:{accuracy:6}},
- hardy:{name:'体质强健',kind:'positive',desc:'最大生命 +6',mods:{hp:6}},
- furious:{name:'好斗',kind:'positive',desc:'攻击 +1',mods:{attack:1}},
- frail:{name:'脆弱',kind:'negative',desc:'最大生命 −4',mods:{hp:-4}},
- anxious:{name:'焦虑',kind:'negative',desc:'抗压 −8',mods:{stressResist:-8}},
- clumsy:{name:'笨拙',kind:'negative',desc:'命中 −5',mods:{accuracy:-5}},
- slow:{name:'迟钝',kind:'negative',desc:'速度 −1',mods:{speed:-1}}
-};
-const CRISES={
- panic:{name:'恐惧',desc:'每次行动有 25% 的概率畏缩'},
- rage:{name:'狂怒',desc:'攻击增加 2，但命中降低 8'},
- despair:{name:'绝望',desc:'命中下降 12，受到的压力更高'}
-};
-const SPECIAL_ROOMS={
- shrine:{title:'破晓的祭坛',eyebrow:'特殊房间 · 祭坛',desc:'祭坛盛放着长明的灰火，似乎可以净化疲惫的魂魄。',choices:[{label:'举行净化仪式',hint:'全队减压，但消耗遗物收益',kind:'purge'},{label:'搜寻祭坛底座',hint:'获得碎片并增加压力',kind:'shrine'}]},
- ambush:{title:'传来脚步声的回廊',eyebrow:'特殊房间 · 伏击',desc:'面前的门扉突然合上，阴影中却留下了一条逃生缝隙。',choices:[{label:'突围作战',hint:'遭遇额外精英战；胜利可获得精英战利品',kind:'ambush-fight'},{label:'借夜色绕行',hint:'全队压力 +8，保全资源',kind:'ambush-avoid'}]},
- cache:{title:'密封的遗物秘库',eyebrow:'特殊房间 · 秘库',desc:'墙后藏着远征者遗忘的密室，其中珍宝与机关同在。',choices:[{label:'破坏古老封印',hint:'稀有饰品并承受伤害',kind:'cache-loot'},{label:'拆解陷阱',hint:'获得金币及补给',kind:'cache-safe'}]}
-};
 function skillLevel(hero,skillId){return Math.max(0,Math.min(MAX_SKILL_LEVEL,hero?.skillLevels?.[skillId]||0));}
 function skillTrainingCost(hero,skillId){const lv=skillLevel(hero,skillId);return {gold:24+lv*20,shards:2+lv*2};}
 function trainSkill(state,heroId,skillId){if(state.phase!=='camp')return false;ensureProgression(state);
@@ -508,46 +810,10 @@ function assignHeroGrowth(hero){if(!Array.isArray(hero.traits)||hero.traits.some
  return hero;}
 
 // V0.5 region-based dungeons. Keys are persisted; old V0.4 expeditions default to crypt.
-const REGIONS={
- crypt:{name:'暮影墓窟',en:'THE SUNKEN CRYPT',short:'墓窟',symbol:'♜',theme:'crypt',desc:'古老誓言与亡者同眠。亡灵、咒术和压力侵蚀。',hazard:'亡者低语：每第 3 回合，一名英雄受到额外压力。',goldMult:1,shardMult:1,
-  enemies:['thrall','ghoul','cultist','guardian','bonearcher','wraith'],elite:['guardian','butcher','cultist'],boss:['boss','cultist','thrall'],eliteTrait:'fortified'},
- mire:{name:'腐潮沼泽',en:'THE BLIGHTED MIRE',short:'沼泽',symbol:'☣',theme:'mire',desc:'被瘴气腐蚀的湿地。毒素、孢子与蚀骨的低语。',hazard:'瘴气弥漫：每第 3 回合，一名英雄被施加中毒。',goldMult:1.2,shardMult:1.25,
-  enemies:['mireling','sporewitch','bogstalker','leech','alchemist','banshee'],elite:['bogcolossus','sporewitch','leech'],boss:['mirequeen','sporewitch','mireling'],eliteTrait:'venomous'},
- forge:{name:'熔烬铸炉',en:'THE CINDER FORGE',short:'铸炉',symbol:'⚒',theme:'forge',desc:'沉睡的铸铁巨炉再度燃烧。高护甲与灼热的连击。',hazard:'余烬灼烧：每第 3 回合，全队受到少量伤害。',goldMult:1.4,shardMult:1.5,
-  enemies:['emberguard','slagbeast','cinderseer','smelter','guardian','herald'],elite:['ironreaver','emberguard','cinderseer'],boss:['forgeheart','emberguard','smelter'],eliteTrait:'relentless'}
-};
-const ELITE_TRAITS={
- fortified:{name:'铁甲精英',desc:'精英小队额外获得 2 点护甲'},
- venomous:{name:'腐毒精英',desc:'精英攻击有概率施加中毒'},
- relentless:{name:'狂热精英',desc:'精英小队攻击和速度提高'}
-};
-const BOSS_TYPES=['boss','mirequeen','forgeheart'];
-const REGION_EVENTS={
- crypt:{title:'亡者的铭碑',eyebrow:'墓窟异闻',desc:'碑文上记录着逝者的姓名。刻痕仍未干透，石缝里有隐约的祈祷。',choices:[{label:'解读禁忌铭文',hint:'获得遗物碎片，全队承受压力',kind:'shrine'},{label:'向亡者致意',hint:'全队减少压力',kind:'leave'}]},
- mire:{title:'会呼吸的孢子林',eyebrow:'沼泽异闻',desc:'泥水下发出均匀的呼吸，发光的孢子围住了一口古老药箱。',choices:[{label:'采集发光孢子',hint:'获得遗物，但队伍会受伤',kind:'spore'},{label:'点燃驱瘴火把',hint:'消耗 1 支火把，全队降低压力',kind:'purify'}]},
- forge:{title:'熄灭的誓约熔炉',eyebrow:'铸炉异闻',desc:'一座半熄的熔炉仍在呼唤献祭。炉内漂浮着冷却的稀有金属。',choices:[{label:'重启锻造机关',hint:'获得遗物碎片，全队失去少量生命',kind:'smelt'},{label:'搜集余温火种',hint:'补充火把和少量金币',kind:'embers'}]}
-};
 function regionOf(state){const id=state?.expedition?.region||state?.selectedRegion||'crypt';return REGIONS[id]?id:'crypt';}
 function selectRegion(state,id){if(state.phase!=='camp'||!REGIONS[id])return false;ensureProgression(state);state.selectedRegion=id;return true;}
 
 // V0.4 settlement progression: additive data, compatible with schemaVersion 1 saves.
-const BUILDINGS={
- infirmary:{name:'战地医馆',en:'FIELD INFIRMARY',icon:'✚',desc:'治疗生命与压力的效果提高，治疗费用下降。',gold:45,shards:3,bonus:'每级疗伤 +8 生命 / +4 减压，费用 −2 金币'},
- chapel:{name:'烬火礼拜堂',en:'EMBER CHAPEL',icon:'✥',desc:'营地可为英雄减压，远征归来时帮助后备英雄恢复精神。',gold:45,shards:3,bonus:'每级祷告 +10 减压；后备英雄远征后 −6 压力'},
- workshop:{name:'遗物工坊',en:'RELIC WORKSHOP',icon:'⚒',desc:'锻造时减少金币消耗，保留已有武器与护甲等级。',gold:65,shards:4,bonus:'每级锻造消耗 −5 金币'},
- watchtower:{name:'守夜塔',en:'NIGHT WATCH',icon:'♜',desc:'出发携带额外火把，扩大下一段路线的侦察视野。',gold:50,shards:4,bonus:'每级远征额外 +1 火把，提前发现一层房间'}
-};
-const MAX_BUILDING_LEVEL=3;
-const EXPEDITION_PLANS={
- cautious:{name:'谨慎行军',icon:'◈',desc:'额外携带 2 支火把和 1 条绷带，带回金币降低 15%。',goldMult:.85,shardMult:1,torches:2,bandages:1,stress:0},
- standard:{name:'标准远征',icon:'✧',desc:'正常物资和收益，适合探索新路线。',goldMult:1,shardMult:1,torches:0,bandages:0,stress:0},
- daring:{name:'孤注一掷',icon:'⚔',desc:'开局损失 2 支火把、全队 +10 压力；成功带回金币 +35%、碎片 +25%。',goldMult:1.35,shardMult:1.25,torches:-2,bandages:0,stress:10}
-};
-const TALENTS={
- vigor:{name:'坚韧体魄',icon:'⬡',desc:'每级 +5 最大生命',max:2},
- might:{name:'锐锋训练',icon:'⚔',desc:'每级 +1 攻击',max:2},
- resolve:{name:'精神韧性',icon:'✶',desc:'每级 +5 抗压',max:2}
-};
 function buildingLevel(state,id){return Math.max(0,Math.min(MAX_BUILDING_LEVEL,Number(state.buildings?.[id]||0)));}
 function buildingCost(state,id){const def=BUILDINGS[id];if(!def)return null;const lv=buildingLevel(state,id);
  return {gold:def.gold+30*lv,shards:def.shards+3*lv};}
@@ -572,41 +838,7 @@ function allocateTalent(state,id,talentId){if(state.phase!=='camp'||!TALENTS[tal
  h.maxHp=heroStats(h,state).maxHp;h.hp=Math.min(h.hp,h.maxHp);
  state.history.unshift(`${h.name} 掌握了${TALENTS[talentId].name}（${h.talents[talentId]}级）。`);return true;}
 
-const HERO_NAMES = ['伊莱恩','维尔','赛勒斯','莫拉'];
-
-const RECRUIT_NAMES=['莱希','乌诺','海泽尔','希恩','维克托','蕾娜','卡尔文','露西亚','艾斯塔','泰伦','米拉','诺拉','赛温','德林'];
-const MAX_RESERVES=6;
 // Data-driven trinkets: item instance -> base + 1-2 affixes, equipped in two unique slots.
-const TRINKET_BASES={
-  ash:{name:'残烬吊坠',icon:'✧',mods:{hp:3}},
-  iron:{name:'锈铁护符',icon:'⬡',mods:{armor:1}},
-  fang:{name:'亡兽利齿',icon:'⌁',mods:{attack:1}},
-  bell:{name:'静默银铃',icon:'✶',mods:{stressResist:5}},
-  feather:{name:'乌鸦羽饰',icon:'➤',mods:{speed:1}},
-  relic:{name:'被遗忘的圣徽',icon:'✥',mods:{healBonus:2}},
-  thorn:{name:'血蔷薇胸针',icon:'❖',mods:{crit:2}},
-  mask:{name:'裂痕面具',icon:'◈',mods:{accuracy:3}},
-  torch:{name:'长明火种',icon:'♨',mods:{stressResist:4,speed:1}},
-  vial:{name:'炼金残液',icon:'✚',mods:{healBonus:4,hp:-2}},
-  crown:{name:'破碎王冠',icon:'♛',mods:{attack:2,stressResist:-4}},
-  seal:{name:'守墓人封蜡',icon:'❖',mods:{armor:1,accuracy:2}}
-};
-const AFFIXES={
-  keen:{name:'锋锐',mods:{attack:2}},
-  steadfast:{name:'坚忍',mods:{hp:5}},
-  guarded:{name:'守护',mods:{armor:1}},
-  swift:{name:'迅捷',mods:{speed:1}},
-  steady:{name:'精准',mods:{accuracy:4}},
-  vicious:{name:'凶戾',mods:{crit:3}},
-  calm:{name:'宁静',mods:{stressResist:6}},
-  merciful:{name:'慈悲',mods:{healBonus:3}},
-  cursed:{name:'受诅咒的',mods:{attack:3,stressResist:-8}},
-  reckless:{name:'鲁莽的',mods:{crit:5,armor:-1}},
-  ritual:{name:'仪式的',mods:{healBonus:4,speed:-1}},
-  twilight:{name:'黄昏的',mods:{hp:7,accuracy:-3}}
-};
-const MOD_LABELS={attack:'攻击',hp:'生命',armor:'护甲',speed:'速度',accuracy:'命中',crit:'暴击率',stressResist:'抗压',healBonus:'治疗'};
-const RARITY_NAMES={common:'普通',rare:'稀有',epic:'史诗'};
 function trinketMods(item){const mods={};if(!item)return mods;
  const sources=[TRINKET_BASES[item.baseId],...(item.affixes||[]).map(id=>AFFIXES[id])];
  for(const source of sources)for(const [key,value] of Object.entries(source?.mods||{}))mods[key]=(mods[key]||0)+value;
@@ -639,6 +871,8 @@ function ensureProgression(state){if(!Array.isArray(state.reserveHeroes))state.r
  if(!state.regionVictories||typeof state.regionVictories!=='object')state.regionVictories={};
  for(const id of Object.keys(REGIONS))if(!Number.isInteger(state.regionVictories[id])||state.regionVictories[id]<0)state.regionVictories[id]=0;
  if(state.expedition&&!REGIONS[state.expedition.region])state.expedition.region='crypt';
+ if(state.supplies){for(const k of ['potions','sigils'])if(!Number.isInteger(state.supplies[k])||state.supplies[k]<0)state.supplies[k]=0;}
+ if(state.expedition){for(const k of ['potions','sigils'])if(!Number.isInteger(state.expedition[k])||state.expedition[k]<0)state.expedition[k]=0;for(const n of state.expedition.nodes||[])if(!n.name&&NODE_NAME_POOL[n.type])n.name=NODE_NAME_POOL[n.type][0];}
  if(state.battle){if(!REGIONS[state.battle.region])state.battle.region=state.expedition?.region||'crypt';
    if(!Number.isInteger(state.battle.bossPhase))state.battle.bossPhase=1;}
  
@@ -693,20 +927,6 @@ function random(state){ let x = (state.rngState >>> 0) || 42; x ^= x << 13; x ^=
 function integer(state, min, max){return Math.floor(random(state)*(max-min+1))+min;}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 // V1.0 achievements are earned from actual campaign state; no external account required.
-const ACHIEVEMENTS={
- first:{name:'踏入黑暗',desc:'完成首次远征',check:s=>s.expeditions>=1},
- steady:{name:'不屈远征者',desc:'累计完成 5 次远征',check:s=>s.expeditions>=5},
- seasoned:{name:'百炼成钢',desc:'累计完成 15 次远征',check:s=>s.expeditions>=15},
- crypt:{name:'墓窟破晓',desc:'击败暮影墓窟首领',check:s=>(s.regionVictories?.crypt||0)>=1},
- mire:{name:'斩断腐根',desc:'击败腐潮沼泽首领',check:s=>(s.regionVictories?.mire||0)>=1},
- forge:{name:'熄灭炉心',desc:'击败熔烬铸炉首领',check:s=>(s.regionVictories?.forge||0)>=1},
- three:{name:'三地凯歌',desc:'三个地牢均取得首胜',check:s=>['crypt','mire','forge'].every(id=>(s.regionVictories?.[id]||0)>0)},
- recruits:{name:'众志成城',desc:'拥有至少两名后备英雄',check:s=>(s.reserveHeroes?.length||0)>=2},
- architect:{name:'营地复兴',desc:'任意建筑达到三级',check:s=>Object.values(s.buildings||{}).some(lv=>lv>=3)},
- mastery:{name:'技艺臻熟',desc:'至少一个技能达到二级',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>Object.values(h.skillLevels||{}).some(lv=>lv>=2))},
- collector:{name:'遗物守护者',desc:'持有至少十件饰品',check:s=>(s.items?.length||0)>=10},
- veteran:{name:'幸存者',desc:'拥有一名五级英雄',check:s=>[...s.heroes,...(s.reserveHeroes||[])].some(h=>h.level>=5)}
-};
 function unlockAchievements(state){
  if(!state.achievements||typeof state.achievements!=='object'||Array.isArray(state.achievements))state.achievements={};
  const unlocked=[];
@@ -716,7 +936,7 @@ function unlockAchievements(state){
  return unlocked;
 }
 function freshGame(seed=Date.now()){
-  const state = {schemaVersion:VERSION, seed:seed>>>0, rngState:(seed>>>0)||42, phase:'camp', day:1, expeditions:0, gold:145, shards:8, buildings:{infirmary:0,chapel:0,workshop:0,watchtower:0}, selectedRegion:'crypt',selectedDifficulty:'pilgrim',regionVictories:{crypt:0,mire:0,forge:0}, expeditionPlan:'standard', expeditionReports:[], defeatStreak:0, achievements:{}, tutorialSeen:false, supplies:{torches:5,bandages:2}, heroes:[], reserveHeroes:[], recruits:[], items:[], nextItemId:1, nextHeroId:4, expedition:null, battle:null, event:null, result:null, history:['营地的篝火重新燃起。灰烬之下，还有誓言。'], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+  const state = {schemaVersion:VERSION, seed:seed>>>0, rngState:(seed>>>0)||42, phase:'camp', day:1, expeditions:0, gold:145, shards:8, buildings:{infirmary:0,chapel:0,workshop:0,watchtower:0}, selectedRegion:'crypt',selectedDifficulty:'pilgrim',regionVictories:{crypt:0,mire:0,forge:0}, expeditionPlan:'standard', expeditionReports:[], defeatStreak:0, achievements:{}, tutorialSeen:false, supplies:{torches:5,bandages:2,potions:1,sigils:0}, heroes:[], reserveHeroes:[], recruits:[], items:[], nextItemId:1, nextHeroId:4, expedition:null, battle:null, event:null, result:null, history:['营地的篝火重新燃起。灰烬之下，还有誓言。'], createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
   Object.entries(CLASSES).slice(0,4).forEach(([id,c],i)=>{state.heroes.push({id:`hero-${i}`,classId:id,name:HERO_NAMES[i],rank:i+1,level:1,xp:0,hp:c.maxHp,maxHp:c.maxHp,stress:integer(state,3,12),afflicted:false,gear:{weapon:0,armor:0},talentPoints:0,talents:{vigor:0,might:0,resolve:0},trinkets:[null,null]});});
   state.heroes.forEach(h=>{assignHeroGrowth(h);h.maxHp=heroStats(h,state).maxHp;h.hp=h.maxHp;});state.recruits=recruitOffers(state);return state;
 }
@@ -742,7 +962,8 @@ function makeDungeon(state){
       nodes.push({id:`${layer}-${row}`,layer,row,type:kind,visited:false});
     }
   }
-  return {region:state.selectedRegion||'crypt',difficulty:state.selectedDifficulty||'pilgrim',nodes,layer:-1,row:0,visited:[],roomsCleared:0,lootGold:0,lootShards:0,lootItems:[],torch:state.supplies.torches,bandages:state.supplies.bandages};
+  for(const n of nodes){const pool=NODE_NAME_POOL[n.type]||NODE_NAME_POOL.battle;n.name=pool[integer(state,0,pool.length-1)];}
+  return {region:state.selectedRegion||'crypt',difficulty:state.selectedDifficulty||'pilgrim',nodes,layer:-1,row:0,visited:[],roomsCleared:0,lootGold:0,lootShards:0,lootItems:[],torch:state.supplies.torches,bandages:state.supplies.bandages,potions:state.supplies.potions||0,sigils:state.supplies.sigils||0};
 }
 function beginExpedition(state){
   if(state.phase!=='camp')return false;ensureProgression(state);
@@ -977,16 +1198,38 @@ function forgeGear(state,id,kind){
  state.history.unshift(`${h.name} 强化了${kind==='weapon'?'武器':'护甲'}，达到 +${level+1}。`);
  return true;
 }
-function buySupplies(state,type){if(state.phase!=='camp')return false;const c=type==='torches'?10:type==='bandages'?14:0;if(!c||state.gold<c)return false;state.gold-=c;state.supplies[type]++;return true;}
-function isValidSave(input){if(!input||typeof input!=='object'||input.schemaVersion!==VERSION||!['camp','map','battle','event','result'].includes(input.phase))return false;
- if(!Number.isInteger(input.gold)||input.gold<0||input.gold>1e9||!Number.isInteger(input.shards)||input.shards<0||input.shards>1e9||!Number.isInteger(input.day)||input.day<1||input.day>100000||!Number.isInteger(input.expeditions)||input.expeditions<0||input.expeditions>100000)return false;
- if(!input.supplies||!['torches','bandages'].every(k=>Number.isInteger(input.supplies[k])&&input.supplies[k]>=0&&input.supplies[k]<=100000))return false;
+function buySupplies(state,type){if(state.phase!=='camp')return false;const meta=SUPPLY_META[type];if(!meta||state.gold<meta.cost)return false;const cur=state.supplies[type]||0;if(cur>=(MAX_SUPPLIES[type]||99))return false;state.gold-=meta.cost;state.supplies[type]=cur+1;return true;}
+/** Spend one potion on a hero during the expedition map. */
+function usePotion(state,heroId){if(state.phase!=='map'||!state.expedition||state.expedition.potions<=0)return false;const h=state.heroes.find(h=>h.id===heroId&&h.hp>0&&h.hp<h.maxHp);if(!h)return false;state.expedition.potions--;h.hp=clamp(h.hp+32,0,h.maxHp);state.history.unshift(`${h.name} 使用治疗药剂，恢复大量生命。`);return true;}
+/** Spend one sigil to relieve stress during the expedition map. */
+function useSigil(state,heroId){if(state.phase!=='map'||!state.expedition||state.expedition.sigils<=0)return false;const h=state.heroes.find(h=>h.id===heroId&&h.hp>0&&h.stress>0);if(!h)return false;state.expedition.sigils--;addStress(h,-18);state.history.unshift(`${h.name} 握紧圣徽，压力消散。`);return true;}
+/** Preview data for the map node detail panel (Phase 3). */
+function nodePreview(state,id){const ex=state.expedition;if(!ex)return null;const node=ex.nodes.find(n=>n.id===id);if(!node)return null;const region=REGIONS[ex.region]||REGIONS.crypt,diff=DIFFICULTIES[ex.difficulty||'pilgrim'],threat=regionThreatLevel(state,ex.region||'crypt'),scouted=buildingLevel(state,'watchtower')>0&&node.layer<=ex.layer+1+buildingLevel(state,'watchtower');
+ const combat=['battle','elite','boss'].includes(node.type),ambush=node.type==='ambush';
+ let encounters=[];if(combat){const pool=node.type==='elite'?region.elite:node.type==='boss'?region.boss:region.enemies;encounters=pool.slice(0,node.type==='boss'?3:2).map(t=>ENEMIES[t]?.name).filter(Boolean);}else if(ambush){encounters=[...(region.elite||[]).slice(0,1).map(t=>ENEMIES[t]?.name),'可能触发精英战'].filter(Boolean);}else{encounters=[TYPE_PREVIEW[node.type]||'未知遭遇'];}
+ const risk=Math.min(5,Math.max(1,(node.type==='boss'?5:node.type==='elite'?4:node.type==='ambush'?3:node.type==='battle'?2:1)+Math.floor((threat-1)/2)));
+ let power=0;if(combat||ambush){const pool=node.type==='boss'?region.boss:node.type==='elite'||ambush?region.elite:region.enemies;power=pool.slice(0,3).reduce((s,t)=>{const e=ENEMIES[t];return s+(e?Math.round(e.maxHp*.35+e.attack*4+e.armor*6):0)},0);power=Math.round(power*diff.attack*(1+.08*(threat-1))*(node.type==='boss'?1.35:node.type==='elite'?1.15:1));}
+ const rewards=[];if(combat||ambush){rewards.push(`金币 ${node.type==='boss'?120:node.type==='elite'?55:28}–${node.type==='boss'?180:node.type==='elite'?85:46}`);rewards.push(`遗物碎片 ${node.type==='boss'?12:node.type==='elite'?5:2}–${node.type==='boss'?20:node.type==='elite'?9:5}`);if(node.type!=='battle')rewards.push('高概率稀有饰品');}else if(node.type==='treasure'){rewards.push('金币 40–70','饰品或遗物');}else if(node.type==='rest'){rewards.push('全队恢复生命 / 降低压力');}else if(node.type==='supply'){rewards.push('补给物资');}else{rewards.push('未知收益');}
+ return {id:node.id,type:node.type,name:node.name||'未知房间',layer:node.layer,visited:!!node.visited,scouted,encounters,risk,power,rewards};}
+const TYPE_PREVIEW={event:'抉择事件',treasure:'战利品',rest:'休整',supply:'补给',shrine:'祭坛仪式',cache:'机关秘库',oracle:'命运占兆',caravan:'流亡商队'};
+/** Estimated total combat power of the active heroes. */
+function teamPower(state){return state.heroes.filter(h=>h.hp>0).reduce((s,h)=>{const t=heroStats(h,state);return s+Math.round(t.attack*4+t.armor*6+h.maxHp*.35+t.speed*2)},0);}
+function isValidSave(input){
+ if(!input||typeof input!=='object'||input.schemaVersion!==VERSION||!['camp','map','battle','event','result'].includes(input.phase))return false;
+ const int=(v,min,max)=>Number.isInteger(v)&&v>=min&&v<=max;
+ const finite=(v,min)=>Number.isFinite(v)&&v>=min;
+ if(!int(input.gold,0,1e9)||!int(input.shards,0,1e9)||!int(input.day,1,100000)||!int(input.expeditions,0,100000)||!int(input.rngState,0,4294967295))return false;
+ if(!input.supplies||!['torches','bandages'].every(k=>int(input.supplies[k],0,100000)))return false;
+ for(const k of ['potions','sigils'])if(input.supplies[k]!==undefined&&!int(input.supplies[k],0,100000))return false;
  if(!Array.isArray(input.history)||input.history.length>50000||input.history.some(x=>typeof x!=='string'||x.length>2000))return false;
- if(input.phase==='battle'&&!input.battle||input.phase==='map'&&!input.expedition||input.phase==='event'&&!input.event||input.phase==='result'&&!input.result)return false;
- if(!Array.isArray(input.heroes)||input.heroes.length!==4||!input.heroes.every(h=>h&&typeof h.id==='string'&&CLASSES[h.classId]&&Number.isFinite(h.hp)&&Number.isFinite(h.stress)&&Number.isFinite(h.maxHp)&&Number.isInteger(h.level)&&h.level>=1&&h.level<=5))return false;
- if(input.reserveHeroes!==undefined&&(!Array.isArray(input.reserveHeroes)||input.reserveHeroes.length>MAX_RESERVES||!input.reserveHeroes.every(h=>h&&CLASSES[h.classId]&&typeof h.id==='string'&&Number.isFinite(h.hp))))return false;
+ if(input.phase==='battle'&&(!input.battle||!Array.isArray(input.battle.heroes)||!Array.isArray(input.battle.enemies)||!Array.isArray(input.battle.order)||!input.expedition))return false;
+ if(input.phase==='map'&&(!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
+ if(input.phase==='event'&&(!input.event||!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
+ if(input.phase==='result'&&!input.result)return false;
+ if(!Array.isArray(input.heroes)||input.heroes.length!==4||!input.heroes.every(h=>h&&typeof h.id==='string'&&CLASSES[h.classId]&&finite(h.hp,0)&&finite(h.stress,0)&&finite(h.maxHp,1)&&int(h.level,1,5)))return false;
+ if(input.reserveHeroes!==undefined&&(!Array.isArray(input.reserveHeroes)||input.reserveHeroes.length>MAX_RESERVES||!input.reserveHeroes.every(h=>h&&CLASSES[h.classId]&&typeof h.id==='string'&&finite(h.hp,0))))return false;
  if(input.items!==undefined&&(!Array.isArray(input.items)||input.items.length>300||!input.items.every(item=>item&&typeof item.id==='string'&&TRINKET_BASES[item.baseId]&&RARITY_NAMES[item.rarity]&&Array.isArray(item.affixes)&&item.affixes.every(id=>AFFIXES[id]))))return false;
- if(input.buildings!==undefined&&(!input.buildings||typeof input.buildings!=='object'||Object.entries(input.buildings).some(([id,lv])=>!BUILDINGS[id]||!Number.isInteger(lv)||lv<0||lv>MAX_BUILDING_LEVEL)))return false;
+ if(input.buildings!==undefined&&(!input.buildings||typeof input.buildings!=='object'||Object.entries(input.buildings).some(([id,lv])=>!BUILDINGS[id]||!int(lv,0,MAX_BUILDING_LEVEL))))return false;
  if(input.expeditionPlan!==undefined&&!EXPEDITION_PLANS[input.expeditionPlan])return false;
  if(input.expedition?.plan!==undefined&&!EXPEDITION_PLANS[input.expedition.plan])return false;
  if(input.selectedRegion!==undefined&&!REGIONS[input.selectedRegion])return false;
@@ -994,27 +1237,39 @@ function isValidSave(input){if(!input||typeof input!=='object'||input.schemaVers
  if(input.expedition?.difficulty!==undefined&&!DIFFICULTIES[input.expedition.difficulty])return false;
  if(input.expedition?.region!==undefined&&!REGIONS[input.expedition.region])return false;
  if(input.battle?.region!==undefined&&!REGIONS[input.battle.region])return false;
- if(input.regionVictories!==undefined&&(!input.regionVictories||typeof input.regionVictories!=='object'||Object.entries(input.regionVictories).some(([id,n])=>!REGIONS[id]||!Number.isInteger(n)||n<0||n>99999)))return false;
- if(input.defeatStreak!==undefined&&(!Number.isInteger(input.defeatStreak)||input.defeatStreak<0||input.defeatStreak>99999))return false;
- if(input.expeditionReports!==undefined&&(!Array.isArray(input.expeditionReports)||input.expeditionReports.length>20||!input.expeditionReports.every(r=>r&&REGIONS[r.region]&&DIFFICULTIES[r.difficulty]&&['victory','retreat','defeat'].includes(r.reason)&&Number.isInteger(r.day)&&r.day>0&&Number.isInteger(r.rooms)&&r.rooms>=0&&Number.isFinite(r.gold)&&r.gold>=0&&Number.isFinite(r.shards)&&r.shards>=0)))return false;
+ if(input.regionVictories!==undefined&&(!input.regionVictories||typeof input.regionVictories!=='object'||Object.entries(input.regionVictories).some(([id,n])=>!REGIONS[id]||!int(n,0,99999))))return false;
+ if(input.defeatStreak!==undefined&&!int(input.defeatStreak,0,99999))return false;
+ if(input.expeditionReports!==undefined&&(!Array.isArray(input.expeditionReports)||input.expeditionReports.length>20||!input.expeditionReports.every(r=>r&&REGIONS[r.region]&&DIFFICULTIES[r.difficulty]&&['victory','retreat','defeat'].includes(r.reason)&&int(r.day,1,100000)&&int(r.rooms,0,1e9)&&finite(r.gold,0)&&finite(r.shards,0))))return false;
  for(const h of [...input.heroes,...(input.reserveHeroes||[])]){
   if(h.traits!==undefined&&(!Array.isArray(h.traits)||h.traits.length>4||!h.traits.every(t=>TRAITS[t])))return false;
   if(h.skillBranches!==undefined&&(!h.skillBranches||typeof h.skillBranches!=='object'||Object.entries(h.skillBranches).some(([id,choice])=>!CLASSES[h.classId].skills.includes(id)||!SKILL_BRANCHES[id]?.some(b=>b.id===choice)||(h.skillLevels?.[id]||0)<1)))return false;
-  if(h.skillLevels!==undefined&&(!h.skillLevels||typeof h.skillLevels!=='object'||Object.entries(h.skillLevels).some(([id,lv])=>!CLASSES[h.classId].skills.includes(id)||!Number.isInteger(lv)||lv<0||lv>MAX_SKILL_LEVEL)))return false;
+  if(h.skillLevels!==undefined&&(!h.skillLevels||typeof h.skillLevels!=='object'||Object.entries(h.skillLevels).some(([id,lv])=>!CLASSES[h.classId].skills.includes(id)||!int(lv,0,MAX_SKILL_LEVEL))))return false;
   if(h.crisis!==undefined&&h.crisis!==null&&!CRISES[h.crisis])return false;
-  if(h.talentPoints!==undefined&&(!Number.isInteger(h.talentPoints)||h.talentPoints<0||h.talentPoints>10))return false;
-  if(h.talents!==undefined&&(!h.talents||typeof h.talents!=='object'||Object.entries(h.talents).some(([id,lv])=>!TALENTS[id]||!Number.isInteger(lv)||lv<0||lv>TALENTS[id].max)))return false;
+  if(h.talentPoints!==undefined&&!int(h.talentPoints,0,10))return false;
+  if(h.talents!==undefined&&(!h.talents||typeof h.talents!=='object'||Object.entries(h.talents).some(([id,lv])=>!TALENTS[id]||!int(lv,0,TALENTS[id].max))))return false;
  }
- if(!Number.isFinite(input.gold)||input.gold<0||!Number.isFinite(input.shards)||input.shards<0||!Number.isInteger(input.rngState))return false;
- if(!input.supplies||!Number.isFinite(input.supplies.torches)||!Number.isFinite(input.supplies.bandages))return false;
- if(input.phase==='battle'&&(!input.battle||!Array.isArray(input.battle.heroes)||!Array.isArray(input.battle.enemies)||!Array.isArray(input.battle.order)||!input.expedition))return false;
- if((input.phase==='map'||input.phase==='event')&&(!input.expedition||!Array.isArray(input.expedition.nodes)))return false;
- if(input.achievements!==undefined&&(!input.achievements||typeof input.achievements!=='object'||Array.isArray(input.achievements)||Object.entries(input.achievements).some(([id,day])=>!ACHIEVEMENTS[id]||!Number.isInteger(day)||day<1||day>100000)))return false;
+ if(input.achievements!==undefined&&(!input.achievements||typeof input.achievements!=='object'||Array.isArray(input.achievements)||Object.entries(input.achievements).some(([id,day])=>!ACHIEVEMENTS[id]||!int(day,1,100000))))return false;
  if(input.tutorialSeen!==undefined&&typeof input.tutorialSeen!=='boolean')return false;
  return true;
 }
 function skipTurn(state){if(state.phase!=='battle'||currentActor(state)?.side!=='hero')return false;
  const actor=currentActor(state);state.battle.logs.unshift({text:`${actor.name} 选择调整呼吸，跳过行动`,type:'system'});advanceTurn(state);return true;}
+/** Basic attack: 100% attack power, no rank restriction. Phase 1 skill-card action. */
+function basicAttack(state,targetId){
+ if(state.phase!=='battle')return {ok:false,error:'当前不在战斗中'};
+ const actor=currentActor(state);if(!actor||actor.side!=='hero')return {ok:false,error:'尚未轮到英雄行动'};
+ const b=state.battle,target=[...b.enemies].find(t=>t.id===targetId&&t.hp>0);
+ if(!target)return {ok:false,error:'目标不合法或已倒下'};
+ const acc=clamp(92+(actor.accuracyBonus||0),1,100);
+ if(integer(state,1,100)>acc){log(b,`${actor.name} 的普通攻击未命中`,'system');}
+ else{damage(state,actor,target,1.0,{});log(b,`${actor.name} 对 ${target.name} 发动普通攻击`,'normal');}
+ if(!endCheck(state))advanceTurn(state);
+ return {ok:true};
+}
+/** End the current hero turn without acting. */
+function endTurn(state){if(state.phase!=='battle'||currentActor(state)?.side!=='hero')return false;
+ const actor=currentActor(state);state.battle.logs.unshift({text:`${actor.name} 结束了回合`,type:'system'});advanceTurn(state);return true;}
+
 
 
 // All data remains in the current browser's IndexedDB. No network access.
@@ -1134,8 +1389,8 @@ function cueForTelemetry(telemetry){
 
 const root=document.getElementById('app');
 const preferences={getItem(key){try{return window.localStorage.getItem(key)}catch{return null}},setItem(key,value){try{window.localStorage.setItem(key,value)}catch{}}};
-let game=null,slot=1,view='menu',chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={};
-let settings={sound:preferences.getItem('av-sound')==='on',lowMotion:preferences.getItem('av-motion')==='low',largeText:preferences.getItem('av-large-text')==='on',shortLogs:preferences.getItem('av-short-logs')==='on',volume:Math.max(0,Math.min(100,Number(preferences.getItem('av-volume')??65)||0)),pace:['slow','normal','fast'].includes(preferences.getItem('av-pace'))?preferences.getItem('av-pace'):'normal'};
+let game=null,slot=1,view='menu',campSection='camp',mapSelectedNode=null,chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={};
+let settings={sound:preferences.getItem('av-sound')==='on',lowMotion:preferences.getItem('av-motion')==='low',largeText:preferences.getItem('av-large-text')==='on',shortLogs:preferences.getItem('av-short-logs')==='on',volume:Math.max(0,Math.min(100,Number(preferences.getItem('av-volume')??65)||0)),music:preferences.getItem('av-music')==='on',pace:['slow','normal','fast'].includes(preferences.getItem('av-pace'))?preferences.getItem('av-pace'):'normal'};
 const reducedMotion=()=>settings.lowMotion||Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 const fxTimers=new Set();
 function scheduleFx(callback,delay){const id=setTimeout(()=>{fxTimers.delete(id);callback()},delay);fxTimers.add(id);return id;}
@@ -1165,6 +1420,36 @@ function sound(kind='tap'){
   o.onended=()=>{o.disconnect();gain.disconnect()};
  }catch(error){console.debug('音频不可用',error)}
 }
+/** Phase 5: lightweight WebAudio ambient pad (no external files). */
+let bgmNodes=null;
+function startBgm(){
+ if(!settings.sound||!settings.music||bgmNodes||reducedMotion()&&false)return;
+ try{
+  const AudioAPI=window.AudioContext||window.webkitAudioContext;if(!AudioAPI)return;
+  audioContext??=new AudioAPI();if(audioContext.state==='suspended')audioContext.resume();
+  const master=audioContext.createGain();master.gain.value=0;master.connect(audioContext.destination);
+  const freqs=[55,82.4,110,164.8];const oscs=[];
+  for(let i=0;i<freqs.length;i++){
+   const o=audioContext.createOscillator(),g=audioContext.createGain();
+   o.type=i%2?'triangle':'sine';o.frequency.value=freqs[i];
+   g.gain.value=0.045/(i+1);
+   const lfo=audioContext.createOscillator(),lg=audioContext.createGain();
+   lfo.frequency.value=0.05+i*0.033;lg.gain.value=0.02/(i+1);
+   lfo.connect(lg);lg.connect(g.gain);lfo.start();
+   o.connect(g);g.connect(master);o.start();
+   oscs.push(o,lfo);
+  }
+  const vol=(settings.volume/100)*0.22;
+  master.gain.linearRampToValueAtTime(Math.max(0.0001,vol),audioContext.currentTime+2.2);
+  bgmNodes={master,oscs};
+ }catch(error){console.debug('BGM 不可用',error)}
+}
+function stopBgm(){
+ if(!bgmNodes)return;
+ try{const t=audioContext.currentTime;bgmNodes.master.gain.cancelScheduledValues(t);bgmNodes.master.gain.setValueAtTime(bgmNodes.master.gain.value,t);bgmNodes.master.gain.linearRampToValueAtTime(0.0001,t+0.6);const nodes=bgmNodes;setTimeout(()=>{for(const o of nodes.oscs){try{o.stop();o.disconnect()}catch{}}},700);}catch{}
+ bgmNodes=null;
+}
+function syncBgm(){if(settings.sound&&settings.music)startBgm();else stopBgm();}
 function battleSnapshot(){if(!game?.battle)return null;const b=game.battle;return {phase:game.phase,round:b.round,finished:b.finished,heroes:b.heroes.map(u=>({id:u.id,hp:u.hp,stress:u.stress,statuses:{...u.statuses}})),enemies:b.enemies.map(u=>({id:u.id,hp:u.hp,stress:u.stress,statuses:{...u.statuses}})),logs:b.logs.map(l=>({...l}))};}
 function addCombatFx(container,className,text,duration){
  if(!container||reducedMotion())return;
@@ -1268,7 +1553,68 @@ function healthBar(u,enemy=false){const hp=Math.max(0,u.hp), stress=clamp(u.stre
 function label(name,sub){return `<div class="section-heading"><span class="rule"></span><span class="eyebrow">${ESC(sub)}</span><h2>${ESC(name)}</h2></div>`}
 function button(text,action='',attrs='',className='btn'){return `<button class="${className}" ${action?`data-action="${action}"`:''} ${attrs}>${text}</button>`}
 function hud(){return `<header class="topbar"><div class="brand" data-action="nav-menu" role="button" tabindex="0"><div class="brand-mark">✧</div><div><div class="brand-title">灰烬誓约<span> · ASHEN VOW</span></div><div class="brand-sub">THE LAST FLAME ENDURES</div></div></div><nav class="nav-tabs"><button data-action="nav-game" class="nav-tab ${view==='game'?'selected':''}" ${!game?'disabled':''}>${ICONS[game?.phase||'camp']} ${game?.phase==='battle'?'战斗中':game?.phase==='map'?'地牢地图':game?.phase==='event'?'遭遇事件':'营地'}</button><button data-action="nav-saves" class="nav-tab ${view==='saves'?'selected':''}">▤ 存档</button><button data-action="nav-guide" class="nav-tab ${view==='guide'?'selected':''}">? 指南</button><button data-action="nav-codex" class="nav-tab ${view==='codex'?'selected':''}">✥ 图鉴</button><button data-action="nav-settings" class="nav-tab ${view==='settings'?'selected':''}">⚙ 设置</button></nav><div class="resource-bar">${game?`<span title="金币">◈ <strong>${game.gold}</strong></span><span title="遗物碎片">✥ <strong>${game.shards}</strong></span><span class="date-line">第 ${game.day} 日</span>`:'<span class="date-line">单机 · 离线</span>'}</div></header>`}
-function homePage(){return `<section class="landing"><div class="landing-art"><div class="moon"></div><div class="mountain back"></div><div class="mountain front"></div><div class="tower tower-one"></div><div class="tower tower-two"></div><div class="tower tower-three"></div><div class="embers"></div></div><div class="landing-inner"><div class="eyebrow overline">A TALE BURIED IN ASHES</div><div class="ornament">✦ ─── ❖ ─── ✦</div><h1>灰烬<span>誓约</span></h1><p class="landing-en">ASHEN VOW</p><p class="landing-desc">“当最后一盏灯熄灭，<br/>谁会记得我们曾经抵抗过黑暗？”</p><div class="landing-actions">${game?button('继续远征 <span>→</span>','nav-game','','btn btn-gold btn-xl'):button('开始新的誓约 <span>→</span>','nav-saves','','btn btn-gold btn-xl')}${button('选择存档','nav-saves','','btn btn-ghost btn-xl')}</div><div class="landing-meta">4 名英雄 &nbsp;·&nbsp; 随机远征 &nbsp;·&nbsp; 回合策略 &nbsp;·&nbsp; 本地存档</div></div><div class="landing-foot"><span>WEB EDITION · V1.0</span><span>独立原创游戏 · 不依赖服务器</span></div></section>`}
+function playerLevel(saved){
+ if(!saved)return 1;
+ return 1+Math.floor((saved.expeditions||0)*2+(saved.day||1)/3+Object.keys(saved.achievements||{}).length*3);
+}
+function homePage(){
+ const saved=game||slotRecord(slot)?.data||null;
+ const lvl=playerLevel(saved&&isValidSave(saved)?saved:null);
+ const days=saved?.day||0,expeditions=saved?.expeditions||0,achv=saved?Object.keys(saved.achievements||{}).length:0;
+ const heroCount=saved?.heroes?.length||0;
+ return `<section class="landing">
+  <div class="landing-art"><div class="moon"></div><div class="mountain back"></div><div class="mountain front"></div><div class="tower tower-one"></div><div class="tower tower-two"></div><div class="tower tower-three"></div><div class="embers"></div></div>
+  <div class="landing-shell">
+   <header class="landing-top">
+    <div class="brand landing-brand"><div class="brand-mark">✧</div><div><div class="brand-title">灰烬誓约<span> · ASHEN VOW</span></div><div class="brand-sub">THE LAST FLAME ENDURES</div></div></div>
+    <div class="landing-profile" aria-label="玩家档案">
+     <div class="profile-orb">${lvl}</div>
+     <div class="profile-copy"><b>夜烬旅者</b><small>档案等级 Lv.${lvl} · ${heroCount ? heroCount+' 名英雄' : '尚未启程'}</small></div>
+    </div>
+   </header>
+   <div class="landing-inner">
+    <div class="eyebrow overline">A TALE BURIED IN ASHES</div>
+    <div class="ornament">✦ ─── ❖ ─── ✦</div>
+    <h1>灰烬<span>誓约</span></h1>
+    <p class="landing-en">ASHEN VOW</p>
+    <p class="landing-desc">“当最后一盏灯熄灭，<br/>谁会记得我们曾经抵抗过黑暗？”</p>
+    <div class="landing-cards">
+     <button class="landing-card primary" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
+      <span class="landing-card-icon">${game?'▶':'✚'}</span>
+      <b>${game?'继续远征':'开始新的誓约'}</b>
+      <small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'创建角色，点亮第一堆篝火'}</small>
+     </button>
+     <button class="landing-card" data-action="nav-saves">
+      <span class="landing-card-icon">▤</span>
+      <b>命运残页</b>
+      <small>选择存档 · 导出备份 · 云端之外的记忆</small>
+     </button>
+     <button class="landing-card" data-action="nav-guide">
+      <span class="landing-card-icon">?</span>
+      <b>旅者指南</b>
+      <small>战斗规则 · 营地建设 · 远征方针</small>
+     </button>
+     <button class="landing-card" data-action="nav-settings">
+      <span class="landing-card-icon">⚙</span>
+      <b>设置</b>
+      <small>音效 · 动画 · 文字大小 · 节奏</small>
+     </button>
+    </div>
+    <div class="landing-meta">4 名英雄 &nbsp;·&nbsp; 随机远征 &nbsp;·&nbsp; 回合策略 &nbsp;·&nbsp; 本地存档</div>
+   </div>
+   <aside class="landing-save-card" aria-label="存档概览">
+    <div class="save-card-tag">ARCHIVE 0${slot}</div>
+    <b>${saved?'残火营地':'空白存档'}</b>
+    <p>${saved?`第 ${days} 日 · 远征 ${expeditions} 次 · 成就 ${achv}/12`:'尚未记录任何誓约'}</p>
+    <div class="landing-save-actions">
+     ${saved&&game?button('进入营地','nav-game','','btn btn-gold btn-tiny'):button('载入此页','load',`data-slot="${slot}"`,'btn btn-gold btn-tiny')}
+     ${button('管理存档','nav-saves','','btn btn-ghost btn-tiny')}
+    </div>
+   </aside>
+   <div class="landing-foot"><span>WEB EDITION · V${VERSION}.0</span><span>独立原创游戏 · 不依赖服务器</span></div>
+  </div>
+ </section>`;
+}
 function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${svgPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
 function trinketStatsText(item){return Object.entries(trinketMods(item)).map(([k,v])=>`${MOD_LABELS[k]||k} ${v>=0?'+':''}${v}`).join(' · ');}
 function journalPage(){const summary=expeditionSummary(game);
@@ -1296,7 +1642,7 @@ function codexPage(){
  if(codexTab==='equipment')entries=Object.entries(TRINKET_SETS).map(([id,v])=>['✥',v.name,v.effect,`部件：${v.pieces.map(x=>TRINKET_BASES[x]?.name||x).join(' + ')}`]);
  return `<section class="content-view utility-view v10-page"><div class="utility-heading">${label('灰烬图鉴','THE ASHEN CODEX')}<p>所有职业、技能、怪物与装备资料；内容来自游戏内实际规则，方便查阅与搭配。</p></div><div class="panel v10-section"><div class="v10-tabs">${tabs.map(([id,n])=>button(n,'codex-tab',`data-id="${id}"`,`btn ${id===codexTab?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="v10-card-grid">${entries.map(([icon,title,desc,stat])=>`<article class="v10-card"><span class="v10-symbol">${ESC(icon)}</span><h3>${ESC(title)}</h3><p>${ESC(desc)}</p><small>${ESC(stat)}</small></article>`).join('')}</div></div></section>`;
 }
-function campTabs(){return `<div class="camp-tabs" role="tablist">${[['team','远征队伍'],['roster','英雄招募'],['trinkets','饰品装备'],['town','城镇建设'],['talents','英雄天赋'],['skills','技能训练'],['journal','远征记录'],['achievements','成就']].map(([id,label])=>`<button class="camp-tab ${campTab===id?'active':''}" role="tab" aria-selected="${campTab===id}" data-action="camp-tab" data-id="${id}">${label}</button>`).join('')}</div>`;}
+function campTabs(){const list=campSection==='archive'?[['journal','远征记录'],['achievements','成就'],['town','城镇建设']]:[['team','远征队伍'],['roster','英雄招募'],['trinkets','饰品装备'],['talents','英雄天赋'],['skills','技能训练']];return `<div class="camp-tabs" role="tablist">${list.map(([id,lab])=>`<button class="camp-tab ${campTab===id?'active':''}" role="tab" aria-selected="${campTab===id}" data-action="camp-tab" data-id="${id}">${lab}</button>`).join('')}</div>`;}
 function rosterPage(){const reserves=game.reserveHeroes||[];const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];return `<div class="roster-page"><div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新招募名单。雇佣费用 65 金币，最多容纳 ${MAX_RESERVES} 名后备英雄。</p></div><div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card"><div class="recruit-face">${svgPortrait(offer.classId)}</div><div><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-full')}</article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div><div class="ornamental-line"></div><h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>${reserves.length?`<p class="muted">先选择要替换的出战位置，再点击后备英雄的“替换入队”。</p><div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card"><div class="reserve-icon">${CLASSES[h.classId].icon}</div><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div><div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div></div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}</div>`;}
 function trinketsPage(){const heroes=[...game.heroes,...(game.reserveHeroes||[])],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];const inUse=ownedTrinketIds(game);const available=(game.items||[]).filter(item=>!inUse.has(item.id));return `<div class="trinkets-page"><div class="roster-intro"><h3>遗物收藏 <span>TRINKET VAULT</span></h3><p>战斗和探索有概率发现饰品。精英必掉稀有饰品，首领必掉史诗饰品。每位英雄可装备两件。</p></div><div class="trinket-summary"><span>收藏 <b>${game.items?.length||0}</b></span><span>未装备 <b>${available.length}</b></span><span>已装备 <b>${inUse.size}</b></span></div><div class="trinket-heroes">${heroes.map(h=>button(`${ESC(h.name)} · ${CLASSES[h.classId].name}`, 'equip-hero',`data-id="${h.id}"`,`btn ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="set-readout">${activeTrinketSet(hero,game)?`<strong>✦ 套装已激活 · ${TRINKET_SETS[activeTrinketSet(hero,game)].name}</strong><span>${TRINKET_SETS[activeTrinketSet(hero,game)].effect}</span>`:`<strong>◇ 未激活饰品套装</strong><span>集齐指定两件基底饰品即可获得额外属性。</span>`}</div><div class="trinket-slots">${[0,1].map(i=>{const item=game.items?.find(t=>t.id===hero.trinkets?.[i]);return `<div class="trinket-slot"><small>饰品槽 ${i+1}</small><strong>${item?ESC(trinketName(item)):'◇ 尚未装备'}</strong><span>${item?trinketStatsText(item):'从下方仓库选择一件饰品'}</span>${item?button('卸下','unequip',`data-id="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost'):''}</div>`}).join('')}</div><div class="set-collection"><h4>可收集的双件套</h4><div class="set-collection-grid">${Object.values(TRINKET_SETS).map(set=>`<div class="set-collection-item"><b>${set.name}</b><small>${set.pieces.map(x=>TRINKET_BASES[x].name).join(" + ")}</small><span>${set.effect}</span></div>`).join("")}</div></div><h3 class="roster-section-title">饰品仓库 <span>${available.length} 件可装备</span></h3>${available.length?`<div class="trinket-grid">${available.map(item=>`<article class="trinket-card rarity-${item.rarity}"><div class="trinket-item-top"><span class="trinket-emblem">${TRINKET_BASES[item.baseId].icon}</span><small>${RARITY_NAMES[item.rarity]}</small></div><h4>${ESC(trinketName(item))}</h4><p>${trinketStatsText(item)}</p><div class="trinket-actions">${[0,1].map(i=>button(`装备至槽 ${i+1}`,'equip',`data-id="${item.id}" data-hero="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost')).join('')}${button('分解','salvage',`data-id="${item.id}"`,'btn btn-small btn-ghost')}</div></article>`).join('')}</div>`:'<p class="no-items">仓库中没有未装备的饰品。探索宝箱、击败精英与首领可以获取新饰品。</p>'}</div>`;}
 function townPage(){return `<div class="town-page">
@@ -1324,13 +1670,142 @@ function skillTrainingPage(){const heroes=[...game.heroes,...game.reserveHeroes]
 function difficultyChooserUI(){return `<div class="difficulty-picker"><div class="eyebrow">DUNGEON THREAT · 地牢难度</div><div class="difficulty-options">${Object.entries(DIFFICULTIES).map(([id,d])=>`<button class="difficulty-option ${game.selectedDifficulty===id?'selected':''}" data-action="difficulty" data-id="${id}" aria-pressed="${game.selectedDifficulty===id}"><b>${d.icon} ${d.name}</b><small>${d.desc}</small><em>金币 ×${d.gold} · 碎片 ×${d.shards}</em></button>`).join('')}</div></div>`;}
 function regionChooserUI(){return `<div class="region-picker"><div class="eyebrow">CHOOSE A DUNGEON · 选择地牢</div><div class="region-options">${Object.entries(REGIONS).map(([id,r])=>`<button data-action="region" data-id="${id}" class="region-option region-${id} ${game.selectedRegion===id?'selected':''}" aria-pressed="${game.selectedRegion===id}"><span class="region-symbol">${r.symbol}</span><span class="region-copy"><b>${r.name}</b><small>${r.desc}</small><em>胜利 ${game.regionVictories?.[id]||0} 次 · 威胁等级 ${regionThreatLevel(game,id)} · 金币 ×${r.goldMult} · 碎片 ×${r.shardMult}</em></span><span class="region-check">${game.selectedRegion===id?'✓':'◇'}</span></button>`).join('')}</div><div class="region-hazard">${REGIONS[game.selectedRegion||'crypt'].hazard}</div></div>`;}
 function expeditionPlanUI(){return `<div class="expedition-plans"><div class="eyebrow">TACTICS · 出征方针</div>${Object.entries(EXPEDITION_PLANS).map(([id,plan])=>`<button data-action="plan" data-id="${id}" class="plan-row ${game.expeditionPlan===id?'chosen':''}" aria-pressed="${game.expeditionPlan===id}"><span class="plan-icon">${plan.icon}</span><span><b>${plan.name}</b><small>${plan.desc}</small></span><span class="plan-check">${game.expeditionPlan===id?'✓':'◇'}</span></button>`).join('')}</div>`;}
-function campPage(){return `<section class="content-view camp-view"><div class="view-hero"><div class="view-hero-text"><div class="eyebrow overline">THE LAST SANCTUARY</div><h1>残火营地</h1><p>远方的钟声响了三次。这里的人知道，那是危险正在靠近。</p></div><div class="camp-flame"><span>♨</span></div></div>${campTabs()}<div class="camp-main"><div class="main-column">${campTab==='team'?`${label('远征小队','THE COMPANY')}<div class="team-grid">${game.heroes.map(h=>heroCard(h,{camp:true})).join('')}</div><p class="hint-foot">治疗、升级、锻造和编队仅可在营地操作。饰品属性将在下一次战斗中生效。</p>`:campTab==='roster'?rosterPage():campTab==='trinkets'?trinketsPage():campTab==='town'?townPage():campTab==='talents'?talentsPage():campTab==='journal'?journalPage():campTab==='achievements'?achievementsPage():skillTrainingPage()}</div><aside class="panel sidebar"><div class="eyebrow">EXPEDITION</div><h2>走进灰烬深处</h2><p class="muted">腐朽的地底传来召唤。准备物资，选择路线，活着带回遗物。</p><div class="ornamental-line"></div><div class="supply"><span>火把 <strong>${game.supplies.torches}</strong></span>${button('+1 · 10 ◈','buy',`data-type="torches" ${game.gold<10?'disabled':''}`,'btn btn-tiny btn-ghost')}</div><div class="supply"><span>绷带 <strong>${game.supplies.bandages}</strong></span>${button('+1 · 14 ◈','buy',`data-type="bandages" ${game.gold<14?'disabled':''}`,'btn btn-tiny btn-ghost')}</div>${regionChooserUI()}${difficultyChooserUI()}${expeditionPlanUI()}<div class="ornamental-line"></div><div class="stats-mini"><div><span>远征次数</span><strong>${game.expeditions}</strong></div><div><span>存档位置</span><strong>${slot} / 3</strong></div><div><span>营地天数</span><strong>${game.day}</strong></div></div>${button('开始远征 <span>→</span>','expedition','','btn btn-gold btn-full btn-xl')}<div class="sidebar-notice">提示：背包饰品会在完成远征或撤退后带回。全队阵亡会失去本次饰品战利品。</div></aside></div><div class="foot-lore">“希望不是一团永远燃烧的火焰；希望是黑暗里依然愿意拿起火把的手。”</div></section>`;}
+function campNavBar(){
+ const items=[['camp','营地','⌂'],['heroes','英雄','♟'],['archive','档案','▤']];
+ return `<nav class="camp-side-nav" role="tablist" aria-label="营地导航">${items.map(([id,lab,ic])=>
+  `<button class="camp-side-item ${campSection===id?'active':''}" role="tab" aria-selected="${campSection===id}" data-action="camp-section" data-id="${id}"><span class="camp-side-icon">${ic}</span><span>${lab}</span></button>`
+ ).join('')}</nav>`;
+}
+function campBuildingChip(id){
+ const def=BUILDINGS[id],lv=buildingLevel(game,id),cost=buildingCost(game,id),max=lv>=MAX_BUILDING_LEVEL;
+ return `<article class="camp-building" data-building="${id}">
+  <div class="camp-building-icon">${def.icon}</div>
+  <div class="camp-building-body">
+   <div class="camp-building-name">${def.name} <em>Lv.${lv}</em></div>
+   <div class="camp-building-desc">${def.desc}</div>
+   <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
+  </div>
+  ${max?'<span class="camp-building-max">已满级</span>':button(`升级 · ${cost.gold}◈`,'building',`data-id="${id}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-tiny btn-ghost')}
+ </article>`;
+}
+function campTeamStrip(){
+ return `<div class="camp-team-strip">
+  <div class="camp-strip-head"><span class="eyebrow">EXPEDITION TEAM · 远征队伍</span>
+   <span class="camp-strip-note">点击英雄卡可在「英雄」页管理站位、装备与天赋</span></div>
+  <div class="camp-team-row">
+   ${game.heroes.map(h=>{
+    const t=CLASSES[h.classId],xp=h.xp??Math.min(99,((h.level||1)-1)*22+8);
+    return `<button class="camp-team-card" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)} · ${t.name}">
+     <div class="camp-team-face" style="--accent:${t.color}">${svgPortrait(h.classId)}</div>
+     <div class="camp-team-meta">
+      <b>${ESC(h.name)}</b>
+      <small>${t.name} · Lv.${h.level}</small>
+      <div class="bar hp"><span style="width:${percent(h.hp,h.maxHp)}%"></span></div>
+      <div class="bar xp"><span style="width:${clamp(xp,0,100)}%"></span></div>
+      <div class="camp-team-nums">HP ${Math.round(h.hp)}/${h.maxHp} · 经验 ${xp}/100</div>
+     </div>
+    </button>`;
+   }).join('')}
+  </div>
+ </div>`;
+}
+function campReserveStrip(){
+ const reserves=game.reserveHeroes||[];
+ return `<div class="camp-reserve-strip">
+  <span class="eyebrow">RESERVES · 后备英雄 ${reserves.length}/${MAX_RESERVES}</span>
+  <div class="camp-reserve-row">
+   ${reserves.map(h=>`<button class="camp-reserve-chip" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)}">${svgPortrait(h.classId)}<i>${ESC(h.name)}</i></button>`).join('')}
+   ${Array.from({length:Math.max(0,Math.min(3,MAX_RESERVES-reserves.length))},()=>`<button class="camp-reserve-chip empty" data-action="camp-section" data-id="heroes" title="前往招募">＋</button>`).join('')}
+   ${button('招募/管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost')}
+  </div>
+ </div>`;
+}
+function campQuickActions(){
+ const cheapest=game.heroes.filter(h=>h.hp<h.maxHp).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
+ const healCost=campHealCost(game);
+ return `<div class="camp-quick-actions">
+  ${button(`治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn camp-quick')}
+  ${button('训练','camp-section','data-id="heroes" data-tab="skills"','btn camp-quick')}
+  ${button('锻造','camp-section','data-id="heroes" data-tab="team"','btn camp-quick')}
+  ${button('升级','camp-section','data-id="archive" data-tab="town"','btn camp-quick')}
+ </div>`;
+}
+function campOverview(){
+ const region=REGIONS[game.selectedRegion]||REGIONS.crypt;
+ return `<div class="camp-overview">
+  <div class="camp-scene">
+   <div class="camp-scene-glow"></div>
+   <div class="camp-buildings">${['infirmary','chapel','workshop','watchtower'].map(campBuildingChip).join('')}</div>
+   ${campQuickActions()}
+  </div>
+  ${campTeamStrip()}
+  ${campReserveStrip()}
+  <div class="camp-depart-bar">
+   <div class="camp-depart-info">
+    <span>下一站：${region.name}</span>
+    <small>${DIFFICULTIES[game.selectedDifficulty]?.name||''} · ${EXPEDITION_PLANS[game.expeditionPlan]?.name||''} · 火把 ${game.supplies.torches} / 绷带 ${game.supplies.bandages}</small>
+   </div>
+   ${button('出发 <span>→</span>','expedition','','btn btn-gold camp-depart')}
+  </div>
+ </div>`;
+}
+function heroHub(){
+ return `${campTabs()}<div class="camp-main"><div class="main-column">${
+  campTab==='roster'?rosterPage():campTab==='trinkets'?trinketsPage():campTab==='town'?townPage():campTab==='talents'?talentsPage():campTab==='journal'?journalPage():campTab==='achievements'?achievementsPage():campTab==='skills'?skillTrainingPage():
+  `${label('远征小队','THE COMPANY')}<div class="team-grid">${game.heroes.map(h=>heroCard(h,{camp:true})).join('')}</div><p class="hint-foot">治疗、升级、锻造和编队仅可在营地操作。饰品属性将在下一次战斗中生效。</p>`
+ }</div>${campSidebar()}</div>`;
+}
+function campSidebar(){
+ return `<aside class="panel sidebar"><div class="eyebrow">EXPEDITION</div><h2>走进灰烬深处</h2><p class="muted">腐朽的地底传来召唤。准备物资，选择路线，活着带回遗物。</p><div class="ornamental-line"></div>${['torches','bandages','potions','sigils'].map(k=>{const m=SUPPLY_META[k],cur=game.supplies[k]||0,cap=MAX_SUPPLIES[k];return `<div class="supply"><span>${m.icon} ${m.name} <strong>${cur} / ${cap}</strong></span>${button('+1 · '+m.cost+' ◈','buy',`data-type="${k}" ${game.gold<m.cost||cur>=cap?'disabled':''}`,'btn btn-tiny btn-ghost')}</div>`}).join('')}${regionChooserUI()}${difficultyChooserUI()}${expeditionPlanUI()}<div class="ornamental-line"></div><div class="stats-mini"><div><span>远征次数</span><strong>${game.expeditions}</strong></div><div><span>存档位置</span><strong>${slot} / 3</strong></div><div><span>营地天数</span><strong>${game.day}</strong></div></div>${button('开始远征 <span>→</span>','expedition','','btn btn-gold btn-full btn-xl')}<div class="sidebar-notice">提示：背包饰品会在完成远征或撤退后带回。全队阵亡会失去本次饰品战利品。</div></aside>`;
+}
+function archiveHub(){
+ return `${campTabs()}<div class="camp-main"><div class="main-column">${campTab==='town'?townPage():campTab==='achievements'?achievementsPage():journalPage()}</div>${campSidebar()}</div>`;
+}
+function campPage(){
+ return `<section class="content-view camp-view">
+  <div class="view-hero"><div class="view-hero-text"><div class="eyebrow overline">THE LAST SANCTUARY</div><h1>残火营地</h1><p>远方的钟声响了三次。这里的人知道，那是危险正在靠近。</p></div><div class="camp-flame"><span>♨</span></div></div>
+  <div class="camp-layout">
+   ${campNavBar()}
+   <div class="camp-stage">
+    ${campSection==='camp'?campOverview():campSection==='heroes'?heroHub():archiveHub()}
+   </div>
+  </div>
+  <div class="foot-lore">“希望不是一团永远燃烧的火焰；希望是黑暗里依然愿意拿起火把的手。”</div>
+ </section>`;
+}
+
+function mapNodeDetail(){
+ const ex=game.expedition;if(!ex)return '';
+ const sel=mapSelectedNode?nodePreview(game,mapSelectedNode):null;
+ const can=reachableNodes(game).map(n=>n.id);
+ if(!sel)return '<div class="map-detail empty"><div class="eyebrow">NODE INTEL</div><h3>选择一个节点</h3><p class="muted">点击地图上可探索的房间，查看遭遇预估、风险与战利品，再决定是否进入。</p></div>';
+ const power=teamPower(game);
+ const riskSkulls='<span class="risk-skulls">'+'☠'.repeat(sel.risk)+'<i>'+'☠'.repeat(5-sel.risk)+'</i></span>';
+ const enterable=can.includes(sel.id)&&!sel.visited;
+ return '<div class="map-detail">'+
+  '<div class="eyebrow">NODE INTEL · 第 '+(sel.layer+1)+' 层</div>'+
+  '<h3 class="map-detail-name">'+ESC(sel.name)+'</h3>'+
+  '<div class="map-detail-type">'+(TYPE_ICON[sel.type]||'◇')+' '+ESC(TYPE_NAMES[sel.type]||sel.type)+(sel.visited?' · 已探索':'')+'</div>'+
+  '<div class="map-detail-row"><span>可能遭遇</span><ul>'+sel.encounters.map(e=>'<li>'+ESC(e)+'</li>').join('')+'</ul></div>'+
+  '<div class="map-detail-row"><span>通关奖励</span><ul>'+sel.rewards.map(e=>'<li>'+ESC(e)+'</li>').join('')+'</ul></div>'+
+  '<div class="map-detail-row"><span>风险评估</span>'+riskSkulls+'</div>'+
+  (sel.power?'<div class="map-detail-row"><span>推荐战力</span><strong class="'+(power>=sel.power?'ok-text':'danger-text')+'">'+sel.power+'（我方 '+power+'）</strong></div>':'')+
+  (enterable?button('进入节点 →','enter-node','data-id="'+sel.id+'"','btn btn-gold btn-full'):sel.visited?'<p class="small-muted">该房间已经探索完毕。</p>':'<p class="small-muted">该节点尚未连通，先清理相邻房间。</p>')+
+ '</div>';
+}
+function mapTeamStrip(){
+ const ex=game.expedition;if(!ex)return '';
+ const use=(kind,hero,disabled)=>button(kind==='potion'?'⚗ 药剂':'✥ 圣徽',kind==='potion'?'use-potion':'use-sigil','data-id="'+hero.id+'" '+(disabled?'disabled':''),'btn btn-tiny btn-ghost');
+ return '<div class="map-team-strip"><div class="map-strip-head"><b>远征队伍</b><span class="map-strip-note">补给：♨ 火把 '+ex.torch+' · ✚ 绷带 '+ex.bandages+' · ⚗ 药剂 '+(ex.potions||0)+' · ✥ 圣徽 '+(ex.sigils||0)+'</span></div><div class="map-strip-row">'+
+  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+svgPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><small>'+ESC(CLASSES[h.classId]?.name||'')+'</small><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' HP · 压力 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
+ '</div></div>';
+}
 function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REGIONS.crypt;const possible=reachableNodes(game).map(n=>n.id);const pos=n=>({x:90+n.layer*174,y:195+n.row*103});let edges='';
  for(let layer=0;layer<4;layer++){const src=ex.nodes.filter(n=>n.layer===layer),dst=ex.nodes.filter(n=>n.layer===layer+1);for(const a of src)for(const b of dst){if(b.layer===4||Math.abs(a.row-b.row)<=1){const v=pos(a),w=pos(b);edges+=`<path d="M${v.x} ${v.y} C${v.x+60} ${v.y},${w.x-60} ${w.y},${w.x} ${w.y}" class="map-edge ${a.visited&&b.visited?'travelled':''}"/>`;}}}
- const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower');return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${(can||visited||scouted)?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${(can||visited||scouted)?TYPE_NAMES[n.type]:'未知房间'}</text></g>`}).join('');
- return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="view-heading"><div>${label(region.name,`DUNGEON · ${region.en}`)}<p class="muted">${region.desc} 每次只能前进一层，战利品需要活着带回营地。</p></div><div class="map-metrics"><div><span>深入层数</span><strong>${ex.layer+1} / 5</strong></div><div><span>火把</span><strong class="${ex.torch===0?'danger-text':''}">♨ ${ex.torch}</strong></div><div><span>绷带</span><strong>${ex.bandages}</strong></div></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><h3>远征队状态</h3>${game.heroes.map(h=>`<div class="mini-member"><span>${ESC(h.name)}</span><span class="${h.hp<12?'danger-text':''}">${h.hp}/${h.maxHp} HP</span>${button('+ 绷带','bandage',`data-id="${h.id}" ${ex.bandages<=0||h.hp<=0||h.hp>=h.maxHp?'disabled':''}`,'btn btn-tiny btn-ghost')}</div>`).join('')}<div class="ornamental-line"></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div></section>`;}
+ const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower'),known=can||visited||scouted;return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''} ${mapSelectedNode===n.id?'selected':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${known?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${known?(n.name||TYPE_NAMES[n.type]):'未知房间'}</text></g>`}).join('');
+ return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="view-heading"><div>${label(region.name,`DUNGEON · ${region.en}`)}<p class="muted">${region.desc} 每次只能前进一层，战利品需要活着带回营地。</p></div><div class="map-metrics"><div><span>深入层数</span><strong>${ex.layer+1} / 5</strong></div><div><span>火把</span><strong class="${ex.torch===0?'danger-text':''}">♨ ${ex.torch}</strong></div><div><span>绷带</span><strong>✚ ${ex.bandages}</strong></div><div><span>药剂</span><strong>⚗ ${ex.potions||0}</strong></div><div><span>圣徽</span><strong>✥ ${ex.sigils||0}</strong></div></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
 function statusBadges(unit){const ss=unit.statuses||{},names={poison:'中毒',bleed:'流血',guard:'守护',mark:'标记',weak:'虚弱',stun:'眩晕'};return Object.entries(names).filter(([key])=>ss[key]>0).map(([key,name])=>`<span class="status-token status-${key}" title="${name} · 剩余 ${ss[key]} 次行动">${name} ${ss[key]}</span>`).join('')||'<span class="status-token status-none">无异常</span>'}
-function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),allowed=actor?.side==='hero'&&skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false;
+function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),basic=chosenSkill==='__basic__',allowed=actor?.side==='hero'?(basic?(enemy&&unit.hp>0):skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false):false;
  const info=enemy?ENEMIES[unit.type]:CLASSES[unit.classId],selected=inspectUnitId===unit.id;
  return `<button type="button" class="combat-unit ${unit.hp<=0?'dead':''} ${active?'unit-active':''} ${allowed?'unit-targetable':''} ${selected?'unit-inspected':''}" data-action="unit" data-id="${unit.id}" style="--accent:${info.color}" aria-label="${ESC(unit.name)}，站位 ${unit.rank}，生命 ${unit.hp}/${unit.maxHp}${allowed?'，可作为技能目标':''}"><div class="unit-position">${unit.rank}</div><div class="unit-art">${svgPortrait(enemy?unit.type:unit.classId,enemy)}</div><div class="unit-name">${ESC(unit.name)}</div><div class="unit-meter"><span style="width:${percent(unit.hp,unit.maxHp)}%"></span></div><div class="unit-numbers">${unit.hp} / ${unit.maxHp}</div>${!enemy?`<div class="unit-stress"><span style="width:${percent(unit.stress,100)}%"></span></div>`:''}${allowed?'<div class="target-indicator">⌖ 可选择</div>':''}${unit.statuses?.poison>0?'<i class="status-dot poison" title="中毒">☠</i>':''}${unit.statuses?.guard>0?'<i class="status-dot guard" title="守护">✧</i>':''}</button>`;
 }
@@ -1339,10 +1814,115 @@ function combatUnitInfo(b,actor){const chosen=[...b.heroes,...b.enemies].find(u=
  const role=chosen.side==='hero'?CLASSES[chosen.classId]?.name:ENEMIES[chosen.type]?.name;
  return `<div class="unit-info-details"><div class="unit-info-title"><span>◈ ${ESC(chosen.name)}</span><small>${role||'未知职业'} · ${chosen.side==='hero'?'友军':'敌军'} · 站位 ${chosen.rank}</small></div><div class="unit-info-stats"><span>生命 <b>${chosen.hp}/${chosen.maxHp}</b></span><span>攻击 <b>${chosen.attack}</b></span><span>护甲 <b>${chosen.armor}</b></span><span>速度 <b>${chosen.speed}</b></span>${chosen.side==='hero'?`<span>压力 <b>${chosen.stress}/100</b></span>`:`<span>毒抗 <b>${enemyResistances(chosen.type).poison}%</b></span><span>流血抗 <b>${enemyResistances(chosen.type).bleed}%</b></span><span>眩晕抗 <b>${enemyResistances(chosen.type).stun}%</b></span>`}</div><div class="status-list">${statusBadges(chosen)}</div></div>`;
 }
-function battlePage(){const b=game.battle,actor=currentActor(game),region=REGIONS[b.region]||REGIONS.crypt;if(!b)return '<div>战斗恢复中...</div>';const hero=actor?.side==='hero',skillList=hero?CLASSES[actor.classId].skills:[],chosen=chosenSkill&&skillList.includes(chosenSkill)?chosenSkill:null;
- const queue=b.order.slice(Math.max(0,b.turnIndex-1)).filter(id=>[...b.heroes,...b.enemies].some(u=>u.id===id&&u.hp>0)).slice(0,8).map(id=>{const u=[...b.heroes,...b.enemies].find(u=>u.id===id);return `<span class="initiative-pill ${u.side==='hero'?'friendly':'hostile'} ${id===actor?.id?'currently':''}" title="${ESC(u.name)}">${u.side==='hero'?'✧':'◈'} ${ESC(u.name)}</span>`}).join('');
- return `<section class="content-view battle-view region-${b.region||'crypt'}"><div class="battle-header"><div><div class="eyebrow">${region.en} · ${b.kind==='boss'?'BOSS ENCOUNTER':b.kind==='elite'?'ELITE ENCOUNTER':'DUNGEON ENCOUNTER'} · ROUND ${b.round}</div><h2>${b.kind==='boss'?`首领：${ENEMIES[region.boss[0]].name} · 第 ${b.bossPhase||1} 阶段`:b.kind==='elite'?`精英战：${ELITE_TRAITS[b.trait]?.name||'精英来袭'}`:'阴影中的伏击'}</h2><div class="combat-region-rule">${b.kind==='elite'?(ELITE_TRAITS[b.trait]?.desc||'')+' · ':''}${region.hazard}</div></div><div class="battle-turn">${hero?`<span class="turn-dot"></span> 轮到 <strong>${ESC(actor.name)}</strong>`:'敌人行动中'} <span>· ${b.heroes.filter(h=>h.hp>0).length} vs ${b.enemies.filter(e=>e.hp>0).length}</span></div></div><div class="turn-strip"><span>行动序列</span><div class="initiative-track">${queue||'<span>准备下一回合...</span>'}</div></div><div class="enemy-intents"><span class="intent-heading">敌方行动预判 <small>预测行动类型，非锁定目标</small></span>${b.enemies.filter(e=>e.hp>0).slice(0,4).map(e=>{const i=enemyIntent(e,b);return `<div class="intent-chip ${i.level}" title="${ESC(i.detail)}"><strong>${ESC(e.name)}</strong><span>${ESC(i.title)}</span></div>`}).join('')}</div><div class="combat-arena region-${b.region||'crypt'} ${b.kind==='boss'?'boss-arena':''}"><div class="crypt-moon"></div><div class="crypt-window crypt-window-a"></div><div class="crypt-window crypt-window-b"></div><div class="crypt-window crypt-window-c"></div><div class="crypt-column crypt-column-a"></div><div class="crypt-column crypt-column-b"></div><div class="crypt-ruins"></div><div class="combat-fog fog-left"></div><div class="combat-fog fog-right"></div><div class="combat-floor"></div><div class="arena-seal">✧</div><div class="combat-side heroes">${[...b.heroes].sort((a,c)=>c.rank-a.rank).map(u=>unitCard(u,'hero')).join('')}</div><div class="combat-vs"><span>⚔</span></div><div class="combat-side enemies">${[...b.enemies].sort((a,c)=>a.rank-c.rank).map(u=>unitCard(u,'enemy')).join('')}</div></div><div class="combat-action-report" aria-live="off">${ESC(b.logs[0]?.text||"警惕阴影中的动静……")}</div><div class="combat-inspector"><span class="eyebrow">${chosen?'SELECT TARGET · 目标选择':'UNIT INSPECTOR · 单位情报'}</span>${combatUnitInfo(b,actor)}<span class="inspector-tip">${chosen?`释放「${SKILLS[chosen].name}」：${SKILLS[chosen].side==='ally'?'选择队友':'选择敌人'}`:'点击任一角色查看属性与异常状态'}</span></div><div class="combat-dashboard"><div class="combat-skills panel"><div class="eyebrow">${hero?`${ESC(actor.name)} · 选择技能`:'行动进行中'}</div><div class="skill-grid">${hero?skillList.map((id,i)=>{const s=SKILLS[id],enabled=s.caster.includes(actor.rank),selected=chosen===id,valid=enabled?validTargets(b,actor,s):[];return `<button class="skill ${selected?'chosen':''}" data-action="skill" data-id="${id}" ${!enabled||valid.length===0?'disabled':''} title="${ESC(s.desc)}"><span class="skill-icon">${s.icon}</span><span class="skill-label"><b>${i+1}. ${s.name} ${skillLevel(actor,id)?`+${skillLevel(actor,id)}`:''}${skillBranch(actor,id)?` · ${skillBranch(actor,id).name}`:''}</b><small>${s.desc}</small><small class="skill-meta">命中 ${s.accuracy}% · 施法站位 ${s.caster.join('/')}</small></span></button>`}).join(''):'<div class="muted">敌人行动已自动执行，请等待下一位英雄。</div>'}</div><div class="skill-footer">${chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span>`:'<span>选择技能后，可攻击的目标将以金色边框显示</span>'}${button('跳过行动','skip','','btn btn-tiny btn-ghost')}</div></div><div class="combat-log panel"><div class="eyebrow">BATTLE LOG · 战斗记录</div><div class="log-scroll" aria-live="polite">${b.logs.slice(0,settings.shortLogs?4:12).map(l=>`<div class="log-line ${l.type}">${ESC(l.text)}</div>`).join('')}</div></div></div><div class="battle-hint"><span>站位规则：1 = 前排，4 = 后排；点击人物可查看属性</span><span>快捷键 1 / 2 / 3 选择技能 · Esc 取消</span></div></section>`;
+function battleSkillCard(id,index,actor,b,chosen){
+ const s=SKILLS[id],lv=skillLevel(actor,id),branch=skillBranch(actor,id);
+ const enabled=s.caster.includes(actor.rank),valid=enabled?validTargets(b,actor,s):[];
+ const disabled=!enabled||valid.length===0;
+ const cat=s.category||'damage';
+ const catLabel=SKILL_CATEGORY_LABELS?.[cat]||'';
+ return `<button class="skill-card cat-${cat} ${chosen===id?'chosen':''}" data-action="skill" data-id="${id}" ${disabled?'disabled':''} title="${ESC(s.desc)}">
+  <span class="skill-card-tag">${catLabel}</span>
+  <span class="skill-card-art">${s.icon}</span>
+  <span class="skill-card-body"><b>${index}. ${ESC(s.name)}${lv?` +${lv}`:''}</b>
+   <small>${ESC(s.desc)}</small>
+   ${branch?`<em>${ESC(branch.name)}</em>`:''}
+   <span class="skill-card-meta">命中 ${s.accuracy}% · 站位 ${s.caster.join('/')}</span>
+  </span>
+  <span class="skill-card-pips">${[1,2,3].map(n=>`<i class="${n<=(lv||0)?'filled':''}"></i>`).join('')}</span>
+ </button>`;
 }
+function battleBasicCard(actor,chosen){
+ const disabled=false;
+ return `<button class="skill-card cat-attack ${chosen==='__basic__'?'chosen':''}" data-action="basic-attack" title="以 100% 攻击力进行普通攻击，无站位限制">
+  <span class="skill-card-tag">攻击</span>
+  <span class="skill-card-art">⚔</span>
+  <span class="skill-card-body"><b>普攻</b><small>100% 攻击力 · 无站位限制</small>
+   <span class="skill-card-meta">命中 92%</span></span>
+  <span class="skill-card-pips"><i class="filled"></i><i class="filled"></i><i class="filled"></i></span>
+ </button>`;
+}
+function battleHeroPanel(actor){
+ if(!actor||actor.side!=='hero')return '';
+ const heroRef=game.heroes.find(h=>h.id===actor.id)||actor;
+ const stats=heroStats(heroRef,game);
+ const xp=heroRef.xp??Math.min(99,((actor.level||1)-1)*22+8);
+ return `<div class="battle-hero-panel">
+  <div class="battle-hero-face">${svgPortrait(actor.classId,false,true)}</div>
+  <div class="battle-hero-meta">
+   <div class="battle-hero-name">${ESC(actor.name)}</div>
+   <div class="battle-hero-sub">${ESC(CLASSES[actor.classId]?.name||'')} · Lv.${actor.level||1}</div>
+   <div class="battle-hero-bars">
+    <div class="bar hp"><span style="width:${percent(actor.hp,actor.maxHp)}%"></span></div>
+    <div class="bar xp"><span style="width:${clamp(xp,0,100)}%"></span></div>
+   </div>
+   <div class="battle-hero-nums"><b>HP ${Math.round(actor.hp)}/${actor.maxHp}</b><span>经验 ${xp}/100</span></div>
+   <div class="battle-hero-stats">
+    <span>攻击 <b>${actor.attack}</b></span>
+    <span>防御 <b>${actor.armor}</b></span>
+    <span>暴击 <b>${10+(stats.critBonus||0)}%</b></span>
+    <span>速度 <b>${actor.speed}</b></span>
+   </div>
+  </div>
+  <button class="btn btn-tiny btn-ghost battle-hero-detail" data-action="unit" data-id="${actor.id}">详情</button>
+ </div>`;
+}
+function battlePage(){
+ const b=game.battle,actor=currentActor(game),region=REGIONS[b.region]||REGIONS.crypt;
+ if(!b)return '<div>战斗恢复中...</div>';
+ const hero=actor?.side==='hero',skillList=hero?CLASSES[actor.classId].skills:[];
+ const chosen=chosenSkill==='__basic__'?'__basic__':(chosenSkill&&skillList.includes(chosenSkill)?chosenSkill:null);
+ const units=[...b.heroes,...b.enemies];
+ const queue=b.order.slice(Math.max(0,b.turnIndex-1)).filter(id=>units.some(u=>u.id===id&&u.hp>0)).slice(0,10).map(id=>{
+  const u=units.find(x=>x.id===id);if(!u)return '';
+  return `<span class="initiative-portrait ${u.side==='hero'?'friendly':'hostile'} ${id===actor?.id?'currently':''}" title="${ESC(u.name)}">
+   ${svgPortrait(u.side==='hero'?u.classId:u.type,u.side==='enemy')}
+   <i>${ESC(u.name)}</i></span>`;
+ }).join('');
+ const basicMode=chosen==='__basic__';
+ return `<section class="content-view battle-view region-${b.region||'crypt'}">
+  <div class="battle-header">
+   <div><div class="eyebrow">${region.en} · ${b.kind==='boss'?'BOSS':b.kind==='elite'?'ELITE':'DUNGEON'} · ROUND ${b.round}</div>
+    <h2>${b.kind==='boss'?`首领：${ENEMIES[region.boss[0]].name} · 第 ${b.bossPhase||1} 阶段`:b.kind==='elite'?`精英战：${ELITE_TRAITS[b.trait]?.name||'精英来袭'}`:'阴影中的伏击'}</h2>
+    <div class="combat-region-rule">${b.kind==='elite'?(ELITE_TRAITS[b.trait]?.desc||'')+' · ':''}${region.hazard}</div></div>
+   <div class="battle-turn">${hero?`<span class="turn-dot"></span> 轮到 <strong>${ESC(actor.name)}</strong>`:'敌人行动中'} <span>· ${b.heroes.filter(h=>h.hp>0).length} vs ${b.enemies.filter(e=>e.hp>0).length}</span></div>
+  </div>
+  <div class="turn-strip portrait-strip"><span>行动序列</span><div class="initiative-track">${queue||'<span>准备下一回合...</span>'}</div></div>
+  <div class="enemy-intents"><span class="intent-heading">敌方行动预判 <small>预测行动类型，非锁定目标</small></span>
+   ${b.enemies.filter(e=>e.hp>0).slice(0,4).map(e=>{const i=enemyIntent(e,b);return `<div class="intent-chip ${i.level}" title="${ESC(i.detail)}"><strong>${ESC(e.name)}</strong><span>${ESC(i.title)}</span></div>`}).join('')}</div>
+  <div class="combat-arena region-${b.region||'crypt'} ${b.kind==='boss'?'boss-arena':''}">
+   <div class="crypt-moon"></div><div class="combat-fog fog-left"></div><div class="combat-fog fog-right"></div><div class="combat-floor"></div><div class="arena-seal">✧</div>
+   <div class="combat-side heroes">${[...b.heroes].sort((a,c)=>c.rank-a.rank).map(u=>unitCard(u,'hero')).join('')}</div>
+   <div class="combat-vs"><span>⚔</span></div>
+   <div class="combat-side enemies">${[...b.enemies].sort((a,c)=>a.rank-c.rank).map(u=>unitCard(u,'enemy')).join('')}</div>
+  </div>
+  <div class="combat-action-report">${ESC(b.logs[0]?.text||'警惕阴影中的动静……')}</div>
+  <div class="combat-inspector"><span class="eyebrow">${(chosen||basicMode)?'SELECT TARGET · 目标选择':'UNIT INSPECTOR · 单位情报'}</span>
+   ${combatUnitInfo(b,actor)}
+   <span class="inspector-tip">${basicMode?'普攻：点击敌方目标发动普通攻击':chosen?`释放「${SKILLS[chosen].name}」：${SKILLS[chosen].side==='ally'?'选择队友':'选择敌人'}`:'点击任一角色查看属性与异常状态'}</span></div>
+  <div class="combat-dashboard">
+   <div class="battle-left-col">
+    ${battleHeroPanel(actor)}
+    <div class="combat-skills panel">
+     <div class="eyebrow">${hero?`${ESC(actor.name)} · 技能卡`:'行动进行中'}</div>
+     <div class="skill-card-grid">
+      ${hero?skillList.map((id,i)=>battleSkillCard(id,i+1,actor,b,chosen)).join('')+battleBasicCard(actor,chosen):'<div class="muted">敌人行动已自动执行，请等待下一位英雄。</div>'}
+     </div>
+     <div class="battle-main-actions">
+      ${hero?`<button class="btn btn-gold" data-action="basic-attack" ${basicMode?'disabled':''}>攻击</button>
+      <button class="btn" data-action="end-turn">结束回合</button>`:'<span class="muted">等待敌方行动…</span>'}
+     </div>
+     <div class="skill-footer">
+      ${basicMode?'<span>⌖ 点击敌方目标发动普通攻击</span>':chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span>`:'<span>选择技能卡后，可攻击的目标将以金色边框显示</span>'}
+     </div>
+    </div>
+   </div>
+   <div class="combat-log panel"><div class="eyebrow">BATTLE LOG · 战斗记录</div>
+    <div class="log-scroll" aria-live="polite">${b.logs.slice(0,settings.shortLogs?4:12).map(l=>`<div class="log-line ${l.type}">${ESC(l.text)}</div>`).join('')}</div></div>
+  </div>
+  <div class="battle-hint"><span>站位规则：1 = 前排，4 = 后排；点击人物可查看属性</span><span>快捷键 1/2/3 技能 · A 普攻 · Space 结束回合 · Esc 取消</span></div>
+ </section>`;
+}
+
 function eventPage(){const event=game.event,region=regionOf(game),presentation=eventPresentation(event,region);
  return `<section class="content-view event-view region-${presentation.region} event-${presentation.motif}"><div class="event-chamber"><div class="event-scene" aria-hidden="true"><span class="event-horizon"></span><span class="event-silhouette"></span><span class="event-light"></span></div><div class="event-sigil"><div class="event-sigil-inner">${presentation.glyph}</div></div><div class="eyebrow overline">${ESC(event.eyebrow)} · ${presentation.kicker}</div><h1>${ESC(event.title)}</h1><div class="ornament">✦ ─── ❖ ─── ✦</div><p class="event-story">${ESC(event.desc)}</p><div class="event-choice-heading">请选择行动 <span>CHOICES HAVE CONSEQUENCES</span></div><div class="event-choices">${event.choices.map((choice,i)=>`<button class="choice" data-action="choice" data-id="${ESC(choice.kind)}"><span class="choice-index">0${i+1}</span><span><b>${ESC(choice.label)}</b><small>${ESC(choice.hint)}</small></span><span class="choice-arrow">→</span></button>`).join('')}</div></div></section>`;
 }
@@ -1350,6 +1930,7 @@ function resultPage(){const r=game.result,win=r.reason==='victory',region=REGION
 function savesPage(){return `<section class="content-view utility-view"><div class="utility-heading">${label('命运的残页','SAVE ARCHIVES')}<p>所有进度仅存储在当前浏览器。建议定期导出 JSON 备份。</p></div><div class="saves-grid">${Array.from({length:SLOT_COUNT},(_,i)=>{const num=i+1,rec=slotRecord(num),saved=rec&&snapshotValid(rec)&&isValidSave(rec.data)?rec.data:null;return `<article class="save-card"><div class="save-index">ARCHIVE <strong>0${num}</strong></div><div class="save-emblem">${saved?'✥':'◇'}</div><h3>${saved?'残火营地 · 第 '+(saved.day||1)+' 日':rec?'存档需要恢复':'空白存档'}</h3><p>${saved?`远征 ${saved.expeditions||0} 次 · ${stamp(rec.updatedAt)}`:rec?'存档异常，请恢复备份':'尚未记录任何誓约'}</p><div class="save-actions">${saved?`${button('继续游戏','load',`data-slot="${num}"`,'btn btn-gold btn-full')}${button('导出备份','export',`data-slot="${num}"`,'btn btn-ghost btn-full')}${button('覆盖新建','new',`data-slot="${num}"`,'btn btn-ghost btn-full')}${button('删除存档','delete',`data-slot="${num}"`,'btn btn-danger btn-full')}`:button('创建新游戏','new',`data-slot="${num}"`,'btn btn-gold btn-full')}${button('从 JSON 导入','import',`data-slot="${num}"`,'btn btn-ghost btn-full')}${!saved&&rec?button('删除损坏存档','delete',`data-slot="${num}"`,'btn btn-danger btn-full'):''}${(cachedBackups[num]||[]).map(b=>button(`恢复备份 ${b.age} · 第${b.day||'?'}日${b.valid?'':'（损坏）'}`,'restore',`data-slot="${num}" data-age="${b.age}" ${b.valid?'':'disabled'}`,'btn btn-ghost btn-full')).join('')}</div></article>`}).join('')}</div><div class="warning-box"><strong>重要存档提示</strong><p>隐私模式、浏览器清理网站数据、切换浏览器或域名会导致进度不可访问。导出 JSON 文件可以离线备份；导入时会校验格式，并在覆盖前确认。</p></div></section>`;}
 function settingsPage(){return `<section class="content-view utility-view"><div class="utility-heading">${label('旅人手记','SETTINGS')}<p>全部设置仅保存在当前浏览器，游戏不需要账号、联网或后端服务。</p></div><div class="settings-panel panel">
  <div class="setting-row"><div><h3>界面音效</h3><p>启用或静音合成音效</p></div><button class="switch ${settings.sound?'on':''}" data-action="setting-sound" aria-label="切换音效"><span></span></button></div>
+ <div class="setting-row"><div><h3>环境音乐</h3><p>营地与旅途的低吟氛围音（合成生成，离线可用）</p></div><button class="switch ${settings.music?'on':''}" data-action="setting-music" aria-label="切换环境音乐"><span></span></button></div>
  <div class="setting-row"><div><h3>减少动态效果</h3><p>关闭多数装饰性过渡和动画</p></div><button class="switch ${settings.lowMotion?'on':''}" data-action="setting-motion" aria-label="切换减少动效"><span></span></button></div>
  <div class="setting-row"><div><h3>大字体模式</h3><p>扩大文字，方便在较小屏幕阅读</p></div><button class="switch ${settings.largeText?'on':''}" data-action="setting-text" aria-label="切换大字体"><span></span></button></div>
  <div class="setting-row"><div><h3>精简战斗日志</h3><p>仅显示最近 4 条记录，关闭则显示最近 12 条</p></div><button class="switch ${settings.shortLogs?'on':''}" data-action="setting-log" aria-label="切换精简战斗日志"><span></span></button></div>
@@ -1357,7 +1938,7 @@ function settingsPage(){return `<section class="content-view utility-view"><div 
  <div class="setting-row"><div><h3>战斗表现节奏</h3><p>控制技能字样、伤害数字及打击动效速度，不改变回合规则</p></div><div class="pace-options" role="group" aria-label="战斗表现节奏">${[['slow','沉浸'],['normal','标准'],['fast','快速']].map(([value,title])=>`<button type="button" data-action="pace" data-id="${value}" class="btn btn-tiny ${settings.pace===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.pace===value}">${title}</button>`).join('')}</div></div>
  <div class="setting-row"><div><h3>显示模式</h3><p>切换浏览器全屏（可能需要许可）</p></div>${button('切换全屏','fullscreen','','btn btn-ghost')}</div><div class="ornamental-line"></div><p class="small-muted">版本 V1.0 · 纯 Web · IndexedDB 本地存档 · 原创游戏与 SVG 场景 · 支持离线运行。</p></div></section>`;}
 function footer(){return `<footer class="site-footer"><span>ASHEN VOW © ORIGINAL BROWSER PROTOTYPE</span><span><span class="save-light"></span><span id="save-text">${saveStatus}</span> · 存档 ${slot} / 3</span></footer><div class="toast" id="toast" role="status"></div><input type="file" id="import-file" accept="application/json,.json" hidden/>`}
-function render(){clearFx();root.innerHTML=`<div class="app-frame ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
+function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`<div class="app-frame ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
  const f=document.getElementById('import-file');if(f)f.addEventListener('change',handleImport);
 }
 async function handleImport(e){const file=e.target.files?.[0];if(!file)return;try{const data=await readSaveFile(file,isValidSave);if(!window.confirm(`确定把导入的存档写入存档槽 ${importTarget} 吗？该槽位旧数据会被覆盖。`))return;await saveQueue.catch(()=>{});await storeSlot(importTarget,data);await reloadSlots();if(game&&slot===importTarget){game=ensureProgression(data);view='game';chosenSkill=null}else{view='saves'}render();announce('存档导入成功');}catch(err){announce(`导入失败：${err.message}`,true)}finally{e.target.value='';}}
@@ -1371,6 +1952,7 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
  if(a==='import'){importTarget=n;document.getElementById('import-file')?.click();return;}
  if(a==='restore'){const age=Number(el.dataset.age);if(!window.confirm(`恢复存档 ${n} 的第 ${age} 份备份吗？当前存档将被覆盖（完整的当前存档会尝试保留到备份历史）。`))return;await saveQueue.catch(()=>{});try{await restoreBackup(n,age,isValidSave);await reloadSlots();if(slot===n){game=ensureProgression(await getSlot(n));view='game';}render();announce('历史存档恢复成功');}catch(e){announce(`恢复失败：${e.message}`,true)}return;}
  if(a==='setting-sound'){settings.sound=!settings.sound;preferences.setItem('av-sound',settings.sound?'on':'off');render();if(settings.sound)sound();return;}
+ if(a==='setting-music'){settings.music=!settings.music;preferences.setItem('av-music',settings.music?'on':'off');syncBgm();render();return;}
  if(a==='setting-motion'){settings.lowMotion=!settings.lowMotion;preferences.setItem('av-motion',settings.lowMotion?'low':'normal');render();return;}
  if(a==='setting-text'){settings.largeText=!settings.largeText;preferences.setItem('av-large-text',settings.largeText?'on':'off');render();return;}
  if(a==='setting-log'){settings.shortLogs=!settings.shortLogs;preferences.setItem('av-short-logs',settings.shortLogs?'on':'off');render();return;}
@@ -1388,6 +1970,9 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
  if(a==='talent-hero'){chosenEquipHero=id;render();return;}
  if(a==='talent'){mutate(()=>allocateTalent(game,id,el.dataset.kind));sound('heal');return;}
  if(a==='camp-tab'){campTab=id;render();return;}
+ if(a==='camp-section'){campSection=id;const t=el.dataset.tab;if(t)campTab=t;else campTab=campSection==='archive'?'journal':'team';render();return;}
+ if(a==='quick-heal'){if(id){const ok=mutate(()=>healAtCamp(game,id));if(ok!==false)sound('heal');}return;}
+ if(a==='hero-focus'){campSection='heroes';campTab='team';chosenActiveHero=id;chosenEquipHero=id;render();return;}
  if(a==='active-choice'){chosenActiveHero=id;render();return;}
  if(a==='equip-hero'){chosenEquipHero=id;render();return;}
  if(a==='recruit'){mutate(()=>hireRecruit(game,Number(el.dataset.index)));sound('heal');return;}
@@ -1402,17 +1987,32 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
  if(a==='move'){mutate(()=>moveHero(game,id,Number(el.dataset.direction)));sound('tap');return;}
  if(a==='buy'){mutate(()=>buySupplies(game,el.dataset.type));sound();return;}
  if(a==='expedition'){mutate(()=>beginExpedition(game));sound();return;}
- if(a==='node'){const result=mutate(()=>enterNode(game,id));if(result!==false)sound(game?.phase==='battle'?'hit':'event');return;}
+ if(a==='node'){mapSelectedNode=id;sound();render();return;}
+ if(a==='enter-node'){mapSelectedNode=null;const result=mutate(()=>enterNode(game,id));if(result!==false)sound(game?.phase==='battle'?'hit':'event');return;}
+ if(a==='use-potion'){mutate(()=>usePotion(game,id));sound('heal');return;}
+ if(a==='use-sigil'){mutate(()=>useSigil(game,id));sound('heal');return;}
  if(a==='choice'){mutate(()=>resolveEvent(game,id));sound();return;}
  if(a==='retreat'){if(window.confirm('现在撤退吗？已获得的战利品可以带回营地。'))mutate(()=>retreat(game));return;}
  if(a==='camp'){mutate(()=>backToCamp(game));return;}
  if(a==='skip'){const result=commitBattleAction(()=>skipTurn(game));if(result!==false)sound('tap');return;}
+ if(a==='end-turn'){const result=commitBattleAction(()=>endTurn(game));if(result!==false)sound('tap');return;}
+ if(a==='basic-attack'){
+  const actor=currentActor(game);if(!actor||actor.side!=='hero'){announce('尚未轮到英雄行动',true);return;}
+  chosenSkill=chosenSkill==='__basic__'?null:'__basic__';inspectUnitId=null;sound();render();return;
+ }
  if(a==='skill'){
   const actor=currentActor(game),s=SKILLS[id];if(!actor||actor.side!=='hero'||!s.caster.includes(actor.rank)){announce('当前站位不可使用该技能',true);return;}
   chosenSkill=chosenSkill===id?null:id;inspectUnitId=null;sound();if(chosenSkill&&s.side==='self'){commitBattleAction(()=>performSkill(game,id,actor.id),id);}else render();return;
  }
  if(a==='unit'){
   const actor=currentActor(game),sk=SKILLS[chosenSkill];
+  if(game.phase==='battle'&&chosenSkill==='__basic__'&&actor?.side==='hero'){
+   if(game.battle.enemies.some(u=>u.id===id&&u.hp>0)){
+    const ret=commitBattleAction(()=>basicAttack(game,id),'__basic__');
+    if(ret?.ok===false)announce(ret.error,true);else chosenSkill=null;
+   }else announce('请选择敌方目标',true);
+   return;
+  }
   if(game.phase==='battle'&&chosenSkill&&actor?.side==='hero'&&sk){
    if(validTargets(game.battle,actor,sk).some(u=>u.id===id)){
     const ret=commitBattleAction(()=>performSkill(game,chosenSkill,id),chosenSkill);
@@ -1426,7 +2026,7 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
  if(a==='bandage'){mutate(()=>useBandage(game,id));return;}
 }
 root.addEventListener('input',e=>{if(e.target?.id==='volume-control'){settings.volume=clamp(Number(e.target.value)||0,0,100);preferences.setItem('av-volume',String(settings.volume));const output=document.getElementById('volume-value');if(output)output.textContent=`${settings.volume}%`;}});
-root.addEventListener('change',e=>{if(e.target?.id==='volume-control')sound('tap');});
+root.addEventListener('change',e=>{if(e.target?.id==='volume-control'){sound('tap');if(bgmNodes&&audioContext){const vol=(settings.volume/100)*0.22;bgmNodes.master.gain.linearRampToValueAtTime(Math.max(0.0001,vol),audioContext.currentTime+0.3);}}});
 root.addEventListener('click',e=>{const control=e.target.closest('[data-action]');if(!control||control.disabled||waiting)return;waiting=true;Promise.resolve(actionRun(control)).catch(err=>{console.error(err);announce(err.message||'操作失败',true)}).finally(()=>waiting=false);});
 window.addEventListener('keydown',e=>{if(view!=='game'||game?.phase!=='battle'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='Escape'){chosenSkill=null;render();return;}if(['1','2','3'].includes(e.key)){const hero=currentActor(game);if(hero?.side==='hero'){const skill=CLASSES[hero.classId].skills[Number(e.key)-1];actionRun({dataset:{action:'skill',id:skill}});}}});
 (async()=>{try{await reloadSlots();const first=cachedSlots.filter(x=>snapshotValid(x)&&isValidSave(x.data)).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0];if(first){slot=first.slot;game=ensureProgression(first.data);saveStatus='本地存档就绪';}}catch(e){saveStatus='存档不可用';console.error(e);}render();})();

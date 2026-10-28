@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640"><defs>
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#12080a"/><stop offset=".5" stop-color="#2c1210"/><stop offset="1" stop-color="#1a0c0c"/></linearGradient>
+<radialGradient id="heat"><stop stop-color="#ff7a33" stop-opacity=".45"/><stop offset="1" stop-color="#ff7a33" stop-opacity="0"/></radialGradient>
+<linearGradient id="metal" x2="0" y2="1"><stop stop-color="#2a1c18"/><stop offset="1" stop-color="#0c0808"/></linearGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="1600" height="640" fill="url(#sky)"/>
+<ellipse cx="800" cy="300" rx="480" ry="240" fill="url(#heat)" filter="url(#blur)"/>
+<g fill="url(#metal)">
+<path d="M120 220 h200 v40 h30 v-80 h40 v80 h30 v360 h-320 z"/>
+<path d="M1220 180 h220 v44 h34 v-90 h44 v90 h34 v420 h-362 z"/>
+<rect x="520" y="300" width="120" height="280" rx="8"/>
+<rect x="960" y="280" width="130" height="300" rx="8"/>
+</g>
+<g fill="#1a0e0c"><rect x="170" y="320" width="40" height="60" rx="4"/><rect x="170" y="420" width="40" height="60" rx="4"/><rect x="1290" y="300" width="44" height="64" rx="4"/><rect x="1290" y="410" width="44" height="64" rx="4"/><rect x="1290" y="520" width="44" height="64" rx="4"/></g>
+<g fill="#ff8a3c" opacity=".8"><rect x="178" y="332" width="24" height="36" rx="3"/><rect x="178" y="432" width="24" height="36" rx="3"/><rect x="1300" y="314" width="26" height="38" rx="3"/><rect x="1300" y="424" width="26" height="38" rx="3"/><rect x="1300" y="534" width="26" height="38" rx="3"/><rect x="555" y="380" width="50" height="80" rx="6"/><rect x="998" y="370" width="54" height="90" rx="6"/></g>
+<path d="M0 540 C220 500 420 570 640 535 C860 500 1080 580 1300 540 C1450 515 1540 555 1600 540 L1600 640 L0 640 Z" fill="#170c0c"/>
+<g fill="#ffb066" opacity=".7"><circle cx="800" cy="260" r="3"/><circle cx="760" cy="210" r="2.2"/><circle cx="850" cy="195" r="2.5"/><circle cx="720" cy="165" r="1.6"/><circle cx="890" cy="150" r="1.8"/><circle cx="810" cy="120" r="1.3"/><circle cx="640" cy="240" r="1.8"/><circle cx="980" cy="230" r="2"/></g>
+<g fill="#e8c4a0" opacity=".28"><circle cx="300" cy="110" r="1.4"/><circle cx="600" cy="80" r="1.1"/><circle cx="1100" cy="120" r="1.3"/><circle cx="1450" cy="95" r="1.1"/></g>
+</svg>
