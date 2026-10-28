@@ -1,0 +1,13 @@
+{
+  "name": "ashen-vow-web-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "灰烬誓约 Web 单机版 V1.0 · 原创回合制暗黑奇幻地牢游戏",
+  "scripts": {
+    "dev": "node tools/serve.js",
+    "test": "node --test tests/*.test.js",
+    "build:standalone": "node tools/build-standalone.js"
+  },
+  "license": "UNLICENSED"
+}
