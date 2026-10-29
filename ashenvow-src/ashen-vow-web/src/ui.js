@@ -25,7 +25,16 @@ import {battleTelemetry,eventPresentation,cueForTelemetry} from './presentation.
 const root=document.getElementById('app');
 const preferences={getItem(key){try{return window.localStorage.getItem(key)}catch{return null}},setItem(key,value){try{window.localStorage.setItem(key,value)}catch{}}};
 let game=null,slot=1,view='menu',campSection='camp',mapSelectedNode=null,chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={},fullLogOpen=false;
-let settings={sound:preferences.getItem('av-sound')==='on',lowMotion:preferences.getItem('av-motion')==='low',largeText:preferences.getItem('av-large-text')==='on',shortLogs:preferences.getItem('av-short-logs')==='on',volume:Math.max(0,Math.min(100,Number(preferences.getItem('av-volume')??65)||0)),music:preferences.getItem('av-music')==='on',pace:['slow','normal','fast'].includes(preferences.getItem('av-pace'))?preferences.getItem('av-pace'):'normal'};
+// hand：惯用手（右手默认 / 左手镜像，见《触控与按键布局方案》§6）
+let settings={sound:preferences.getItem('av-sound')==='on',lowMotion:preferences.getItem('av-motion')==='low',largeText:preferences.getItem('av-large-text')==='on',shortLogs:preferences.getItem('av-short-logs')==='on',volume:Math.max(0,Math.min(100,Number(preferences.getItem('av-volume')??65)||0)),music:preferences.getItem('av-music')==='on',pace:['slow','normal','fast'].includes(preferences.getItem('av-pace'))?preferences.getItem('av-pace'):'normal',hand:preferences.getItem('av-hand')==='left'?'left':'right'};
+/* 交互诊断：只做本地计数，对应方案 §5.3.5「误触拦截统计」。不含任何上报。 */
+function readDiag(){try{const v=JSON.parse(preferences.getItem('av-touch-diag')||'{}');return{holds:Number(v.holds)||0,cancels:Number(v.cancels)||0,deadzone:Number(v.deadzone)||0};}catch{return{holds:0,cancels:0,deadzone:0};}}
+let touchDiag=readDiag();
+function bumpDiag(key){touchDiag[key]=(touchDiag[key]||0)+1;preferences.setItem('av-touch-diag',JSON.stringify(touchDiag));}
+// 手势阈值（方案 §5.2）：位移 <8pt 视为点按；8–24pt 为死区；≥24pt 视为滑动，均不触发核心决策。
+const TAP_SLOP=8;
+// 长按确认（方案 §5.2/§5.3）：300–500ms 区间，高危操作取偏保守的 450ms。
+const HOLD_MS=450;
 const reducedMotion=()=>settings.lowMotion||Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 const fxTimers=new Set();
 function scheduleFx(callback,delay){const id=setTimeout(()=>{fxTimers.delete(id);callback()},delay);fxTimers.add(id);return id;}
@@ -100,6 +109,8 @@ function visualImpact(previous,skillId=null){
  }
  const summary=battleTelemetry(previous,battleSnapshot());
  sound(cueForTelemetry(summary));
+ // 命中/暴击短促震动（方案 §5.4），与音效、飘字组成多通道反馈
+ if(!reducedMotion()&&summary.effects.some(e=>e.kind==='damage'||e.kind==='death'))haptic(summary.critical?[16,40,12]:12);
  if(reducedMotion())return;
  const duration=effectDuration(),arena=document.querySelector('.combat-arena');
  if(arena){
@@ -136,6 +147,10 @@ function stamp(str){try{return new Date(str).toLocaleString('zh-CN',{month:'nume
 function percent(v,max){return clamp(Math.round(v/Math.max(1,max)*100),0,100)}
 function phaseView(){return game?.phase||'menu'}
 function uiNavigate(next){view=next;inspectUnitId=null;render();}
+/* 惯用手镜像：只镜像交互层（键位落点与阅读顺序），不镜像立绘/战场/地图朝向。
+   技能卡序号仍跟随技能本身，镜像时整组顺序反向（方案 §6.2）。 */
+function handLeft(){return settings.hand==='left';}
+function skillOrder(list){const pairs=list.map((id,i)=>[id,i+1]);return handLeft()?pairs.reverse():pairs;}
 async function reloadSlots(){try{cachedSlots=await allSlots();cachedBackups={};for(let i=1;i<=SLOT_COUNT;i++)cachedBackups[i]=await listBackups(i);}catch(e){announce(`存档读取失败：${e.message}`,true)}}
 function slotRecord(id){return cachedSlots.find(x=>x.slot===id)}
 function playSave(){if(!game)return;const localSlot=slot;const snapshot=structuredClone(game);saveStatus='正在保存';renderSaveStatus();saveQueue=saveQueue.catch(()=>{}).then(async()=>{await storeSlot(localSlot,snapshot);saveStatus='已自动保存';renderSaveStatus();}).catch(e=>{saveStatus='保存失败';renderSaveStatus();announce(`保存失败：${e.message}`,true);});}
@@ -214,15 +229,15 @@ function homePage(){
     </div>
    </header>
    <div class="landing-menu">
-    <button class="landing-cta" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
-     <span class="landing-cta-icon">${game?'▶':'✚'}</span>
-     <span class="landing-cta-text"><b>${game?'继续远征':'开始新的誓约'}</b><small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'踏入黑暗，直面命运 · 点亮第一堆篝火'}</small></span>
-     <span class="landing-card-arrow">›</span>
-    </button>
     <div class="landing-cards">
      <button class="landing-card" data-action="nav-saves">
       <span class="landing-card-icon">▤</span>
       <span class="landing-card-text"><b>命运残页</b><small>选择存档 · 导出备份</small></span>
+      <span class="landing-card-arrow">›</span>
+     </button>
+     <button class="landing-card" data-action="nav-codex">
+      <span class="landing-card-icon">✥</span>
+      <span class="landing-card-text"><b>灰烬图鉴</b><small>职业 · 技能 · 敌人</small></span>
       <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-guide">
@@ -232,10 +247,15 @@ function homePage(){
      </button>
      <button class="landing-card" data-action="nav-settings">
       <span class="landing-card-icon">⚙</span>
-      <span class="landing-card-text"><b>设置</b><small>音效 · 动画 · 文字 · 节奏</small></span>
+      <span class="landing-card-text"><b>设置</b><small>音效 · 惯用手 · 节奏</small></span>
       <span class="landing-card-arrow">›</span>
      </button>
     </div>
+    <button class="landing-cta" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
+     <span class="landing-cta-icon">${game?'▶':'✚'}</span>
+     <span class="landing-cta-text"><b>${game?'继续远征':'开始新的誓约'}</b><small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'踏入黑暗，直面命运 · 点亮第一堆篝火'}</small></span>
+     <span class="landing-card-arrow">›</span>
+    </button>
     <div class="landing-meta">4 名英雄 &nbsp;·&nbsp; 随机远征 &nbsp;·&nbsp; 回合策略 &nbsp;·&nbsp; 本地存档</div>
    </div>
    <aside class="landing-save-card" aria-label="存档概览">
@@ -510,7 +530,7 @@ function mapNodeDetail(){
   '<div class="map-detail-row"><span>通关奖励</span><ul>'+sel.rewards.map(e=>'<li>'+ESC(e)+'</li>').join('')+'</ul></div>'+
   '<div class="map-detail-row"><span>风险评估</span>'+riskSkulls+'</div>'+
   (sel.power?'<div class="map-detail-row"><span>推荐战力</span><strong class="'+(power>=sel.power?'ok-text':'danger-text')+'">'+sel.power+'（我方 '+power+'）</strong></div>':'')+
-  (enterable?button('进入节点 →','enter-node','data-id="'+sel.id+'"','btn btn-gold btn-full'):sel.visited?'<p class="small-muted">该房间已经探索完毕。</p>':'<p class="small-muted">该节点尚未连通，先清理相邻房间。</p>')+
+  (enterable?button('进入节点 →','enter-node','data-id="'+sel.id+'"','btn btn-gold btn-full map-enter'):sel.visited?'<p class="small-muted">该房间已经探索完毕。</p>':'<p class="small-muted">该节点尚未连通，先清理相邻房间。</p>')+
  '</div>';
 }
 function mapTeamStrip(){
@@ -523,8 +543,8 @@ function mapTeamStrip(){
 }
 function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REGIONS.crypt;const possible=reachableNodes(game).map(n=>n.id);const pos=n=>({x:90+n.layer*174,y:195+n.row*103});let edges='';
  for(let layer=0;layer<4;layer++){const src=ex.nodes.filter(n=>n.layer===layer),dst=ex.nodes.filter(n=>n.layer===layer+1);for(const a of src)for(const b of dst){if(b.layer===4||Math.abs(a.row-b.row)<=1){const v=pos(a),w=pos(b);edges+=`<path d="M${v.x} ${v.y} C${v.x+60} ${v.y},${w.x-60} ${w.y},${w.x} ${w.y}" class="map-edge ${a.visited&&b.visited?'travelled':''}"/>`;}}}
- const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower'),known=can||visited||scouted;return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''} ${mapSelectedNode===n.id?'selected':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${known?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${known?(n.name||TYPE_NAMES[n.type]):'未知房间'}</text></g>`}).join('');
- return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="map-head"><div class="map-head-title">${label(region.name,`DUNGEON · ${region.en}`)}</div><div class="map-supplies"><span class="map-chip ${ex.layer+1>=5?'is-danger':''}"><small>层</small><b>${ex.layer+1}/5</b></span><span class="map-chip ${ex.torch===0?'is-danger':''}"><small>火把</small><b>♨ ${ex.torch}</b></span><span class="map-chip"><small>绷带</small><b>✚ ${ex.bandages}</b></span><span class="map-chip"><small>药剂</small><b>⚗ ${ex.potions||0}</b></span><span class="map-chip"><small>圣徽</small><b>✥ ${ex.sigils||0}</b></span></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
+ const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower'),known=can||visited||scouted;return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''} ${mapSelectedNode===n.id?'selected':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="40" class="node-hit"/><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${known?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${known?(n.name||TYPE_NAMES[n.type]):'未知房间'}</text></g>`}).join('');
+ return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="map-head"><button class="map-exit" data-action="retreat" title="撤退并带回战利品" aria-label="撤退并带回战利品"><i>⎋</i><b>撤退</b></button><div class="map-head-title">${label(region.name,`DUNGEON · ${region.en}`)}</div><div class="map-supplies"><span class="map-chip ${ex.layer+1>=5?'is-danger':''}"><small>层</small><b>${ex.layer+1}/5</b></span><span class="map-chip ${ex.torch===0?'is-danger':''}"><small>火把</small><b>♨ ${ex.torch}</b></span><span class="map-chip"><small>绷带</small><b>✚ ${ex.bandages}</b></span><span class="map-chip"><small>药剂</small><b>⚗ ${ex.potions||0}</b></span><span class="map-chip"><small>圣徽</small><b>✥ ${ex.sigils||0}</b></span></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p></aside></div>${mapTeamStrip()}</section>`;}
 function statusBadges(unit){const ss=unit.statuses||{},names={poison:'中毒',bleed:'流血',guard:'守护',mark:'标记',weak:'虚弱',stun:'眩晕'};return Object.entries(names).filter(([key])=>ss[key]>0).map(([key,name])=>`<span class="status-token status-${key}" title="${name} · 剩余 ${ss[key]} 次行动">${name} ${ss[key]}</span>`).join('')||'<span class="status-token status-none">无异常</span>'}
 function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),basic=chosenSkill==='__basic__',allowed=actor?.side==='hero'?(basic?(enemy&&unit.hp>0):skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false):false;
  const info=enemy?ENEMIES[unit.type]:CLASSES[unit.classId],selected=inspectUnitId===unit.id;
@@ -555,15 +575,23 @@ function battleSkillCard(id,index,actor,b,chosen){
   <span class="skill-card-pips">${[1,2,3].map(n=>`<i class="${n<=(lv||0)?'filled':''}"></i>`).join('')}</span>
  </button>`;
 }
-function battleBasicCard(actor,chosen){
- const disabled=false;
- return `<button class="skill-card cat-attack ${chosen==='__basic__'?'chosen':''}" data-action="basic-attack" title="以 100% 攻击力进行普通攻击，无站位限制">
-  <span class="skill-card-tag">攻击</span>
-  <span class="skill-card-art">⚔</span>
-  <span class="skill-card-body"><b>普攻</b><small>100% 攻击力 · 无站位限制</small>
-   <span class="skill-card-meta">命中 92%</span></span>
-  <span class="skill-card-pips"><i class="filled"></i><i class="filled"></i><i class="filled"></i></span>
- </button>`;
+/* 主操作行（方案 §3.1 A 区）：普攻与结束回合各 ≥64pt，结束回合独立 ≥16pt 间距 + 长按确认。
+   普攻不再占技能坞格子 —— 4 项职业技能正好一排，普攻回到最舒适的右下主操作位。 */
+function battlePrimaryActions(actor,basicMode){
+ if(!actor||actor.side!=='hero')return '<div class="battle-main-actions"><span class="muted battle-wait">等待敌方行动…</span></div>';
+ return `<div class="battle-main-actions">
+  <button class="btn battle-attack ${basicMode?'chosen':''}" data-action="basic-attack" aria-pressed="${basicMode}" title="以 100% 攻击力普攻，无站位限制，命中 92%"><b>⚔</b><span>普攻</span></button>
+  <button class="btn btn-gold battle-endturn" data-action="end-turn" data-hold="end-turn" aria-label="结束回合（长按 0.45 秒确认）"><b>⌛</b><span>结束回合</span><i class="hold-ring" aria-hidden="true"></i></button>
+ </div>`;
+}
+/* 次级行（方案 §3.1）：战报/跳过/详情 44×44 图标键，仍在 A 区，不与两个主操作抢位置。
+   绷带在引擎里只允许地图阶段使用（useBandage 要求 phase==='map'），故战斗屏不放。 */
+function battleTools(actor,hero){
+ return `<div class="battle-tools">
+  <button class="battle-tool" data-action="full-log" title="完整战报"><i>☰</i><b>战报</b></button>
+  ${hero&&actor?`<button class="battle-tool" data-action="skip" title="跳过该英雄本次行动"><i>⇥</i><b>跳过</b></button>
+  <button class="battle-tool" data-action="unit" data-id="${actor.id}" title="查看该单位属性与异常状态"><i>◍</i><b>详情</b></button>`:''}
+ </div>`;
 }
 function battleHeroPanel(actor){
  if(!actor||actor.side!=='hero')return '';
@@ -629,15 +657,12 @@ function battlePage(){
     <div class="combat-skills panel">
      <div class="eyebrow">${hero?`${ESC(actor.name)} · 技能卡`:'行动进行中'}</div>
      <div class="skill-card-grid">
-      ${hero?skillList.map((id,i)=>battleSkillCard(id,i+1,actor,b,chosen)).join('')+battleBasicCard(actor,chosen):'<div class="muted">敌人行动已自动执行，请等待下一位英雄。</div>'}
+      ${hero?skillOrder(skillList).map(([id,n])=>battleSkillCard(id,n,actor,b,chosen)).join(''):'<div class="muted">敌人行动已自动执行，请等待下一位英雄。</div>'}
      </div>
-     <div class="battle-main-actions">
-      ${hero?`<button class="btn btn-red" data-action="basic-attack" ${basicMode?'disabled':''}>⚔ 攻击</button>
-      <button class="btn btn-gold" data-action="end-turn">⌛ 结束回合</button>`:'<span class="muted">等待敌方行动…</span>'}
-      <button class="btn btn-ghost battle-report-btn" data-action="full-log" title="完整战报">☰ 战报</button>
-     </div>
+     ${battlePrimaryActions(actor,basicMode)}
      <div class="skill-footer">
-      ${basicMode?'<span>⌖ 点击敌方目标发动普通攻击</span>':chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span><em class="skill-desc-line">${SKILLS[chosen].desc} · 命中 ${SKILLS[chosen].accuracy}%</em>`:'<span>选择技能卡后，可攻击的目标将以金色边框显示</span>'}
+      <span class="skill-hint">${basicMode?'⌖ 点选一名敌人发动普攻':chosen?`⌖ ${SKILLS[chosen].side==='ally'?'点选队友':'点选敌人'}施放「${SKILLS[chosen].name}」`:'选技能卡 → 点目标 → 结束回合'}</span>
+      ${battleTools(actor,hero)}
      </div>
     </div>
    </div>
@@ -707,15 +732,18 @@ function settingsPage(){
   ${group('DISPLAY','画面与动效',
    row('减少动态效果','关闭多数装饰性过渡和动画',toggle('setting-motion',settings.lowMotion,'切换减少动效'))
    +row('大字体模式','扩大文字，方便在较小屏幕阅读',toggle('setting-text',settings.largeText,'切换大字体'))
+   +row('惯用手','左手持机时，主操作与技能卡顺序镜像到左下拇指弧（只翻交互层，不翻立绘与地图）。',`<div class="hand-options" role="group" aria-label="惯用手">${[['right','右手'],['left','左手']].map(([value,title])=>`<button type="button" data-mirror="${value}" class="btn btn-tiny ${settings.hand===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.hand===value}">${title}</button>`).join('')}</div>`,'setting-row-wide')
    +row('战斗表现节奏','技能字样、伤害数字与打击动效的速度，不影响回合规则',`<div class="pace-options" role="group" aria-label="战斗表现节奏">${[['slow','沉浸'],['normal','标准'],['fast','快速']].map(([value,title])=>`<button type="button" data-action="pace" data-id="${value}" class="btn btn-tiny ${settings.pace===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.pace===value}">${title}</button>`).join('')}</div>`,'setting-row-wide')
    +row('显示模式','切换浏览器全屏（可能需要许可）',button('切换全屏','fullscreen','','btn btn-ghost btn-small')))}
   ${group('BATTLE LOG','战斗记录',
    row('精简战斗日志','战报只保留最近 20 条，关闭则保留 200 条；两种模式都能打开「完整战报」。',toggle('setting-log',settings.shortLogs,'切换精简战斗日志')))}
+  ${group('TOUCH','触控诊断',
+   row('本机误触计数','只在本机累计，不上报。死区拦截 = 手指位移 8–24pt 视为无效；长按取消 = 未按满 0.45 秒即抬起。',`<div class="touch-diag" aria-label="交互诊断计数"><span>长按完成 <b>${touchDiag.holds}</b></span><span>长按取消 <b>${touchDiag.cancels}</b></span><span>死区拦截 <b>${touchDiag.deadzone}</b></span></div>`,'setting-row-wide'))}
   <p class="settings-foot">版本 V1.1 · 纯 Web · IndexedDB 本地存档 · 原创游戏与场景美术 · 支持离线运行</p>
  </div></section>`;
 }
 function footer(){return `<footer class="site-footer"><span>ASHEN VOW © ORIGINAL BROWSER PROTOTYPE</span><span><span class="save-light"></span><span id="save-text">${saveStatus}</span> · 存档 ${slot} / 3</span></footer><div class="toast" id="toast" role="status"></div><input type="file" id="import-file" accept="application/json,.json" hidden/>`}
-function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`${rotateHint()}<div class="app-frame phase-${view==='game'&&game?game.phase:'shell'} ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${view==='menu'?'':hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
+function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`${rotateHint()}<div class="app-frame phase-${view==='game'&&game?game.phase:'shell'} ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} ${handLeft()?'hand-left':''} pace-${settings.pace}"><div class="grain"></div>${view==='menu'?'':hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
  const f=document.getElementById('import-file');if(f)f.addEventListener('change',handleImport);
  syncMobileLayout();
 }
@@ -848,6 +876,78 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
 }
 root.addEventListener('input',e=>{if(e.target?.id==='volume-control'){settings.volume=clamp(Number(e.target.value)||0,0,100);preferences.setItem('av-volume',String(settings.volume));const output=document.getElementById('volume-value');if(output)output.textContent=`${settings.volume}%`;}});
 root.addEventListener('change',e=>{if(e.target?.id==='volume-control'){sound('tap');if(bgmNodes&&audioContext){const vol=(settings.volume/100)*0.22;bgmNodes.master.gain.linearRampToValueAtTime(Math.max(0.0001,vol),audioContext.currentTime+0.3);}}});
-root.addEventListener('click',e=>{const control=e.target.closest('[data-action]');if(!control||control.disabled||waiting)return;waiting=true;Promise.resolve(actionRun(control)).catch(err=>{console.error(err);announce(err.message||'操作失败',true)}).finally(()=>waiting=false);});
-window.addEventListener('keydown',e=>{if(view!=='game'||game?.phase!=='battle'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='Escape'){chosenSkill=null;render();return;}if(['1','2','3'].includes(e.key)){const hero=currentActor(game);if(hero?.side==='hero'){const skill=CLASSES[hero.classId].skills[Number(e.key)-1];actionRun({dataset:{action:'skill',id:skill}});}}});
+/* §6.1 触控手势（方案 §5.2 / §5.3）
+   Tap：位移 <8pt 且时长 <300ms；死区 8–24pt 不触发；≥24pt 视为滑动，同样不触发核心决策。
+   长按：在 [data-hold] 键位按下满 HOLD_MS 才执行，进度环实时回填；提前抬起或滑出阈值即取消。 */
+const nowMs=()=>Date.now();
+let gesture=null,hold=null,suppressClickUntil=0;
+function runControl(el){if(!el||el.disabled||waiting)return;waiting=true;Promise.resolve(actionRun(el)).catch(err=>{console.error(err);announce(err.message||'操作失败',true)}).finally(()=>waiting=false);}
+function haptic(pattern){try{navigator.vibrate?.(pattern)}catch{}}
+function clearHoldVisual(el){if(el)el.classList.remove('holding','hold-ready');}
+function cancelHold(counted){
+ if(!hold)return;
+ const el=hold.el;
+ if(hold.raf)cancelAnimationFrame(hold.raf);
+ clearTimeout(hold.timer);
+ if(counted){
+  if(nowMs()-hold.started>=120)bumpDiag('cancels');
+  suppressClickUntil=nowMs()+320;           // 没按满就松手/滑开：这次点击不生效
+ }
+ hold=null;clearHoldVisual(el);
+ const ring=el.querySelector('.hold-ring');if(ring)ring.style.setProperty('--hold','0');
+}
+function startHold(el){
+ cancelHold(false);
+ hold={el,started:nowMs(),raf:0,timer:0};
+ el.classList.add('holding');
+ const ring=el.querySelector('.hold-ring');
+ const tick=()=>{
+  if(!hold)return;
+  const p=Math.min(1,(nowMs()-hold.started)/HOLD_MS);
+  if(ring)ring.style.setProperty('--hold',String(Math.round(p*100)));
+  if(p<1)hold.raf=requestAnimationFrame(tick);
+ };
+ if(typeof requestAnimationFrame==='function')hold.raf=requestAnimationFrame(tick);
+ hold.timer=setTimeout(()=>{
+  if(!hold)return;
+  const target=hold.el;
+  if(hold.raf)cancelAnimationFrame(hold.raf);
+  hold=null;
+  target.classList.remove('holding');target.classList.add('hold-ready');
+  if(ring)ring.style.setProperty('--hold','100');
+  bumpDiag('holds');haptic(18);
+  suppressClickUntil=nowMs()+320;           // 吞掉松手后浏览器补发的那次 click
+  runControl(target);
+ },HOLD_MS);
+}
+root.addEventListener('pointerdown',e=>{
+ if(e.button!==undefined&&e.button!==0)return;
+ const el=e.target?.closest?.('[data-action],[data-mirror]');
+ gesture=el?{el,x:e.clientX,y:e.clientY,moved:0}:null;
+ if(el&&el.hasAttribute('data-hold'))startHold(el);
+},{passive:true});
+root.addEventListener('pointermove',e=>{
+ if(!gesture)return;
+ const d=Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y);
+ if(d>gesture.moved)gesture.moved=d;
+ if(d>TAP_SLOP)cancelHold(true);           // 手指滑开即取消长按
+},{passive:true});
+root.addEventListener('pointerup',()=>{
+ if(gesture&&gesture.moved>=TAP_SLOP){
+  suppressClickUntil=nowMs()+320;
+  if(gesture.moved<24)bumpDiag('deadzone');   // 8–24pt 记死区；≥24pt 视为滑动，不算误触
+ }
+ cancelHold(true);
+ gesture=null;
+},{passive:true});
+root.addEventListener('pointercancel',()=>{suppressClickUntil=nowMs()+320;cancelHold(true);gesture=null;},{passive:true});
+root.addEventListener('click',e=>{
+ if(nowMs()<suppressClickUntil){e.stopPropagation();e.preventDefault();return;}
+ const mirror=e.target?.closest?.('[data-mirror]');
+ if(mirror){settings.hand=mirror.dataset.mirror==='left'?'left':'right';preferences.setItem('av-hand',settings.hand);sound('tap');render();return;}
+ const control=e.target?.closest?.('[data-action]');
+ if(!control||control.disabled||waiting)return;
+ runControl(control);
+},true);
+window.addEventListener('keydown',e=>{if(view!=='game'||game?.phase!=='battle'||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='Escape'){chosenSkill=null;render();return;}const typing=e.target?.closest?.('button,input,textarea,select,a[href]');if(['1','2','3'].includes(e.key)){const hero=currentActor(game);if(hero?.side==='hero'){const skill=CLASSES[hero.classId].skills[Number(e.key)-1];actionRun({dataset:{action:'skill',id:skill}});}return;}if(typing)return;if(e.key==='a'||e.key==='A'){actionRun({dataset:{action:'basic-attack'}});return;}if(e.key===' '){e.preventDefault();actionRun({dataset:{action:'end-turn'}});}});
 (async()=>{try{await reloadSlots();const first=cachedSlots.filter(x=>snapshotValid(x)&&isValidSave(x.data)).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0];if(first){slot=first.slot;game=ensureProgression(first.data);saveStatus='本地存档就绪';}}catch(e){saveStatus='存档不可用';console.error(e);}render();})();
