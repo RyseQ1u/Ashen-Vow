@@ -2008,6 +2008,96 @@ body:has(.landing) .site-footer{display:none}
  .event-choices .choice{padding:var(--sp-2) var(--sp-3)}
 }
 
+/* ========================================================================
+   UI 重设计 · Phase 9.1 战场 + 单位情报
+   —— 单位卡：名字与血量同行（省一行高度），血条/压力条贴底对齐，
+      低血与高压力各有独立警示色；可选目标描金，正在查看的单位描米白。
+   —— 情报条：友/敌标记 + 等宽数值，生命与压力按危险度变色。
+   ======================================================================== */
+.combat-unit .unit-head{display:flex;align-items:baseline;justify-content:space-between;gap:2px;width:100%;min-width:0;padding:0 1px}
+.combat-unit .unit-name{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-xs);letter-spacing:0;color:var(--cream)}
+.combat-unit .unit-numbers{flex:0 0 auto;font:600 10px/1 Arial,sans-serif;letter-spacing:0;color:var(--cream)}
+.combat-unit .unit-numbers i{font-style:normal;font-size:7.5px;color:var(--dim);letter-spacing:0}
+.combat-unit .unit-art{flex:1 1 auto;height:auto;min-height:0}
+.combat-unit .unit-meter{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:12px;margin:var(--sp-1) 0 2px;border:1px solid #4a3538;border-radius:3px;background:#2a2023;overflow:hidden}
+.combat-unit .unit-meter>span{position:absolute;top:0;bottom:0;left:0;width:var(--hp,0%);background:linear-gradient(90deg,#8f3b33,#c9634f);transition:width .25s}
+.combat-unit .unit-meter:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#00000040,transparent 60%,#00000059);pointer-events:none}
+.combat-unit .unit-numbers{position:relative;z-index:1;font:600 9px/1 Arial,sans-serif;letter-spacing:0;color:#f4e0cd;text-shadow:0 1px 2px #000c}
+.combat-unit .unit-numbers i{font-style:normal;font-size:7px;color:#e3c9b2cc}
+.combat-unit .unit-stress{width:100%;height:2px;margin-top:2px;border-radius:var(--r-pill);background:#2c2733;overflow:hidden}
+.combat-unit .unit-stress span{height:100%;width:var(--stress,0%);background:#6f7fa6}
+.combat-unit.unit-low .unit-meter{box-shadow:0 0 0 1px #e2604a66}
+.combat-unit.unit-low .unit-meter span{background:linear-gradient(90deg,#b3352c,#e8694f)}
+.combat-unit.unit-stressed .unit-stress span{background:linear-gradient(90deg,#9a6fc4,#c79ae8)}
+.combat-unit.unit-targetable{border-color:var(--gold);box-shadow:inset 0 0 0 1px #e0bd7e44}
+.combat-unit.unit-inspected{border-color:#f0dcb4}
+
+.unit-info-flag{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:var(--r-sm);font-size:9px;line-height:1;letter-spacing:0;border:1px solid #6d4f28;background:#2b2318;color:var(--gold)}
+.unit-info-flag.foe{border-color:#7d4038;background:#2a1715;color:#d99a8f}
+.unit-info-name{font-size:var(--fs-sm);color:var(--cream);white-space:nowrap}
+.unit-info-stats span{display:inline-flex;align-items:baseline;gap:3px;color:var(--muted)}
+.unit-info-stats span b{font-family:Arial,sans-serif;font-size:var(--fs-sm);color:var(--cream)}
+.unit-info-stats span b i{font-style:normal;font-size:9px;color:var(--dim)}
+.unit-info-stats .stat-hp.is-low b{color:#e88a76}
+.unit-info-stats .stat-stress.is-mid b{color:#d8b573}
+.unit-info-stats .stat-stress.is-high b{color:#c79ae8}
+
+/* ========================================================================
+   UI 重设计 · Phase 9.2 技能坞 + 战报
+   —— 技能卡：选中=金框+内发光，禁用=降饱和且明确变暗，类别色只留在左侧描边；
+      受击预估压成一枚小徽标，不再盖住单位；主操作只有「结束回合」是实心金。
+   —— 战报浮层：行距与分隔更清晰，序号列定宽，底部操作按钮在窄屏撑满。
+   ======================================================================== */
+.skill-card{position:relative;transition:border-color .15s,background .15s,box-shadow .15s,opacity .15s}
+.skill-card.chosen{border-color:var(--gold);box-shadow:inset 0 0 0 1px #e0bd7e66,0 0 14px #d8a95f3d;background:linear-gradient(160deg,#3b2f24,#241d1c)}
+.skill-card.chosen .skill-card-art{color:var(--gold-light);text-shadow:0 0 10px #e6bb7480}
+.skill-card:disabled{opacity:.42;filter:saturate(.6)}
+.skill-card:disabled .skill-card-tag{opacity:.7}
+.skill-card-tag{box-shadow:inset 0 0 0 1px #0000004d}
+.skill-card.cat-damage .skill-card-tag,.skill-card.cat-finisher .skill-card-tag{background:#3a1f1d;color:#e6b3a4;border-color:#8a4a42}
+.skill-card.cat-defense .skill-card-tag{background:#202b26;color:#a9c4b2;border-color:#4c6357}
+.skill-card.cat-buff .skill-card-tag,.skill-card.cat-attack .skill-card-tag{background:#33291a;color:#e6cd9d;border-color:#7a6238}
+
+.damage-preview{display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;overflow:hidden;border:1px solid #7a3f36;background:#1a0f0ee8;color:#e7bfa8;font-size:8.5px;letter-spacing:0}
+.damage-preview b{font:700 10.5px/1.2 Arial,sans-serif;color:#ffd7b0}
+.damage-preview i{font-style:normal;color:#b99f8c;font-size:8px}
+.damage-preview em{font-style:normal;padding:0 2px;border-radius:2px;background:#6d2f2a;color:#ffd0bb;font-size:8px}
+.damage-preview.heal{border-color:#4f6b52;background:#0f1712e8;color:#bcd6bd}
+.damage-preview.stress{border-color:#5b4a7a;background:#120f1be8;color:#cbb6ea}
+
+.battle-view .status-token.status-none{display:none}
+.battle-view .skill-footer{align-items:flex-start}
+.battle-view .skill-footer>span{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.battle-view .battle-main-actions .btn-gold{flex:2 1 0;font-weight:600}
+.battle-view .battle-report-btn{flex:1 1 0;color:var(--muted)}
+.battle-view .battle-report-btn:hover{color:var(--cream)}
+
+.full-log-head{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#1c120c,#1c120cf2);backdrop-filter:blur(2px)}
+.full-log-body .log-line{padding:var(--sp-2) 0;border-bottom:1px solid #594d4033;color:#c2b2a4}
+.full-log-body .log-line:last-child{border-bottom:0}
+.full-log-body .log-line.round{color:var(--gold);font-style:normal;letter-spacing:1px;padding-top:var(--sp-3)}
+.full-log-body .log-line.hit{color:#e6c3a1}
+.full-log-body .log-line.hurt{color:#dd9a8e}
+.full-log-body .log-line.heal{color:#aec9ac}
+.log-index{min-width:20px;color:#7d6a52}
+.full-log-actions .btn{flex:1 1 0}
+.full-log-panel{border-radius:var(--r-md)}
+
+/* Phase 9.1b 战斗头部：谁在行动 + 敌方意图的对比拉开（只调字号/明度，不动高度） */
+.battle-view .battle-turn{display:inline-flex;align-items:center;gap:var(--sp-2);padding:2px var(--sp-2);border:1px solid #6d4f28;border-radius:var(--r-pill);background:#1d1a14cc;font-size:var(--fs-xs);letter-spacing:0;white-space:nowrap}
+.battle-view .battle-turn strong{color:var(--gold-light);font-weight:600}
+.battle-view .battle-turn>span:last-child{font-size:9px;color:var(--dim)}
+.battle-view .battle-header h2{font-size:var(--fs-md);letter-spacing:1px;margin:var(--sp-1) 0 0}
+.battle-view .battle-header .eyebrow{font-size:8px;letter-spacing:1.5px;color:var(--muted)}
+.battle-view .combat-region-rule{font-size:9px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.enemy-intents .intent-chip strong{font-weight:400;font-size:9.5px;color:var(--muted);letter-spacing:0}
+.enemy-intents .intent-chip span{font-weight:600;color:#f0dcc0}
+.enemy-intents .intent-chip.warning span{color:#f0cf92}
+.enemy-intents .intent-chip.critical span{color:#f4b3a6}
+.initiative-portrait.currently{border-color:var(--gold);box-shadow:inset 0 0 0 1px #e0bd7e44,0 0 10px #d8a95f33;color:var(--cream)}
+.initiative-portrait{font-size:8.5px}
+.turn-strip>span{font-size:8.5px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
 // Static game data tables extracted from engine.js (Phase 0 refactor).
 // No runtime logic — import-safe constants only.
@@ -3490,13 +3580,15 @@ function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REG
 function statusBadges(unit){const ss=unit.statuses||{},names={poison:'中毒',bleed:'流血',guard:'守护',mark:'标记',weak:'虚弱',stun:'眩晕'};return Object.entries(names).filter(([key])=>ss[key]>0).map(([key,name])=>`<span class="status-token status-${key}" title="${name} · 剩余 ${ss[key]} 次行动">${name} ${ss[key]}</span>`).join('')||'<span class="status-token status-none">无异常</span>'}
 function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),basic=chosenSkill==='__basic__',allowed=actor?.side==='hero'?(basic?(enemy&&unit.hp>0):skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false):false;
  const info=enemy?ENEMIES[unit.type]:CLASSES[unit.classId],selected=inspectUnitId===unit.id;
+ const hpRatio=percent(unit.hp,unit.maxHp),lowHp=unit.hp>0&&hpRatio<=30,stressHigh=(unit.stress||0)>=70;
  const preview=allowed?previewSkillDamage(game,basic?'__basic__':chosenSkill,unit.id):null;
- return `<button type="button" class="combat-unit ${unit.hp<=0?'dead':''} ${active?'unit-active':''} ${allowed?'unit-targetable':''} ${selected?'unit-inspected':''}" data-action="unit" data-id="${unit.id}" style="--accent:${info.color}" aria-label="${ESC(unit.name)}，站位 ${unit.rank}，生命 ${unit.hp}/${unit.maxHp}${allowed?'，可作为技能目标':''}"><div class="unit-position">${unit.rank}</div><div class="unit-art">${enemy?svgPortrait(unit.type,true):heroPortrait(unit.classId)}</div><div class="unit-name">${ESC(unit.name)}</div><div class="unit-meter"><span style="width:${percent(unit.hp,unit.maxHp)}%"></span></div><div class="unit-numbers">${unit.hp} / ${unit.maxHp}</div>${!enemy?`<div class="unit-stress"><span style="width:${percent(unit.stress,100)}%"></span></div>`:''}${preview?.ok?`<div class="damage-preview ${preview.type}" title="受击预估：含 ±2 浮动${preview.critChance?`，暴击率约 ${preview.critChance}%`:''}">${preview.type==='damage'?`受击 <b>${preview.min}~${preview.max}</b>${preview.critMax?` · 暴击≤${preview.critMax}`:''} · 命中 ${preview.hit}%${preview.kill?' · 可击杀':''}`:preview.type==='heal'?`恢复 <b>${preview.max}</b> 点`:`压力 -<b>${preview.max}</b>`}</div>`:''}${allowed?'<div class="target-indicator">⌖ 可选择</div>':''}${unit.statuses?.poison>0?'<i class="status-dot poison" title="中毒">☠</i>':''}${unit.statuses?.guard>0?'<i class="status-dot guard" title="守护">✧</i>':''}</button>`;
+ return `<button type="button" class="combat-unit ${unit.hp<=0?'dead':''} ${active?'unit-active':''} ${allowed?'unit-targetable':''} ${selected?'unit-inspected':''} ${lowHp?'unit-low':''} ${stressHigh?'unit-stressed':''}" data-action="unit" data-id="${unit.id}" style="--accent:${info.color};--hp:${hpRatio}%;--stress:${percent(unit.stress,100)}%" aria-label="${ESC(unit.name)}，站位 ${unit.rank}，生命 ${unit.hp}/${unit.maxHp}${allowed?'，可作为技能目标':''}"><div class="unit-position">${unit.rank}</div><div class="unit-art">${enemy?svgPortrait(unit.type,true):heroPortrait(unit.classId)}</div><div class="unit-head"><span class="unit-name">${ESC(unit.name)}</span></div><div class="unit-meter"><span></span><b class="unit-numbers">${unit.hp}<i>/${unit.maxHp}</i></b></div>${!enemy?`<div class="unit-stress"><span></span></div>`:''}${preview?.ok?`<div class="damage-preview ${preview.type}" title="受击预估：含 ±2 浮动${preview.critChance?`，暴击率约 ${preview.critChance}%`:''}">${preview.type==='damage'?`<b>${preview.min}~${preview.max}</b><i>${preview.hit}%</i>${preview.kill?'<em>可击杀</em>':''}`:preview.type==='heal'?`恢复 <b>${preview.max}</b>`:`压力 <b>-${preview.max}</b>`}</div>`:''}${allowed?'<div class="target-indicator">⌖ 可选择</div>':''}${unit.statuses?.poison>0?'<i class="status-dot poison" title="中毒">☠</i>':''}${unit.statuses?.guard>0?'<i class="status-dot guard" title="守护">✧</i>':''}</button>`;
 }
 function combatUnitInfo(b,actor){const chosen=[...b.heroes,...b.enemies].find(u=>u.id===inspectUnitId)||actor||b.enemies.find(u=>u.hp>0)||b.heroes.find(u=>u.hp>0);
  if(!chosen)return '<span>暂无可查看单位</span>';
  const role=chosen.side==='hero'?CLASSES[chosen.classId]?.name:ENEMIES[chosen.type]?.name;
- return `<div class="unit-info-details"><div class="unit-info-title"><span>◈ ${ESC(chosen.name)}</span><small>${role||'未知职业'} · ${chosen.side==='hero'?'友军':'敌军'} · 站位 ${chosen.rank}</small></div><div class="unit-info-stats"><span>生命 <b>${chosen.hp}/${chosen.maxHp}</b></span><span>攻击 <b>${chosen.attack}</b></span><span>护甲 <b>${chosen.armor}</b></span><span>速度 <b>${chosen.speed}</b></span>${chosen.side==='hero'?`<span>压力 <b>${chosen.stress}/100</b></span>`:`<span>毒抗 <b>${enemyResistances(chosen.type).poison}%</b></span><span>流血抗 <b>${enemyResistances(chosen.type).bleed}%</b></span><span>眩晕抗 <b>${enemyResistances(chosen.type).stun}%</b></span>`}</div><div class="status-list">${statusBadges(chosen)}</div></div>`;
+ const hpRatio=percent(chosen.hp,chosen.maxHp),stressLevel=(chosen.stress||0)>=70?'is-high':(chosen.stress||0)>=40?'is-mid':'';
+ return `<div class="unit-info-details"><div class="unit-info-title"><span class="unit-info-flag ${chosen.side==='hero'?'ally':'foe'}">${chosen.side==='hero'?'友':'敌'}</span><span class="unit-info-name">${ESC(chosen.name)}</span><small>${role||'未知职业'} · 站位 ${chosen.rank}</small></div><div class="unit-info-stats"><span class="stat-hp ${hpRatio<=30?'is-low':''}">生命 <b>${chosen.hp}<i>/${chosen.maxHp}</i></b></span><span>攻击 <b>${chosen.attack}</b></span><span>护甲 <b>${chosen.armor}</b></span><span>速度 <b>${chosen.speed}</b></span>${chosen.side==='hero'?`<span class="stat-stress ${stressLevel}">压力 <b>${chosen.stress}<i>/100</i></b></span>`:`<span>毒抗 <b>${enemyResistances(chosen.type).poison}%</b></span><span>流血抗 <b>${enemyResistances(chosen.type).bleed}%</b></span><span>眩晕抗 <b>${enemyResistances(chosen.type).stun}%</b></span>`}</div><div class="status-list">${statusBadges(chosen)}</div></div>`;
 }
 function battleSkillCard(id,index,actor,b,chosen){
  const s=SKILLS[id],lv=skillLevel(actor,id),branch=skillBranch(actor,id);
@@ -3594,7 +3686,7 @@ function battlePage(){
      <div class="battle-main-actions">
       ${hero?`<button class="btn btn-red" data-action="basic-attack" ${basicMode?'disabled':''}>⚔ 攻击</button>
       <button class="btn btn-gold" data-action="end-turn">⌛ 结束回合</button>`:'<span class="muted">等待敌方行动…</span>'}
-      <button class="btn btn-ghost battle-report-btn" data-action="full-log" title="完整战报">▤ 战报</button>
+      <button class="btn btn-ghost battle-report-btn" data-action="full-log" title="完整战报">☰ 战报</button>
      </div>
      <div class="skill-footer">
       ${basicMode?'<span>⌖ 点击敌方目标发动普通攻击</span>':chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span><em class="skill-desc-line">${SKILLS[chosen].desc} · 命中 ${SKILLS[chosen].accuracy}%</em>`:'<span>选择技能卡后，可攻击的目标将以金色边框显示</span>'}
