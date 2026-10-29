@@ -214,25 +214,25 @@ function homePage(){
     </div>
    </header>
    <div class="landing-menu">
+    <button class="landing-cta" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
+     <span class="landing-cta-icon">${game?'▶':'✚'}</span>
+     <span class="landing-cta-text"><b>${game?'继续远征':'开始新的誓约'}</b><small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'踏入黑暗，直面命运 · 点亮第一堆篝火'}</small></span>
+     <span class="landing-card-arrow">›</span>
+    </button>
     <div class="landing-cards">
-     <button class="landing-card primary" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
-      <span class="landing-card-icon">${game?'▶':'✚'}</span>
-      <span class="landing-card-text"><b>${game?'继续远征':'开始新的誓约'}</b><small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'踏入黑暗，直面命运 · 点亮第一堆篝火'}</small></span>
-      <span class="landing-card-arrow">›</span>
-     </button>
      <button class="landing-card" data-action="nav-saves">
       <span class="landing-card-icon">▤</span>
-      <span class="landing-card-text"><b>命运残页</b><small>选择存档 · 导出备份 · 云端之外的记忆</small></span>
+      <span class="landing-card-text"><b>命运残页</b><small>选择存档 · 导出备份</small></span>
       <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-guide">
       <span class="landing-card-icon">?</span>
-      <span class="landing-card-text"><b>旅者指南</b><small>战斗规则 · 营地建设 · 远征方针</small></span>
+      <span class="landing-card-text"><b>旅者指南</b><small>战斗规则 · 营地建设</small></span>
       <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-settings">
       <span class="landing-card-icon">⚙</span>
-      <span class="landing-card-text"><b>设置</b><small>音效 · 动画 · 文字大小 · 节奏</small></span>
+      <span class="landing-card-text"><b>设置</b><small>音效 · 动画 · 文字 · 节奏</small></span>
       <span class="landing-card-arrow">›</span>
      </button>
     </div>

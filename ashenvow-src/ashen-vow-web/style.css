@@ -1532,3 +1532,35 @@ body:has(.landing) .site-footer{display:none}
 
   .battle-view .skill-card { min-height: 58px; }
 }
+
+/* ========================================================================
+   UI 重设计 · Phase 4 主菜单：信息层级重构
+   —— 主操作升级为全宽大 CTA，次要入口横向紧凑，统一视觉语言
+   ======================================================================== */
+.landing-cta{
+  display:flex;align-items:center;gap:var(--sp-4);width:100%;min-height:64px;
+  text-align:left;border:1px solid var(--gold);border-radius:var(--r-lg);
+  background:linear-gradient(135deg,#e5c88b,#b58b52 65%,#d4ae72);
+  color:#191719;padding:var(--sp-3) var(--sp-5);cursor:pointer;
+  box-shadow:inset 0 0 0 1px #f9df995c,0 12px 28px #0006;
+  transition:transform .16s,box-shadow .16s;
+}
+.landing-cta:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px #f9df995c,0 16px 36px #c29a5240}
+.landing-cta-icon{font-size:24px;flex-shrink:0}
+.landing-cta-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.landing-cta-text b{font-size:18px;font-weight:600;letter-spacing:1px;color:#191719}
+.landing-cta-text small{font-size:12px;color:#3a2c1c;opacity:.82;line-height:1.4}
+.landing-cta .landing-card-arrow{font-size:26px;color:#191719;flex-shrink:0}
+
+/* 次要入口：横向紧凑，等宽三列 */
+.landing-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3);margin-top:var(--sp-3);width:100%}
+.landing-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:0;padding:var(--sp-3) var(--sp-3) var(--sp-2);text-align:left;border:1px solid var(--border);border-radius:var(--r-md);background:linear-gradient(155deg,#2b242cd9,#181a1fd9);color:#e2d0b4;cursor:pointer;transition:transform .16s,border-color .16s}
+.landing-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+.landing-card-icon{font-size:20px;color:#e8c18a;line-height:1}
+.landing-card-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.landing-card-text b{font-size:15px;color:#f0ddc0;letter-spacing:.5px}
+.landing-card-text small{font-size:10.5px;color:#a99b8c;line-height:1.4}
+.landing-card-arrow{align-self:center;font-size:20px;color:#d1ab77}
+
+/* Phase 4 补充：手机端隐藏装饰性 meta 行（信息层级：首屏只留决策与主操作） */
+@media all{.landing-menu>.landing-meta{display:none}}
