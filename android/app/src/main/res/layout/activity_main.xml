@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主界面：整屏 WebView + 原生兜底错误页（正常运行时错误页不可见） -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/av_ink"
+    android:fitsSystemWindows="true">
+
+    <WebView
+        android:id="@+id/game_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/av_ink" />
+
+    <LinearLayout
+        android:id="@+id/error_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/av_ink"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚔"
+            android:textColor="@color/av_gold"
+            android:textSize="44sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/error_title"
+            android:textColor="@color/av_cream"
+            android:textSize="19sp" />
+
+        <TextView
+            android:id="@+id/error_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="@color/av_muted"
+            android:textSize="13sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:backgroundTint="@color/av_red"
+            android:onClick="onReloadClicked"
+            android:paddingLeft="26dp"
+            android:paddingRight="26dp"
+            android:text="@string/reload"
+            android:textAllCaps="false"
+            android:textColor="@color/av_cream" />
+    </LinearLayout>
+</FrameLayout>

@@ -359,7 +359,7 @@ export function validTargets(b,actor,skill){const allies=actor.side==='hero'?b.h
  const members=skill.side==='ally'?allies:enemies;
  return living(members).filter(u=>skill.targets.includes(u.rank));
 }
-function log(b,text,type='normal'){b.logs.unshift({text,type});if(b.logs.length>24)b.logs.length=24;}
+function log(b,text,type='normal'){b.logs.unshift({text,type});if(b.logs.length>400)b.logs.length=400;}
 function compressRanks(b){for(const group of [b.heroes,b.enemies]) living(group).forEach((u,i)=>u.rank=i+1);}
 function endCheck(state){const b=state.battle;if(!b)return true;
  if(!living(b.enemies).length){const bonus=b.kind==='boss'?110:b.kind==='elite'?55:integer(state,18,35);state.expedition.lootGold+=bonus;state.expedition.lootShards+=b.kind==='boss'?12:b.kind==='elite'?4:integer(state,0,2);if(b.kind==='boss')awardTrinket(state,'epic');else if(b.kind==='elite')awardTrinket(state,'rare');else if(integer(state,1,100)<=25)awardTrinket(state);b.finished=true;syncHeroes(state);
@@ -574,6 +574,43 @@ export function basicAttack(state,targetId){
  else{damage(state,actor,target,1.0,{});log(b,`${actor.name} 对 ${target.name} 发动普通攻击`,'normal');}
  if(!endCheck(state))advanceTurn(state);
  return {ok:true};
+}
+/**
+ * 纯函数：预估当前英雄对目标使用技能/普攻的受击结果（不修改任何状态）。
+ * skillId 传 '__basic__' 表示普攻。返回 {ok,type,min,max,hit,critChance,critMax,kill}。
+ * 数值口径与 damage()/performSkill() 一致：浮动 -2~+2，护甲/守护/标记/虚弱按同公式结算。
+ */
+export function previewSkillDamage(state,skillId,targetId){
+ const b=state?.battle;if(!b)return {ok:false};
+ const actor=currentActor(state);if(!actor||actor.side!=='hero')return {ok:false};
+ const target=[...b.heroes,...b.enemies].find(u=>u.id===targetId&&u.hp>0);
+ if(!target)return {ok:false};
+ let type='damage',power=1,accuracy=92,pierce=0,critBonus=0,extraHeal=0,reliefBonus=0;
+ if(skillId!=='__basic__'){
+  const base=SKILLS[skillId];if(!base)return {ok:false};
+  const lv=skillLevel(actor,skillId),branch=skillBranch(actor,skillId);
+  type=base.type;
+  power=base.power+(base.type==='damage'?.12*lv:base.type==='heal'?4*lv:base.type==='relief'?6*lv:0)+(branch?.power||0);
+  accuracy=Math.min(100,base.accuracy+2*lv);
+  pierce=branch?.pierce||0;critBonus=branch?.crit||0;
+  extraHeal=(actor.level||1)*2+(actor.healBonus||0)+(branch?.heal||0);
+  reliefBonus=branch?.relief||0;
+ }
+ const hit=clamp(accuracy+(actor.accuracyBonus||0),1,100);
+ if(type==='damage'){
+  const raw=spread=>Math.max(1,Math.round(actor.attack*power+spread-Math.max(0,target.armor-pierce)));
+  const mod=v=>{let a=v;
+   if(target.statuses?.guard>0)a=Math.max(1,Math.floor(a*.55));
+   if(target.statuses?.mark>0)a=Math.round(a*1.3);
+   if(actor.statuses?.weak>0)a=Math.max(1,Math.round(a*.65));
+   return a;};
+  const min=mod(raw(-2)),max=mod(raw(2));
+  const critChance=9+(actor.critBonus||0)+critBonus;
+  return {ok:true,type:'damage',min,max,hit,critChance,critMax:Math.round(max*1.5),kill:max>=target.hp};
+ }
+ if(type==='heal'){const amount=Math.round(power+extraHeal);const effective=Math.min(target.maxHp-target.hp,amount);return {ok:true,type:'heal',min:effective,max:effective,hit:100};}
+ if(type==='relief'){const v=Math.round(power+reliefBonus);return {ok:true,type:'relief',min:v,max:v,hit:100};}
+ return {ok:true,type,hit:100};
 }
 /** End the current hero turn without acting. */
 export function endTurn(state){if(state.phase!=='battle'||currentActor(state)?.side!=='hero')return false;

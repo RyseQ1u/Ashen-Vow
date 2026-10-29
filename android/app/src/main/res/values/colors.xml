@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 与网页版同一套色板，保证启动瞬间到游戏画面没有跳色 -->
+    <color name="av_ink">#0B0C10</color>
+    <color name="av_ink_dark">#07080A</color>
+    <color name="av_surface">#1A1B21</color>
+    <color name="av_gold">#CFAC70</color>
+    <color name="av_gold_light">#EAD6A6</color>
+    <color name="av_cream">#E6D9C6</color>
+    <color name="av_muted">#938C84</color>
+    <color name="av_red">#A64C47</color>
+    <color name="ic_launcher_background">#0B0C10</color>
+</resources>

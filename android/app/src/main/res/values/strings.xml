@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">灰烬誓约</string>
+    <string name="exit_hint">再按一次退出游戏</string>
+    <string name="error_title">篝火熄灭了</string>
+    <string name="error_detail">游戏内容未能载入，请重新加载。</string>
+    <string name="load_failed">资源载入失败：%1$s</string>
+    <string name="render_gone">渲染进程已被系统回收，请重新打开应用。</string>
+    <string name="reload">重新点燃</string>
+    <string name="no_browser">设备上没有可用的浏览器</string>
+</resources>

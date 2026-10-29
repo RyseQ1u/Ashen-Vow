@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 冷启动背景：纯深色 + 居中徽记（约 132dp），与 4.3MB 内联页面解析的 0.3~1 秒形成过渡 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/av_ink" />
+    <item
+        android:width="132dp"
+        android:height="132dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/splash_mark" />
+    </item>
+</layer-list>

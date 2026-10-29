@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ 系统启动页：品牌深色底 + 徽记，随后切入游戏画面 -->
+    <style name="Theme.AshenVow" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/av_ink</item>
+        <item name="android:colorBackground">@color/av_ink</item>
+        <item name="android:statusBarColor">@color/av_ink</item>
+        <item name="android:navigationBarColor">@color/av_ink</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:colorAccent">@color/av_gold</item>
+        <item name="android:windowDisablePreview">false</item>
+    </style>
+
+    <style name="Theme.AshenVow.Splash" parent="Theme.AshenVow">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowSplashScreenBackground">@color/av_ink</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_mark</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/av_ink_dark</item>
+        <item name="android:windowSplashScreenAnimationDuration">300</item>
+    </style>
+</resources>

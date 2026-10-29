@@ -48,3 +48,26 @@ Status: playable standalone Web prototype, ready for local acceptance.
 
 ### Final status V1.1
 - Phases 0–5 delivered. Remaining human verification: real-browser IndexedDB persist/reload; optional playtest balance pass with art in place.
+
+### Android 封装 + 窄屏营地修复（2026-10-28）
+- 新增 `android/` 原生壳工程（WebView + 虚拟域名 `appassets.androidplatform.net` 映射 assets），包名 `com.ashenvow.game`，versionName 1.1.0 / versionCode 11000，零权限离线运行。
+- 构建产物：debug 3.5 MB、release 3.4 MB（已签名）；在 API 37 模拟器完成安装、冷启动、四界面走查、IndexedDB 落盘与强停重装后的存档恢复验证。
+- 修复 `style.css` 窄屏营地右侧裁切：`.camp-layout` 单列轨道由 `1fr` 改为 `minmax(0, 1fr)`，并给 `.camp-stage/.camp-overview/.camp-scene` 补 `min-width:0`，队伍卡改横向滚动（浏览器端同样生效）。
+- 回归：`node --test tests/*.test.js` 110/110 通过；单文件产物重建后 4,358,540 字节。
+
+### 手机单屏操控优化（2026-10-29）
+- 问题定位（390×844 实测）：战斗页总高 2150px，战场在 404–917、技能卡在 1291–1700；在 y=994 选中技能后战场顶部变为 -590，每次行动需上下各滑约 600px 才能"选技能→点目标"。地图选中节点后「进入节点」在 y≈1543，距当前位置约 1400px；营地「出发」在 y=1605–1749（1.9 屏），建筑卡竖排 725px；地图节点点击区仅 39×55px。
+- 战斗：改为 `100dvh` 三段式（战况条 / 战场 flex / 技能坞），页面纵向零滚动。技能坞 4 卡横排（54px 高，保留分类色条与名称），主操作 44px，单位情报压缩成单行横滑条，战报移入浮层（原 `.combat-log` 在手机上隐藏，`full-log` 浮层保留全部功能）。390×844 实测 docH=844，战场 461px；360×640 战场 315px。
+- 地图：`svg` viewBox 裁至实际内容（`0 55 885 415`）、最小宽度 700px，节点点击区 49×68px；节点情报与「进入节点」改为 36vh 底部面板（矮屏 34vh），CTA 吸底，选中后无需滚动即可进入。
+- 营地：「出发」改固定底栏（64px），建筑两列排布，营地高度 1919 → 1168px；事件页压缩装饰，两个选项同屏（844 → 844）。
+- 回归：桌面 1280/1024/768 版式不变（arena 344、报告按钮 display:none）；`node --test tests/*.test.js` 110/110 通过；单文件产物重建 4,380,708 字节，已同步到 `android/app/src/main/assets/www/index.html` 与根目录网页版。
+- 已知限制：761–1040px 平板仍用原多屏布局；英雄/档案页签仍是长页面；地图在 ≤640px 高度机型需纵向平移约 130px 才能看全三层。
+
+### 全应用统一竖屏（2026-10-29 第二轮）
+- 原生壳本就 `screenOrientation="portrait"`；问题在网页层：>760px 会切回桌面多栏，平板竖屏与大屏窗口是第二套排法。
+- 断点归零：29 处 `@media (max-width: N)` 改为 `@media all`，只保留 `max-height` 与 `prefers-*`。CSS 顶部有说明段。
+- 大屏收栏：≥601px 时 `.app-frame` 固定 560px 居中；`position:fixed` 的出发栏/地图情报/战报浮层/噪点层显式对齐 560px。
+- 横屏：手机横屏（高度 ≤520）显示转屏提示层；平板横屏不拦截。
+- 修掉两处真实阻塞：`.main`(z-index:1) 低于 `.site-footer`(2)，滚到底时页脚盖住「出发」按钮无法点击；320px 下情报条标题与属性重叠、技能名截成“夜幕…”。
+- 实测：320/360/390/412/768/1024/1440 七档，战斗页 scrollHeight 恒等于视口高，全部页面无横向溢出；`node --test` 110/110。
+- 未验证：真机横竖屏切换（安卓已锁竖屏，WebView 不触发重建）；旧 WebView(<105) 对 `dvh` 与 `:has` 的降级表现。

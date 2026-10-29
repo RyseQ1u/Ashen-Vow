@@ -1,0 +1,16 @@
+# Gradle / Android 构建产物
+.gradle/
+build/
+captures/
+*.apk
+*.aab
+*.iml
+
+# 本机 SDK 路径（每台机器不同）
+local.properties
+
+# 打包输出与验证截图
+dist/
+
+# IDE
+.idea/

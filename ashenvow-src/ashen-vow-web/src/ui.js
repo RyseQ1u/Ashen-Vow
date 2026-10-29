@@ -1,10 +1,10 @@
-import {VERSION,CLASSES,SKILLS,ENEMIES,freshGame,heroStats,beginExpedition,reachableNodes,enterNode,resolveEvent,currentActor,validTargets,performSkill,useBandage,retreat,backToCamp,healAtCamp,upgradeHero,forgeGear,moveHero,buySupplies,isValidSave,skipTurn,clamp,ensureProgression,MAX_RESERVES,hireRecruit,swapHero,dismissReserve,equipTrinket,unequipTrinket,salvageTrinket,trinketName,trinketMods,TRINKET_BASES,MOD_LABELS,RARITY_NAMES,ownedTrinketIds,BUILDINGS,MAX_BUILDING_LEVEL,EXPEDITION_PLANS,TALENTS,buildingLevel,buildingCost,upgradeBuilding,campHealCost,campPrayerCost,prayAtCamp,selectExpeditionPlan,allocateTalent,REGIONS,ELITE_TRAITS,selectRegion,regionOf,DIFFICULTIES,selectDifficulty,TRAITS,CRISES,MAX_SKILL_LEVEL,skillTrainingCost,skillLevel,trainSkill,SKILL_BRANCHES,skillBranch,chooseSkillBranch,TRINKET_SETS,activeTrinketSet,enemyResistances,quirkTreatmentCost,treatNegativeTrait,regionThreatLevel,enemyIntent,expeditionSummary,ACHIEVEMENTS,unlockAchievements,basicAttack,endTurn,SKILL_CATEGORY_LABELS,nodePreview,usePotion,useSigil,teamPower,SUPPLY_META,MAX_SUPPLIES} from './engine.js';
+import {VERSION,CLASSES,SKILLS,ENEMIES,freshGame,heroStats,beginExpedition,reachableNodes,enterNode,resolveEvent,currentActor,validTargets,performSkill,useBandage,retreat,backToCamp,healAtCamp,upgradeHero,forgeGear,moveHero,buySupplies,isValidSave,skipTurn,clamp,ensureProgression,MAX_RESERVES,hireRecruit,swapHero,dismissReserve,equipTrinket,unequipTrinket,salvageTrinket,trinketName,trinketMods,TRINKET_BASES,MOD_LABELS,RARITY_NAMES,ownedTrinketIds,BUILDINGS,MAX_BUILDING_LEVEL,EXPEDITION_PLANS,TALENTS,buildingLevel,buildingCost,upgradeBuilding,campHealCost,campPrayerCost,prayAtCamp,selectExpeditionPlan,allocateTalent,REGIONS,ELITE_TRAITS,selectRegion,regionOf,DIFFICULTIES,selectDifficulty,TRAITS,CRISES,MAX_SKILL_LEVEL,skillTrainingCost,skillLevel,trainSkill,SKILL_BRANCHES,skillBranch,chooseSkillBranch,TRINKET_SETS,activeTrinketSet,enemyResistances,quirkTreatmentCost,treatNegativeTrait,regionThreatLevel,enemyIntent,expeditionSummary,ACHIEVEMENTS,unlockAchievements,basicAttack,endTurn,SKILL_CATEGORY_LABELS,previewSkillDamage,nodePreview,usePotion,useSigil,teamPower,SUPPLY_META,MAX_SUPPLIES} from './engine.js';
 import {SLOT_COUNT,allSlots,getSlot,storeSlot,deleteSlot,downloadSave,readSaveFile,listBackups,restoreBackup,snapshotValid} from './storage.js';
 import {battleTelemetry,eventPresentation,cueForTelemetry} from './presentation.js';
 
 const root=document.getElementById('app');
 const preferences={getItem(key){try{return window.localStorage.getItem(key)}catch{return null}},setItem(key,value){try{window.localStorage.setItem(key,value)}catch{}}};
-let game=null,slot=1,view='menu',campSection='camp',mapSelectedNode=null,chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={};
+let game=null,slot=1,view='menu',campSection='camp',mapSelectedNode=null,chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={},fullLogOpen=false;
 let settings={sound:preferences.getItem('av-sound')==='on',lowMotion:preferences.getItem('av-motion')==='low',largeText:preferences.getItem('av-large-text')==='on',shortLogs:preferences.getItem('av-short-logs')==='on',volume:Math.max(0,Math.min(100,Number(preferences.getItem('av-volume')??65)||0)),music:preferences.getItem('av-music')==='on',pace:['slow','normal','fast'].includes(preferences.getItem('av-pace'))?preferences.getItem('av-pace'):'normal'};
 const reducedMotion=()=>settings.lowMotion||Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 const fxTimers=new Set();
@@ -121,6 +121,8 @@ function renderSaveStatus(){const el=document.querySelector('#save-text');if(el)
 function mutate(fn){if(!game)return;try{const res=fn();if(res===false){announce('当前操作不可执行',true);return;}chosenSkill=null;const unlocked=unlockAchievements(game);playSave();render();if(unlocked.length)announce(`成就解锁：${ACHIEVEMENTS[unlocked[0]].name}`);return res;}catch(e){console.error(e);announce(`操作失败：${e.message}`,true)}}
 async function startNew(id){await saveQueue.catch(()=>{});const old=slotRecord(id);if(old&&!window.confirm(`存档 ${id} 已有进度，确定覆盖并开始新游戏吗？`))return;slot=id;game=freshGame();view='guide';chosenSkill=null;inspectUnitId=null;playSave();render();announce(`第 ${id} 个存档已创建`);}
 async function load(id){await saveQueue.catch(()=>{});try{const loaded=await getSlot(id);if(!loaded){announce('该存档为空',true);return;}if(!isValidSave(loaded)){announce('存档内容不兼容或已损坏',true);return;}game=ensureProgression(loaded);slot=id;view='game';chosenSkill=null;inspectUnitId=null;saveStatus='读取成功';render();}catch(e){announce(`读取失败：${e.message}`,true)}}
+const HERO_ART={warden:'./assets/art-hero-gareth.jpg',ranger:'./assets/art-hero-elaina.jpg',medic:'./assets/art-hero-cecelia.jpg',occult:'./assets/art-hero-cecelia.jpg',duelist:'./assets/art-hero-elaina.jpg',penitent:'./assets/art-hero-raymond.jpg'};
+function heroPortrait(type){const src=HERO_ART[type];if(!src)return svgPortrait(type);return `<img class="portrait-img art-${type}" src="${src}" alt="">`;}
 function svgPortrait(type,enemy=false,big=false){const classKey=enemy?'enemy-'+type:type;const info=enemy?ENEMIES[type]:CLASSES[type];const col=info?.color||'#9b9385';const glows=enemy?'#c75d49':'#e8ae63';
  const sigils={warden:'M56 132 L90 96 L124 132 L114 178 L90 196 L66 178 Z',ranger:'M57 147 Q90 95 123 147 L117 192 H63 Z',medic:'M66 130 Q90 99 114 130 L127 199 H53 Z',occult:'M66 112 L90 85 L114 112 L132 209 H48 Z',duelist:'M55 130L83 95L126 135L120 211H60Z',penitent:'M62 127L87 99L119 130L137 215H45Z'};
  const weapon=enemy?`<path d="M44 88 Q18 137 31 189" stroke="${col}" stroke-width="5" fill="none"/>`:
@@ -178,41 +180,37 @@ function homePage(){
  const days=saved?.day||0,expeditions=saved?.expeditions||0,achv=saved?Object.keys(saved.achievements||{}).length:0;
  const heroCount=saved?.heroes?.length||0;
  return `<section class="landing">
-  <div class="landing-art"><div class="moon"></div><div class="mountain back"></div><div class="mountain front"></div><div class="tower tower-one"></div><div class="tower tower-two"></div><div class="tower tower-three"></div><div class="embers"></div></div>
+  <div class="landing-art"></div>
   <div class="landing-shell">
    <header class="landing-top">
-    <div class="brand landing-brand"><div class="brand-mark">✧</div><div><div class="brand-title">灰烬誓约<span> · ASHEN VOW</span></div><div class="brand-sub">THE LAST FLAME ENDURES</div></div></div>
+    <div class="brand landing-brand"><div class="brand-mark">✛</div><div><div class="brand-title">灰烬誓约<span> · ASHEN VOW</span></div><div class="brand-sub">THE LAST FLAME ENDURES</div></div></div>
     <div class="landing-profile" aria-label="玩家档案">
-     <div class="profile-orb">${lvl}</div>
-     <div class="profile-copy"><b>夜烬旅者</b><small>档案等级 Lv.${lvl} · ${heroCount ? heroCount+' 名英雄' : '尚未启程'}</small></div>
+     <div class="profile-face"><img class="portrait-img" src="./assets/art-hero-cecelia.jpg" alt=""></div>
+     <div class="profile-copy"><b>夜烬旅者</b><small>档案等级 Lv.${lvl} · ${heroCount?heroCount+' 名英雄':'尚未启程'}</small><div class="bar xp"><span style="width:${clamp(14+lvl*8,10,100)}%"></span></div></div>
+     <div class="profile-badge">⚜</div>
     </div>
    </header>
-   <div class="landing-inner">
-    <div class="eyebrow overline">A TALE BURIED IN ASHES</div>
-    <div class="ornament">✦ ─── ❖ ─── ✦</div>
-    <h1>灰烬<span>誓约</span></h1>
-    <p class="landing-en">ASHEN VOW</p>
-    <p class="landing-desc">“当最后一盏灯熄灭，<br/>谁会记得我们曾经抵抗过黑暗？”</p>
+   <div class="landing-menu">
     <div class="landing-cards">
      <button class="landing-card primary" data-action="${game?'nav-game':'new'}" data-slot="${slot}">
       <span class="landing-card-icon">${game?'▶':'✚'}</span>
-      <b>${game?'继续远征':'开始新的誓约'}</b>
-      <small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'创建角色，点亮第一堆篝火'}</small>
+      <span class="landing-card-text"><b>${game?'继续远征':'开始新的誓约'}</b><small>${game?`第 ${game.day} 日 · ${game.phase==='battle'?'战斗中':game.phase==='map'?'地牢深处':'营地整备'}`:'踏入黑暗，直面命运 · 点亮第一堆篝火'}</small></span>
+      <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-saves">
       <span class="landing-card-icon">▤</span>
-      <b>命运残页</b>
-      <small>选择存档 · 导出备份 · 云端之外的记忆</small>
+      <span class="landing-card-text"><b>命运残页</b><small>选择存档 · 导出备份 · 云端之外的记忆</small></span>
+      <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-guide">
       <span class="landing-card-icon">?</span>
-      <b>旅者指南</b>
-      <small>战斗规则 · 营地建设 · 远征方针</small>
+      <span class="landing-card-text"><b>旅者指南</b><small>战斗规则 · 营地建设 · 远征方针</small></span>
+      <span class="landing-card-arrow">›</span>
      </button>
      <button class="landing-card" data-action="nav-settings">
       <span class="landing-card-icon">⚙</span>
-      <b>设置</b>
-      <small>音效 · 动画 · 文字大小 · 节奏</small>
+      <span class="landing-card-text"><b>设置</b><small>音效 · 动画 · 文字大小 · 节奏</small></span>
+      <span class="landing-card-arrow">›</span>
      </button>
     </div>
     <div class="landing-meta">4 名英雄 &nbsp;·&nbsp; 随机远征 &nbsp;·&nbsp; 回合策略 &nbsp;·&nbsp; 本地存档</div>
@@ -226,11 +224,11 @@ function homePage(){
      ${button('管理存档','nav-saves','','btn btn-ghost btn-tiny')}
     </div>
    </aside>
-   <div class="landing-foot"><span>WEB EDITION · V${VERSION}.0</span><span>独立原创游戏 · 不依赖服务器</span></div>
+   <div class="landing-foot"><span>WEB EDITION · V${VERSION}.1</span><span>独立原创游戏 · 不依赖服务器</span></div>
   </div>
  </section>`;
 }
-function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${svgPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
+function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${heroPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
 function trinketStatsText(item){return Object.entries(trinketMods(item)).map(([k,v])=>`${MOD_LABELS[k]||k} ${v>=0?'+':''}${v}`).join(' · ');}
 function journalPage(){const summary=expeditionSummary(game);
  const reason={victory:'凯旋',retreat:'撤退',defeat:'溃败'};
@@ -258,7 +256,7 @@ function codexPage(){
  return `<section class="content-view utility-view v10-page"><div class="utility-heading">${label('灰烬图鉴','THE ASHEN CODEX')}<p>所有职业、技能、怪物与装备资料；内容来自游戏内实际规则，方便查阅与搭配。</p></div><div class="panel v10-section"><div class="v10-tabs">${tabs.map(([id,n])=>button(n,'codex-tab',`data-id="${id}"`,`btn ${id===codexTab?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="v10-card-grid">${entries.map(([icon,title,desc,stat])=>`<article class="v10-card"><span class="v10-symbol">${ESC(icon)}</span><h3>${ESC(title)}</h3><p>${ESC(desc)}</p><small>${ESC(stat)}</small></article>`).join('')}</div></div></section>`;
 }
 function campTabs(){const list=campSection==='archive'?[['journal','远征记录'],['achievements','成就'],['town','城镇建设']]:[['team','远征队伍'],['roster','英雄招募'],['trinkets','饰品装备'],['talents','英雄天赋'],['skills','技能训练']];return `<div class="camp-tabs" role="tablist">${list.map(([id,lab])=>`<button class="camp-tab ${campTab===id?'active':''}" role="tab" aria-selected="${campTab===id}" data-action="camp-tab" data-id="${id}">${lab}</button>`).join('')}</div>`;}
-function rosterPage(){const reserves=game.reserveHeroes||[];const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];return `<div class="roster-page"><div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新招募名单。雇佣费用 65 金币，最多容纳 ${MAX_RESERVES} 名后备英雄。</p></div><div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card"><div class="recruit-face">${svgPortrait(offer.classId)}</div><div><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-full')}</article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div><div class="ornamental-line"></div><h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>${reserves.length?`<p class="muted">先选择要替换的出战位置，再点击后备英雄的“替换入队”。</p><div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card"><div class="reserve-icon">${CLASSES[h.classId].icon}</div><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div><div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div></div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}</div>`;}
+function rosterPage(){const reserves=game.reserveHeroes||[];const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];return `<div class="roster-page"><div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新招募名单。雇佣费用 65 金币，最多容纳 ${MAX_RESERVES} 名后备英雄。</p></div><div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card"><div class="recruit-face">${heroPortrait(offer.classId)}</div><div><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-full')}</article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div><div class="ornamental-line"></div><h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>${reserves.length?`<p class="muted">先选择要替换的出战位置，再点击后备英雄的“替换入队”。</p><div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card"><div class="reserve-icon">${CLASSES[h.classId].icon}</div><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div><div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div></div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}</div>`;}
 function trinketsPage(){const heroes=[...game.heroes,...(game.reserveHeroes||[])],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];const inUse=ownedTrinketIds(game);const available=(game.items||[]).filter(item=>!inUse.has(item.id));return `<div class="trinkets-page"><div class="roster-intro"><h3>遗物收藏 <span>TRINKET VAULT</span></h3><p>战斗和探索有概率发现饰品。精英必掉稀有饰品，首领必掉史诗饰品。每位英雄可装备两件。</p></div><div class="trinket-summary"><span>收藏 <b>${game.items?.length||0}</b></span><span>未装备 <b>${available.length}</b></span><span>已装备 <b>${inUse.size}</b></span></div><div class="trinket-heroes">${heroes.map(h=>button(`${ESC(h.name)} · ${CLASSES[h.classId].name}`, 'equip-hero',`data-id="${h.id}"`,`btn ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="set-readout">${activeTrinketSet(hero,game)?`<strong>✦ 套装已激活 · ${TRINKET_SETS[activeTrinketSet(hero,game)].name}</strong><span>${TRINKET_SETS[activeTrinketSet(hero,game)].effect}</span>`:`<strong>◇ 未激活饰品套装</strong><span>集齐指定两件基底饰品即可获得额外属性。</span>`}</div><div class="trinket-slots">${[0,1].map(i=>{const item=game.items?.find(t=>t.id===hero.trinkets?.[i]);return `<div class="trinket-slot"><small>饰品槽 ${i+1}</small><strong>${item?ESC(trinketName(item)):'◇ 尚未装备'}</strong><span>${item?trinketStatsText(item):'从下方仓库选择一件饰品'}</span>${item?button('卸下','unequip',`data-id="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost'):''}</div>`}).join('')}</div><div class="set-collection"><h4>可收集的双件套</h4><div class="set-collection-grid">${Object.values(TRINKET_SETS).map(set=>`<div class="set-collection-item"><b>${set.name}</b><small>${set.pieces.map(x=>TRINKET_BASES[x].name).join(" + ")}</small><span>${set.effect}</span></div>`).join("")}</div></div><h3 class="roster-section-title">饰品仓库 <span>${available.length} 件可装备</span></h3>${available.length?`<div class="trinket-grid">${available.map(item=>`<article class="trinket-card rarity-${item.rarity}"><div class="trinket-item-top"><span class="trinket-emblem">${TRINKET_BASES[item.baseId].icon}</span><small>${RARITY_NAMES[item.rarity]}</small></div><h4>${ESC(trinketName(item))}</h4><p>${trinketStatsText(item)}</p><div class="trinket-actions">${[0,1].map(i=>button(`装备至槽 ${i+1}`,'equip',`data-id="${item.id}" data-hero="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost')).join('')}${button('分解','salvage',`data-id="${item.id}"`,'btn btn-small btn-ghost')}</div></article>`).join('')}</div>`:'<p class="no-items">仓库中没有未装备的饰品。探索宝箱、击败精英与首领可以获取新饰品。</p>'}</div>`;}
 function townPage(){return `<div class="town-page">
  <div class="town-head"><div class="eyebrow">REBUILD THE SANCTUARY</div><h3>在废墟上重建家园</h3><p>升级建筑会永久改变之后每次远征和营地管理的效果。所有建设消耗当前存档的金币和遗物碎片。</p></div>
@@ -273,14 +271,39 @@ function townPage(){return `<div class="town-page">
 function talentsPage(){const heroes=[...game.heroes,...game.reserveHeroes],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];
  return `<div class="talents-page"><div class="town-head"><div class="eyebrow">HERO GROWTH</div><h3>英雄专精</h3><p>英雄每次升级获得 1 个天赋点。每种天赋最多强化 2 次，永久影响角色属性。后备英雄同样可以使用。</p></div>
  <div class="talent-roster">${heroes.map(h=>button(`${ESC(h.name)} · ${h.talentPoints||0} 点`,'talent-hero',`data-id="${h.id}"`,`btn ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
- <div class="talent-hero-heading"><span class="talent-face">${svgPortrait(hero.classId)}</span><div><div class="eyebrow">${CLASSES[hero.classId].title}</div><h4>${ESC(hero.name)} · Lv.${hero.level}</h4><p>剩余天赋点 <strong>${hero.talentPoints||0}</strong> · 攻击 ${heroStats(hero,game).attack} · 最大生命 ${heroStats(hero,game).maxHp}</p></div></div>
+ <div class="talent-hero-heading"><span class="talent-face">${heroPortrait(hero.classId)}</span><div><div class="eyebrow">${CLASSES[hero.classId].title}</div><h4>${ESC(hero.name)} · Lv.${hero.level}</h4><p>剩余天赋点 <strong>${hero.talentPoints||0}</strong> · 攻击 ${heroStats(hero,game).attack} · 最大生命 ${heroStats(hero,game).maxHp}</p></div></div>
  <div class="talent-grid">${Object.entries(TALENTS).map(([id,t])=>{const lv=hero.talents?.[id]||0;return `<article class="talent-card"><span class="talent-symbol">${t.icon}</span><h4>${t.name}</h4><p>${t.desc}</p><div class="talent-ranks">${Array.from({length:t.max},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>${button(lv>=t.max?'已满级':`强化 · 1 天赋点`,'talent',`data-id="${hero.id}" data-kind="${id}" ${lv>=t.max||!hero.talentPoints?'disabled':''}`,'btn btn-gold btn-full')}</article>`}).join('')}</div></div>`;}
+function skillSpecRows(hero,id){
+ const sk=SKILLS[id],lv=skillLevel(hero,id),branch=skillBranch(hero,id);
+ const rows=[['类型',(SKILL_CATEGORY_LABELS?.[sk.category]||'')+(sk.type==='damage'?' · 伤害':sk.type==='heal'?' · 治疗':sk.type==='relief'?' · 减压':sk.type==='guard'?' · 守护':sk.type==='mark'?' · 标记':'')]];
+ if(sk.type==='damage'){
+  const power=sk.power+.12*lv+(branch?.power||0),hit=Math.min(100,sk.accuracy+2*lv);
+  rows.push(['伤害',`攻击 ×${power.toFixed(2).replace(/0$/,'').replace(/\.$/,'')}${lv?`（+${(.12*lv).toFixed(2)} 等级）`:''}`]);
+  rows.push(['命中 / 暴击',`${hit}% / 基础 9%${branch?.crit?` +${branch.crit}%`:''}`]);
+  if(branch?.pierce)rows.push(['穿甲',`无视 ${branch.pierce} 点护甲`]);
+ }else if(sk.type==='heal'){
+  rows.push(['治疗量',`约 ${Math.round(sk.power+4*lv+(hero.level||1)*2+(branch?.heal||0))} 点${branch?.heal?`（专精 +${branch.heal}）`:''}`]);
+ }else if(sk.type==='relief'){
+  rows.push(['压力减免',`${Math.round(sk.power+6*lv+(branch?.relief||0))} 点${branch?.heal?` · 附带治疗 ${branch.heal}`:''}`]);
+ }else if(sk.type==='guard'){
+  rows.push(['守护',`${2+lv+(branch?.duration||0)} 回合 · 所受伤害 ×55%`]);
+ }else if(sk.type==='mark'){
+  rows.push(['标记',`${3+lv+(branch?.duration||0)} 回合 · 目标受伤 +30%`]);
+ }
+ rows.push(['施放站位',sk.caster.join(' / ')+' 排']);
+ rows.push(['目标',sk.side==='self'?'自身':sk.side==='ally'?`友方（位 ${sk.targets.join('/')}）`:`敌方（位 ${sk.targets.join('/')}）`]);
+ if(sk.status){const names={poison:'中毒',bleed:'流血',stun:'眩晕',weak:'虚弱',mark:'标记'};rows.push(['附加效果',`${names[sk.status]||sk.status} ${sk.chance||0}% · ${sk.status==='stun'?1:2} 回合${branch?.chance?`（专精 +${branch.chance}%）`:''}${branch?.duration?`（专精 +${branch.duration} 回合）`:''}`]);}
+ if(sk.selfStress)rows.push(['副作用',`自身压力 +${sk.selfStress}`]);
+ if(sk.selfDamage)rows.push(['副作用',`自身生命 -${sk.selfDamage}${branch?.selfDamageReduction?`（专精减免 ${branch.selfDamageReduction}）`:''}`]);
+ rows.push(['升级效果',sk.type==='damage'?`每级伤害 +0.12 倍 · 命中 +2%`:sk.type==='heal'?'每级治疗 +4 点':sk.type==='relief'?'每级减压 +6 点':'每级延长 1 回合 · 命中 +2%']);
+ return rows.map(([k,v])=>`<div class="skill-spec-row"><span>${k}</span><b>${v}</b></div>`).join('');
+}
 function skillTrainingPage(){const heroes=[...game.heroes,...game.reserveHeroes],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];
  return `<div class="skills-training-page"><div class="town-head"><div class="eyebrow">BATTLE TECHNIQUES · ADVANCED</div><h3>职业技能训练</h3><p>每个职业的三项技能都能提升两级。技能达到 +1 后，可在两种互斥专精中选择一种。专精直接改变战斗数值；切换专精需要额外花费。</p></div>
  <div class="talent-roster">${heroes.map(h=>button(ESC(h.name),'talent-hero',`data-id="${h.id}"`,`btn ${h.id===hero.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
  <div class="training-summary"><strong>${ESC(hero.name)} · ${CLASSES[hero.classId].name}</strong><span>金币 ◈ ${game.gold} · 碎片 ✥ ${game.shards}</span></div>
  <div class="skill-training-grid">${CLASSES[hero.classId].skills.map(id=>{const sk=SKILLS[id],lv=skillLevel(hero,id),cost=skillTrainingCost(hero,id),max=lv>=MAX_SKILL_LEVEL;
- return `<article class="training-card"><div class="training-icon">${sk.icon}</div><div class="eyebrow">LEVEL ${lv} / ${MAX_SKILL_LEVEL}</div><h4>${sk.name}</h4><p>${sk.desc}</p><div class="training-meter">${Array.from({length:MAX_SKILL_LEVEL},(_,i)=>`<span class="${i<lv?'filled':''}"></span>`).join('')}</div>${button(max?'已满级':`训练 · ${cost.gold} ◈ / ${cost.shards} ✥`,'train-skill',`data-id="${hero.id}" data-kind="${id}" ${max||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-gold btn-full')}<div class="branch-chooser"><div class="eyebrow">SKILL BRANCH · 技能专精</div>${SKILL_BRANCHES[id].map(br=>{const selected=skillBranch(hero,id)?.id===br.id,cost=hero.skillBranches?.[id]?{gold:22,shards:2}:{gold:35,shards:3};return `<button class="branch-option ${selected?'selected':''}" data-action="skill-branch" data-id="${hero.id}" data-kind="${id}" data-branch="${br.id}" ${lv<1||selected||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}><strong>${selected?'✓ ':''}${br.name}</strong><small>${br.desc}</small><em>${selected?'当前专精':lv<1?'需技能 +1':`${cost.gold} ◈ / ${cost.shards} ✥`}</em></button>`}).join('')}</div></article>`}).join('')}</div></div>`;
+ return `<article class="training-card"><div class="training-icon">${sk.icon}</div><div class="eyebrow">LEVEL ${lv} / ${MAX_SKILL_LEVEL}</div><h4>${sk.name}</h4><p>${sk.desc}</p><div class="skill-spec">${skillSpecRows(hero,id)}</div><div class="training-meter">${Array.from({length:MAX_SKILL_LEVEL},(_,i)=>`<span class="${i<lv?'filled':''}"></span>`).join('')}</div>${button(max?'已满级':`训练 · ${cost.gold} ◈ / ${cost.shards} ✥`,'train-skill',`data-id="${hero.id}" data-kind="${id}" ${max||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-gold btn-full')}<div class="branch-chooser"><div class="eyebrow">SKILL BRANCH · 技能专精</div>${SKILL_BRANCHES[id].map(br=>{const selected=skillBranch(hero,id)?.id===br.id,cost=hero.skillBranches?.[id]?{gold:22,shards:2}:{gold:35,shards:3};return `<button class="branch-option ${selected?'selected':''}" data-action="skill-branch" data-id="${hero.id}" data-kind="${id}" data-branch="${br.id}" ${lv<1||selected||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}><strong>${selected?'✓ ':''}${br.name}</strong><small>${br.desc}</small><em>${selected?'当前专精':lv<1?'需技能 +1':`${cost.gold} ◈ / ${cost.shards} ✥`}</em></button>`}).join('')}</div></article>`}).join('')}</div></div>`;
 }
 function difficultyChooserUI(){return `<div class="difficulty-picker"><div class="eyebrow">DUNGEON THREAT · 地牢难度</div><div class="difficulty-options">${Object.entries(DIFFICULTIES).map(([id,d])=>`<button class="difficulty-option ${game.selectedDifficulty===id?'selected':''}" data-action="difficulty" data-id="${id}" aria-pressed="${game.selectedDifficulty===id}"><b>${d.icon} ${d.name}</b><small>${d.desc}</small><em>金币 ×${d.gold} · 碎片 ×${d.shards}</em></button>`).join('')}</div></div>`;}
 function regionChooserUI(){return `<div class="region-picker"><div class="eyebrow">CHOOSE A DUNGEON · 选择地牢</div><div class="region-options">${Object.entries(REGIONS).map(([id,r])=>`<button data-action="region" data-id="${id}" class="region-option region-${id} ${game.selectedRegion===id?'selected':''}" aria-pressed="${game.selectedRegion===id}"><span class="region-symbol">${r.symbol}</span><span class="region-copy"><b>${r.name}</b><small>${r.desc}</small><em>胜利 ${game.regionVictories?.[id]||0} 次 · 威胁等级 ${regionThreatLevel(game,id)} · 金币 ×${r.goldMult} · 碎片 ×${r.shardMult}</em></span><span class="region-check">${game.selectedRegion===id?'✓':'◇'}</span></button>`).join('')}</div><div class="region-hazard">${REGIONS[game.selectedRegion||'crypt'].hazard}</div></div>`;}
@@ -311,7 +334,7 @@ function campTeamStrip(){
    ${game.heroes.map(h=>{
     const t=CLASSES[h.classId],xp=h.xp??Math.min(99,((h.level||1)-1)*22+8);
     return `<button class="camp-team-card" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)} · ${t.name}">
-     <div class="camp-team-face" style="--accent:${t.color}">${svgPortrait(h.classId)}</div>
+     <div class="camp-team-face" style="--accent:${t.color}">${heroPortrait(h.classId)}</div>
      <div class="camp-team-meta">
       <b>${ESC(h.name)}</b>
       <small>${t.name} · Lv.${h.level}</small>
@@ -329,7 +352,7 @@ function campReserveStrip(){
  return `<div class="camp-reserve-strip">
   <span class="eyebrow">RESERVES · 后备英雄 ${reserves.length}/${MAX_RESERVES}</span>
   <div class="camp-reserve-row">
-   ${reserves.map(h=>`<button class="camp-reserve-chip" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)}">${svgPortrait(h.classId)}<i>${ESC(h.name)}</i></button>`).join('')}
+   ${reserves.map(h=>`<button class="camp-reserve-chip" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)}">${heroPortrait(h.classId)}<i>${ESC(h.name)}</i></button>`).join('')}
    ${Array.from({length:Math.max(0,Math.min(3,MAX_RESERVES-reserves.length))},()=>`<button class="camp-reserve-chip empty" data-action="camp-section" data-id="heroes" title="前往招募">＋</button>`).join('')}
    ${button('招募/管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost')}
   </div>
@@ -339,10 +362,10 @@ function campQuickActions(){
  const cheapest=game.heroes.filter(h=>h.hp<h.maxHp).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
  const healCost=campHealCost(game);
  return `<div class="camp-quick-actions">
-  ${button(`治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn camp-quick')}
-  ${button('训练','camp-section','data-id="heroes" data-tab="skills"','btn camp-quick')}
-  ${button('锻造','camp-section','data-id="heroes" data-tab="team"','btn camp-quick')}
-  ${button('升级','camp-section','data-id="archive" data-tab="town"','btn camp-quick')}
+  ${button(`治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn btn-red camp-quick')}
+  ${button('训练','camp-section','data-id="heroes" data-tab="skills"','btn btn-gold camp-quick')}
+  ${button('锻造','camp-section','data-id="heroes" data-tab="team"','btn btn-gold camp-quick')}
+  ${button('升级','camp-section','data-id="archive" data-tab="town"','btn btn-teal camp-quick')}
  </div>`;
 }
 function campOverview(){
@@ -360,7 +383,7 @@ function campOverview(){
     <span>下一站：${region.name}</span>
     <small>${DIFFICULTIES[game.selectedDifficulty]?.name||''} · ${EXPEDITION_PLANS[game.expeditionPlan]?.name||''} · 火把 ${game.supplies.torches} / 绷带 ${game.supplies.bandages}</small>
    </div>
-   ${button('出发 <span>→</span>','expedition','','btn btn-gold camp-depart')}
+   ${button('出发 <span>→</span>','expedition','','btn btn-red camp-depart')}
   </div>
  </div>`;
 }
@@ -393,11 +416,12 @@ function mapNodeDetail(){
  const ex=game.expedition;if(!ex)return '';
  const sel=mapSelectedNode?nodePreview(game,mapSelectedNode):null;
  const can=reachableNodes(game).map(n=>n.id);
- if(!sel)return '<div class="map-detail empty"><div class="eyebrow">NODE INTEL</div><h3>选择一个节点</h3><p class="muted">点击地图上可探索的房间，查看遭遇预估、风险与战利品，再决定是否进入。</p></div>';
+ if(!sel)return '<div class="map-detail empty"><div class="map-detail-art"></div><div class="eyebrow">NODE INTEL</div><h3>选择一个节点</h3><p class="muted">点击地图上可探索的房间，查看遭遇预估、风险与战利品，再决定是否进入。</p></div>';
  const power=teamPower(game);
  const riskSkulls='<span class="risk-skulls">'+'☠'.repeat(sel.risk)+'<i>'+'☠'.repeat(5-sel.risk)+'</i></span>';
  const enterable=can.includes(sel.id)&&!sel.visited;
  return '<div class="map-detail">'+
+  '<div class="map-detail-art"></div>'+
   '<div class="eyebrow">NODE INTEL · 第 '+(sel.layer+1)+' 层</div>'+
   '<h3 class="map-detail-name">'+ESC(sel.name)+'</h3>'+
   '<div class="map-detail-type">'+(TYPE_ICON[sel.type]||'◇')+' '+ESC(TYPE_NAMES[sel.type]||sel.type)+(sel.visited?' · 已探索':'')+'</div>'+
@@ -412,17 +436,18 @@ function mapTeamStrip(){
  const ex=game.expedition;if(!ex)return '';
  const use=(kind,hero,disabled)=>button(kind==='potion'?'⚗ 药剂':'✥ 圣徽',kind==='potion'?'use-potion':'use-sigil','data-id="'+hero.id+'" '+(disabled?'disabled':''),'btn btn-tiny btn-ghost');
  return '<div class="map-team-strip"><div class="map-strip-head"><b>远征队伍</b><span class="map-strip-note">补给：♨ 火把 '+ex.torch+' · ✚ 绷带 '+ex.bandages+' · ⚗ 药剂 '+(ex.potions||0)+' · ✥ 圣徽 '+(ex.sigils||0)+'</span></div><div class="map-strip-row">'+
-  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+svgPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><small>'+ESC(CLASSES[h.classId]?.name||'')+'</small><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' HP · 压力 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
+  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+heroPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><small>'+ESC(CLASSES[h.classId]?.name||'')+'</small><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' HP · 压力 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
  '</div></div>';
 }
 function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REGIONS.crypt;const possible=reachableNodes(game).map(n=>n.id);const pos=n=>({x:90+n.layer*174,y:195+n.row*103});let edges='';
  for(let layer=0;layer<4;layer++){const src=ex.nodes.filter(n=>n.layer===layer),dst=ex.nodes.filter(n=>n.layer===layer+1);for(const a of src)for(const b of dst){if(b.layer===4||Math.abs(a.row-b.row)<=1){const v=pos(a),w=pos(b);edges+=`<path d="M${v.x} ${v.y} C${v.x+60} ${v.y},${w.x-60} ${w.y},${w.x} ${w.y}" class="map-edge ${a.visited&&b.visited?'travelled':''}"/>`;}}}
  const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower'),known=can||visited||scouted;return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''} ${mapSelectedNode===n.id?'selected':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${known?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${known?(n.name||TYPE_NAMES[n.type]):'未知房间'}</text></g>`}).join('');
- return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="view-heading"><div>${label(region.name,`DUNGEON · ${region.en}`)}<p class="muted">${region.desc} 每次只能前进一层，战利品需要活着带回营地。</p></div><div class="map-metrics"><div><span>深入层数</span><strong>${ex.layer+1} / 5</strong></div><div><span>火把</span><strong class="${ex.torch===0?'danger-text':''}">♨ ${ex.torch}</strong></div><div><span>绷带</span><strong>✚ ${ex.bandages}</strong></div><div><span>药剂</span><strong>⚗ ${ex.potions||0}</strong></div><div><span>圣徽</span><strong>✥ ${ex.sigils||0}</strong></div></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
+ return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="view-heading"><div>${label(region.name,`DUNGEON · ${region.en}`)}<p class="muted">${region.desc} 每次只能前进一层，战利品需要活着带回营地。</p></div><div class="map-metrics"><div><span>深入层数</span><strong>${ex.layer+1} / 5</strong></div><div><span>火把</span><strong class="${ex.torch===0?'danger-text':''}">♨ ${ex.torch}</strong></div><div><span>绷带</span><strong>✚ ${ex.bandages}</strong></div><div><span>药剂</span><strong>⚗ ${ex.potions||0}</strong></div><div><span>圣徽</span><strong>✥ ${ex.sigils||0}</strong></div></div></div><div class="region-tabs">${['crypt','mire','forge'].map(k=>{const r=REGIONS[k];return `<div class="region-tab region-${k} ${ex.region===k?'active':''}"><b>${r.symbol} ${r.name}</b><small>${r.short} · ${r.en}</small></div>`}).join('')}</div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
 function statusBadges(unit){const ss=unit.statuses||{},names={poison:'中毒',bleed:'流血',guard:'守护',mark:'标记',weak:'虚弱',stun:'眩晕'};return Object.entries(names).filter(([key])=>ss[key]>0).map(([key,name])=>`<span class="status-token status-${key}" title="${name} · 剩余 ${ss[key]} 次行动">${name} ${ss[key]}</span>`).join('')||'<span class="status-token status-none">无异常</span>'}
 function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),basic=chosenSkill==='__basic__',allowed=actor?.side==='hero'?(basic?(enemy&&unit.hp>0):skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false):false;
  const info=enemy?ENEMIES[unit.type]:CLASSES[unit.classId],selected=inspectUnitId===unit.id;
- return `<button type="button" class="combat-unit ${unit.hp<=0?'dead':''} ${active?'unit-active':''} ${allowed?'unit-targetable':''} ${selected?'unit-inspected':''}" data-action="unit" data-id="${unit.id}" style="--accent:${info.color}" aria-label="${ESC(unit.name)}，站位 ${unit.rank}，生命 ${unit.hp}/${unit.maxHp}${allowed?'，可作为技能目标':''}"><div class="unit-position">${unit.rank}</div><div class="unit-art">${svgPortrait(enemy?unit.type:unit.classId,enemy)}</div><div class="unit-name">${ESC(unit.name)}</div><div class="unit-meter"><span style="width:${percent(unit.hp,unit.maxHp)}%"></span></div><div class="unit-numbers">${unit.hp} / ${unit.maxHp}</div>${!enemy?`<div class="unit-stress"><span style="width:${percent(unit.stress,100)}%"></span></div>`:''}${allowed?'<div class="target-indicator">⌖ 可选择</div>':''}${unit.statuses?.poison>0?'<i class="status-dot poison" title="中毒">☠</i>':''}${unit.statuses?.guard>0?'<i class="status-dot guard" title="守护">✧</i>':''}</button>`;
+ const preview=allowed?previewSkillDamage(game,basic?'__basic__':chosenSkill,unit.id):null;
+ return `<button type="button" class="combat-unit ${unit.hp<=0?'dead':''} ${active?'unit-active':''} ${allowed?'unit-targetable':''} ${selected?'unit-inspected':''}" data-action="unit" data-id="${unit.id}" style="--accent:${info.color}" aria-label="${ESC(unit.name)}，站位 ${unit.rank}，生命 ${unit.hp}/${unit.maxHp}${allowed?'，可作为技能目标':''}"><div class="unit-position">${unit.rank}</div><div class="unit-art">${enemy?svgPortrait(unit.type,true):heroPortrait(unit.classId)}</div><div class="unit-name">${ESC(unit.name)}</div><div class="unit-meter"><span style="width:${percent(unit.hp,unit.maxHp)}%"></span></div><div class="unit-numbers">${unit.hp} / ${unit.maxHp}</div>${!enemy?`<div class="unit-stress"><span style="width:${percent(unit.stress,100)}%"></span></div>`:''}${preview?.ok?`<div class="damage-preview ${preview.type}" title="受击预估：含 ±2 浮动${preview.critChance?`，暴击率约 ${preview.critChance}%`:''}">${preview.type==='damage'?`受击 <b>${preview.min}~${preview.max}</b>${preview.critMax?` · 暴击≤${preview.critMax}`:''} · 命中 ${preview.hit}%${preview.kill?' · 可击杀':''}`:preview.type==='heal'?`恢复 <b>${preview.max}</b> 点`:`压力 -<b>${preview.max}</b>`}</div>`:''}${allowed?'<div class="target-indicator">⌖ 可选择</div>':''}${unit.statuses?.poison>0?'<i class="status-dot poison" title="中毒">☠</i>':''}${unit.statuses?.guard>0?'<i class="status-dot guard" title="守护">✧</i>':''}</button>`;
 }
 function combatUnitInfo(b,actor){const chosen=[...b.heroes,...b.enemies].find(u=>u.id===inspectUnitId)||actor||b.enemies.find(u=>u.hp>0)||b.heroes.find(u=>u.hp>0);
  if(!chosen)return '<span>暂无可查看单位</span>';
@@ -462,7 +487,7 @@ function battleHeroPanel(actor){
  const stats=heroStats(heroRef,game);
  const xp=heroRef.xp??Math.min(99,((actor.level||1)-1)*22+8);
  return `<div class="battle-hero-panel">
-  <div class="battle-hero-face">${svgPortrait(actor.classId,false,true)}</div>
+  <div class="battle-hero-face">${heroPortrait(actor.classId)}</div>
   <div class="battle-hero-meta">
    <div class="battle-hero-name">${ESC(actor.name)}</div>
    <div class="battle-hero-sub">${ESC(CLASSES[actor.classId]?.name||'')} · Lv.${actor.level||1}</div>
@@ -490,7 +515,7 @@ function battlePage(){
  const queue=b.order.slice(Math.max(0,b.turnIndex-1)).filter(id=>units.some(u=>u.id===id&&u.hp>0)).slice(0,10).map(id=>{
   const u=units.find(x=>x.id===id);if(!u)return '';
   return `<span class="initiative-portrait ${u.side==='hero'?'friendly':'hostile'} ${id===actor?.id?'currently':''}" title="${ESC(u.name)}">
-   ${svgPortrait(u.side==='hero'?u.classId:u.type,u.side==='enemy')}
+   ${u.side==='hero'?heroPortrait(u.classId):svgPortrait(u.type,true)}
    <i>${ESC(u.name)}</i></span>`;
  }).join('');
  const basicMode=chosen==='__basic__';
@@ -523,19 +548,33 @@ function battlePage(){
       ${hero?skillList.map((id,i)=>battleSkillCard(id,i+1,actor,b,chosen)).join('')+battleBasicCard(actor,chosen):'<div class="muted">敌人行动已自动执行，请等待下一位英雄。</div>'}
      </div>
      <div class="battle-main-actions">
-      ${hero?`<button class="btn btn-gold" data-action="basic-attack" ${basicMode?'disabled':''}>攻击</button>
-      <button class="btn" data-action="end-turn">结束回合</button>`:'<span class="muted">等待敌方行动…</span>'}
+      ${hero?`<button class="btn btn-red" data-action="basic-attack" ${basicMode?'disabled':''}>⚔ 攻击</button>
+      <button class="btn btn-gold" data-action="end-turn">⌛ 结束回合</button>`:'<span class="muted">等待敌方行动…</span>'}
+      <button class="btn btn-ghost battle-report-btn" data-action="full-log" title="完整战报">▤ 战报</button>
      </div>
      <div class="skill-footer">
-      ${basicMode?'<span>⌖ 点击敌方目标发动普通攻击</span>':chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span>`:'<span>选择技能卡后，可攻击的目标将以金色边框显示</span>'}
+      ${basicMode?'<span>⌖ 点击敌方目标发动普通攻击</span>':chosen?`<span>⌖ ${SKILLS[chosen].side==='ally'?'点击己方英雄':'点击敌方目标'}施放 ${SKILLS[chosen].name}</span><em class="skill-desc-line">${SKILLS[chosen].desc} · 命中 ${SKILLS[chosen].accuracy}%</em>`:'<span>选择技能卡后，可攻击的目标将以金色边框显示</span>'}
      </div>
     </div>
    </div>
-   <div class="combat-log panel"><div class="eyebrow">BATTLE LOG · 战斗记录</div>
-    <div class="log-scroll" aria-live="polite">${b.logs.slice(0,settings.shortLogs?4:12).map(l=>`<div class="log-line ${l.type}">${ESC(l.text)}</div>`).join('')}</div></div>
+  <div class="combat-log panel"><div class="eyebrow">BATTLE LOG · 战斗记录 <small>共 ${b.logs.length} 条</small></div>
+   <div class="log-scroll" aria-live="polite">${b.logs.slice(0,settings.shortLogs?20:200).map(l=>`<div class="log-line ${l.type}">${ESC(l.text)}</div>`).join('')}</div>
+   <div class="log-actions">${button('完整战报 ⧉','full-log','','btn btn-tiny btn-ghost')}</div></div>
+  ${fullLogOpen?fullLogOverlay(b):''}
   </div>
   <div class="battle-hint"><span>站位规则：1 = 前排，4 = 后排；点击人物可查看属性</span><span>快捷键 1/2/3 技能 · A 普攻 · Space 结束回合 · Esc 取消</span></div>
  </section>`;
+}
+
+function fullLogOverlay(b){
+ const lines=[...b.logs].reverse();
+ return `<div class="full-log-overlay" role="dialog" aria-modal="true" aria-label="完整战报">
+  <div class="full-log-panel panel">
+   <div class="full-log-head"><div class="eyebrow">BATTLE REPORT · 完整战报</div><h3>整场战斗记录 · 共 ${lines.length} 条</h3></div>
+   <div class="full-log-body">${lines.map((l,i)=>`<div class="log-line ${l.type}"><i class="log-index">${String(i+1).padStart(2,'0')}</i><span>${ESC(l.text)}</span></div>`).join('')||'<p class="muted">暂无战斗记录。</p>'}</div>
+   <div class="full-log-actions">${button('复制战报','copy-log','','btn btn-gold')}${button('关闭','close-log','','btn btn-ghost')}</div>
+  </div>
+ </div>`;
 }
 
 function eventPage(){const event=game.event,region=regionOf(game),presentation=eventPresentation(event,region);
@@ -548,13 +587,48 @@ function settingsPage(){return `<section class="content-view utility-view"><div 
  <div class="setting-row"><div><h3>环境音乐</h3><p>营地与旅途的低吟氛围音（合成生成，离线可用）</p></div><button class="switch ${settings.music?'on':''}" data-action="setting-music" aria-label="切换环境音乐"><span></span></button></div>
  <div class="setting-row"><div><h3>减少动态效果</h3><p>关闭多数装饰性过渡和动画</p></div><button class="switch ${settings.lowMotion?'on':''}" data-action="setting-motion" aria-label="切换减少动效"><span></span></button></div>
  <div class="setting-row"><div><h3>大字体模式</h3><p>扩大文字，方便在较小屏幕阅读</p></div><button class="switch ${settings.largeText?'on':''}" data-action="setting-text" aria-label="切换大字体"><span></span></button></div>
- <div class="setting-row"><div><h3>精简战斗日志</h3><p>仅显示最近 4 条记录，关闭则显示最近 12 条</p></div><button class="switch ${settings.shortLogs?'on':''}" data-action="setting-log" aria-label="切换精简战斗日志"><span></span></button></div>
+ <div class="setting-row"><div><h3>精简战斗日志</h3><p>启用后战斗面板只显示最近 20 条记录，关闭则显示最近 200 条；两种模式均可点击「完整战报」查看并复制整场战斗文本。</p></div><button class="switch ${settings.shortLogs?'on':''}" data-action="setting-log" aria-label="切换精简战斗日志"><span></span></button></div>
  <div class="setting-row"><div><h3>音效音量</h3><p>调整战斗、治疗和菜单音效（0 = 静音）</p></div><label class="volume-control"><input id="volume-control" type="range" min="0" max="100" step="5" value="${settings.volume}" aria-label="音效音量"/><output id="volume-value" for="volume-control">${settings.volume}%</output></label></div>
  <div class="setting-row"><div><h3>战斗表现节奏</h3><p>控制技能字样、伤害数字及打击动效速度，不改变回合规则</p></div><div class="pace-options" role="group" aria-label="战斗表现节奏">${[['slow','沉浸'],['normal','标准'],['fast','快速']].map(([value,title])=>`<button type="button" data-action="pace" data-id="${value}" class="btn btn-tiny ${settings.pace===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.pace===value}">${title}</button>`).join('')}</div></div>
- <div class="setting-row"><div><h3>显示模式</h3><p>切换浏览器全屏（可能需要许可）</p></div>${button('切换全屏','fullscreen','','btn btn-ghost')}</div><div class="ornamental-line"></div><p class="small-muted">版本 V1.0 · 纯 Web · IndexedDB 本地存档 · 原创游戏与 SVG 场景 · 支持离线运行。</p></div></section>`;}
+ <div class="setting-row"><div><h3>显示模式</h3><p>切换浏览器全屏（可能需要许可）</p></div>${button('切换全屏','fullscreen','','btn btn-ghost')}</div><div class="ornamental-line"></div><p class="small-muted">版本 V1.1 · 纯 Web · IndexedDB 本地存档 · 原创游戏与场景美术 · 支持离线运行。</p></div></section>`;}
 function footer(){return `<footer class="site-footer"><span>ASHEN VOW © ORIGINAL BROWSER PROTOTYPE</span><span><span class="save-light"></span><span id="save-text">${saveStatus}</span> · 存档 ${slot} / 3</span></footer><div class="toast" id="toast" role="status"></div><input type="file" id="import-file" accept="application/json,.json" hidden/>`}
-function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`<div class="app-frame ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
+function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`${rotateHint()}<div class="app-frame phase-${view==='game'&&game?game.phase:'shell'} ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${view==='menu'?'':hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
  const f=document.getElementById('import-file');if(f)f.addEventListener('change',handleImport);
+ syncMobileLayout();
+}
+/* 竖屏提示：仅在实际放不下竖屏版式的横屏手机上出现（由 CSS 决定是否可见） */
+function rotateHint(){
+ return `<div class="rotate-hint" role="status">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.4 19.2h3.2"/></svg>
+  <b>请将设备转为竖屏</b>
+  <small>本作按竖屏版式设计，横屏下无法完整显示</small>
+ </div>`;
+}
+/* 手机端版面校准：阶段切换回到顶部；地图自动把当前层居中，避免每次渲染都跳回第 1 层 */
+let lastRenderedPhase='';
+function syncMobileLayout(){
+ try{
+  /* 竖屏单版式：不再按窗口宽度跳过，大屏竖栏里同样需要裁 viewBox、贴合底部面板 */
+  if(view!=='game'||!game)return;
+  const phase=game.phase;
+  if(phase!==lastRenderedPhase){lastRenderedPhase=phase;window.scrollTo(0,0);}
+  if(phase!=='map')return;
+  const panel=document.querySelector('.map-panel'),svg=document.querySelector('.dungeon-map');
+  if(!panel||!svg)return;
+  svg.setAttribute('viewBox','0 55 885 415');
+  const aside=document.querySelector('.map-aside');
+  if(aside){
+   const limit=aside.getBoundingClientRect().top-panel.getBoundingClientRect().top-8;
+   panel.style.maxHeight=Math.max(160,Math.round(limit))+'px';
+  }
+  const pr=panel.getBoundingClientRect(),sr=svg.getBoundingClientRect();
+  if(!sr.width)return;
+  const scale=sr.width/885;
+  const layer=Math.min(4,Math.max(0,(game.expedition&&game.expedition.layer)||0));
+  const target=(90+layer*174)*scale;
+  const left=(sr.left-pr.left)+panel.scrollLeft+target-panel.clientWidth/2;
+  panel.scrollLeft=Math.max(0,Math.min(left,panel.scrollWidth-panel.clientWidth));
+ }catch(err){}
 }
 async function handleImport(e){const file=e.target.files?.[0];if(!file)return;try{const data=await readSaveFile(file,isValidSave);if(!window.confirm(`确定把导入的存档写入存档槽 ${importTarget} 吗？该槽位旧数据会被覆盖。`))return;await saveQueue.catch(()=>{});await storeSlot(importTarget,data);await reloadSlots();if(game&&slot===importTarget){game=ensureProgression(data);view='game';chosenSkill=null}else{view='saves'}render();announce('存档导入成功');}catch(err){announce(`导入失败：${err.message}`,true)}finally{e.target.value='';}}
 async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Number(el.dataset.slot);
@@ -610,6 +684,14 @@ async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Numb
  if(a==='retreat'){if(window.confirm('现在撤退吗？已获得的战利品可以带回营地。'))mutate(()=>retreat(game));return;}
  if(a==='camp'){mutate(()=>backToCamp(game));return;}
  if(a==='skip'){const result=commitBattleAction(()=>skipTurn(game));if(result!==false)sound('tap');return;}
+ if(a==='full-log'){fullLogOpen=!fullLogOpen;sound('tap');render();return;}
+ if(a==='close-log'){fullLogOpen=false;sound('tap');render();return;}
+ if(a==='copy-log'){
+  const text=game?.battle?[...game.battle.logs].reverse().map(l=>`[${l.type}] ${l.text}`).join('\n'):'';
+  if(text&&navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>announce('完整战报已复制到剪贴板')).catch(()=>announce('复制失败，请手动选择文本',true));
+  else announce('暂无战报可复制',true);
+  return;
+ }
  if(a==='end-turn'){const result=commitBattleAction(()=>endTurn(game));if(result!==false)sound('tap');return;}
  if(a==='basic-attack'){
   const actor=currentActor(game);if(!actor||actor.side!=='hero'){announce('尚未轮到英雄行动',true);return;}
