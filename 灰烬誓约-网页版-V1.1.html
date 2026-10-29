@@ -1964,6 +1964,50 @@ body:has(.landing) .site-footer{display:none}
 .map-view .map-progress span{padding:1px var(--sp-1);font-size:8px}
 .map-view .dungeon-map{margin-top:0}
 
+/* ========================================================================
+   UI 重设计 · Phase 8 事件 + 结算
+   —— 事件：三条选项等权重、等间距，编号/标题/说明三级清晰；
+      结算：战绩 2×2，正文加径向暗幕保证对比，返回营地是唯一主操作。
+   ======================================================================== */
+.event-view .event-chamber{border-radius:var(--r-md);border-color:var(--border)}
+/* 房间背景图的环形装饰会压到正文，加一层自下而上的暗幕把文字区拉回干净底色 */
+.event-view .event-chamber:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#0d0a1100 0%,#0d0a1114 14%,#0d0a11b8 34%,#0b080de6 56%,#0a070ceb 100%)}
+.event-chamber .event-story{margin:var(--sp-3) auto var(--sp-4);max-width:32em;font-size:var(--fs-sm);line-height:1.9;color:#c8b7a5}
+.event-choice-heading{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);margin:0 0 var(--sp-2);padding-bottom:var(--sp-1);border-bottom:1px solid #6d4f2850;font-size:var(--fs-xs);letter-spacing:2px;color:var(--gold)}
+.event-choice-heading span{display:block;color:var(--gold);letter-spacing:2px}
+.event-choice-heading em{font:8px/1 Arial,sans-serif;font-style:normal;letter-spacing:1px;color:var(--dim)}
+.event-choices{gap:var(--sp-2)}
+.event-choices .choice{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:var(--sp-3);padding:var(--sp-3);border-radius:var(--r-sm)}
+.choice-index{font-family:Arial,sans-serif;font-size:var(--fs-base);letter-spacing:0;color:var(--gold);opacity:.75}
+.choice-copy{min-width:0}
+.choice-copy b{display:block;margin:0 0 2px;font-size:var(--fs-base);color:var(--cream)}
+.choice-copy small{display:block;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.choice-arrow{font-size:var(--fs-md);line-height:1;color:var(--gold)}
+
+.result-view{position:relative;isolation:isolate}
+.result-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 72% 56% at 50% 50%,#0a0705f5 0%,#0a0705cc 40%,#0a070559 68%,transparent 86%)}
+.result-view>*:not(.result-scrim){position:relative;z-index:1}
+.result-view .result-mark{font-size:var(--fs-3xl);line-height:1}
+.result-view h1{margin:var(--sp-2) 0;font-size:var(--fs-xl);letter-spacing:2px}
+.result-sub{margin:0 0 var(--sp-4);font-size:var(--fs-sm);color:#c9b8a4}
+.result-view .result-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);width:100%;max-width:340px;margin-bottom:var(--sp-5)}
+.result-view .result-grid div{display:flex;flex-direction:column;gap:2px;padding:var(--sp-2) var(--sp-3);border-radius:var(--r-sm);border-color:#574b41;background:#171316d9}
+.result-view .result-grid small{margin:0;font-size:9px;letter-spacing:.5px}
+.result-view .result-grid strong{font-size:var(--fs-md)}
+.result-view .btn.btn-xl{width:100%;max-width:340px;min-height:48px}
+
+/* 短屏（<=720 高）：压掉场景图与纹章，尽量让两个选项同屏可见（只按高度断点，不影响竖栏版式） */
+@media (max-height:720px){
+ .event-view{min-height:0}
+ .event-view .event-chamber{padding-bottom:var(--sp-4)}
+ .event-chamber .event-scene{height:88px;margin-bottom:0}
+ .event-sigil{width:62px;height:62px;margin:-28px auto var(--sp-2)}
+ .event-sigil-inner{width:46px;height:46px;font-size:26px}
+ .event-chamber h1{margin:var(--sp-1) 0;font-size:var(--fs-lg)}
+ .event-chamber .event-story{margin:var(--sp-2) auto var(--sp-3);line-height:1.7}
+ .event-choices .choice{padding:var(--sp-2) var(--sp-3)}
+}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
 // Static game data tables extracted from engine.js (Phase 0 refactor).
 // No runtime logic — import-safe constants only.
@@ -3578,9 +3622,14 @@ function fullLogOverlay(b){
 }
 
 function eventPage(){const event=game.event,region=regionOf(game),presentation=eventPresentation(event,region);
- return `<section class="content-view event-view region-${presentation.region} event-${presentation.motif}"><div class="event-chamber"><div class="event-scene" aria-hidden="true"><span class="event-horizon"></span><span class="event-silhouette"></span><span class="event-light"></span></div><div class="event-sigil"><div class="event-sigil-inner">${presentation.glyph}</div></div><div class="eyebrow overline">${ESC(event.eyebrow)} · ${presentation.kicker}</div><h1>${ESC(event.title)}</h1><div class="ornament">✦ ─── ❖ ─── ✦</div><p class="event-story">${ESC(event.desc)}</p><div class="event-choice-heading">请选择行动 <span>CHOICES HAVE CONSEQUENCES</span></div><div class="event-choices">${event.choices.map((choice,i)=>`<button class="choice" data-action="choice" data-id="${ESC(choice.kind)}"><span class="choice-index">0${i+1}</span><span><b>${ESC(choice.label)}</b><small>${ESC(choice.hint)}</small></span><span class="choice-arrow">→</span></button>`).join('')}</div></div></section>`;
+ return `<section class="content-view event-view region-${presentation.region} event-${presentation.motif}"><div class="event-chamber"><div class="event-scene" aria-hidden="true"><span class="event-horizon"></span><span class="event-silhouette"></span><span class="event-light"></span></div><div class="event-sigil"><div class="event-sigil-inner">${presentation.glyph}</div></div><div class="eyebrow overline">${ESC(event.eyebrow)} · ${presentation.kicker}</div><h1>${ESC(event.title)}</h1><p class="event-story">${ESC(event.desc)}</p><div class="event-choice-heading"><span>请选择行动</span><em>CHOICES HAVE CONSEQUENCES</em></div><div class="event-choices">${event.choices.map((choice,i)=>`<button class="choice" data-action="choice" data-id="${ESC(choice.kind)}"><span class="choice-index">0${i+1}</span><span class="choice-copy"><b>${ESC(choice.label)}</b><small>${ESC(choice.hint)}</small></span><span class="choice-arrow">→</span></button>`).join('')}</div></div></section>`;
 }
-function resultPage(){const r=game.result,win=r.reason==='victory',region=REGIONS[r.region]||REGIONS.crypt;return `<section class="content-view result-view region-${r.region||'crypt'}"><div class="result-mark">${win?'✦':r.reason==='retreat'?'◇':'☽'}</div><div class="eyebrow overline">${region.name} · ${DIFFICULTIES[r.difficulty||'pilgrim']?.name||'巡礼'} · EXPEDITION REPORT</div><h1>${win?'黎明尚未消亡':r.reason==='retreat'?'从深渊归来':'黑暗夺走一切'}</h1><p class="result-sub">${win?'代价沉重，但你们守住了誓约。':r.reason==='retreat'?'逃离不代表怯懦。仍然活着，就是机会。':'火焰熄灭了，但营地仍在等待。'}</p><div class="result-grid"><div><small>探索房间</small><strong>${r.rooms}</strong></div><div><small>收获金币</small><strong>◈ ${r.rewards.gold}</strong></div><div><small>遗物碎片</small><strong>✥ ${r.rewards.shards}</strong></div><div><small>饰品战利品</small><strong>✧ ${r.rewards.items?.length||0}</strong></div></div>${button('返回残火营地 <span>→</span>','camp','','btn btn-gold btn-xl')}</section>`;}
+function resultPage(){
+ // Phase 8：四格战绩改为 2×2，正文加暗幕提升对比，返回营地仍是唯一主操作
+ const r=game.result,win=r.reason==='victory',region=REGIONS[r.region]||REGIONS.crypt;
+ const stats=[['探索房间',r.rooms],['收获金币','◈ '+r.rewards.gold],['遗物碎片','✥ '+r.rewards.shards],['饰品战利品','✧ '+(r.rewards.items?.length||0)]];
+ return `<section class="content-view result-view region-${r.region||'crypt'}"><div class="result-scrim" aria-hidden="true"></div><div class="result-mark">${win?'✦':r.reason==='retreat'?'◇':'☽'}</div><div class="eyebrow overline">${region.name} · ${DIFFICULTIES[r.difficulty||'pilgrim']?.name||'巡礼'} · EXPEDITION REPORT</div><h1>${win?'黎明尚未消亡':r.reason==='retreat'?'从深渊归来':'黑暗夺走一切'}</h1><p class="result-sub">${win?'代价沉重，但你们守住了誓约。':r.reason==='retreat'?'逃离不代表怯懦。仍然活着，就是机会。':'火焰熄灭了，但营地仍在等待。'}</p><div class="result-grid">${stats.map(([k,v])=>`<div><small>${k}</small><strong>${v}</strong></div>`).join('')}</div>${button('返回残火营地 <span>→</span>','camp','','btn btn-gold btn-xl')}</section>`;
+}
 function savesPage(){
  // Phase 5：单列档案卡 —— 主操作（继续/新建）独占一行，破坏性操作降为小按钮，备份列表收进 details
  return `<section class="content-view utility-view utility-page">

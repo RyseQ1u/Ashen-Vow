@@ -1962,3 +1962,47 @@ body:has(.landing) .site-footer{display:none}
 .map-view .map-progress{gap:2px;padding:0 var(--sp-2)}
 .map-view .map-progress span{padding:1px var(--sp-1);font-size:8px}
 .map-view .dungeon-map{margin-top:0}
+
+/* ========================================================================
+   UI 重设计 · Phase 8 事件 + 结算
+   —— 事件：三条选项等权重、等间距，编号/标题/说明三级清晰；
+      结算：战绩 2×2，正文加径向暗幕保证对比，返回营地是唯一主操作。
+   ======================================================================== */
+.event-view .event-chamber{border-radius:var(--r-md);border-color:var(--border)}
+/* 房间背景图的环形装饰会压到正文，加一层自下而上的暗幕把文字区拉回干净底色 */
+.event-view .event-chamber:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#0d0a1100 0%,#0d0a1114 14%,#0d0a11b8 34%,#0b080de6 56%,#0a070ceb 100%)}
+.event-chamber .event-story{margin:var(--sp-3) auto var(--sp-4);max-width:32em;font-size:var(--fs-sm);line-height:1.9;color:#c8b7a5}
+.event-choice-heading{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);margin:0 0 var(--sp-2);padding-bottom:var(--sp-1);border-bottom:1px solid #6d4f2850;font-size:var(--fs-xs);letter-spacing:2px;color:var(--gold)}
+.event-choice-heading span{display:block;color:var(--gold);letter-spacing:2px}
+.event-choice-heading em{font:8px/1 Arial,sans-serif;font-style:normal;letter-spacing:1px;color:var(--dim)}
+.event-choices{gap:var(--sp-2)}
+.event-choices .choice{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:var(--sp-3);padding:var(--sp-3);border-radius:var(--r-sm)}
+.choice-index{font-family:Arial,sans-serif;font-size:var(--fs-base);letter-spacing:0;color:var(--gold);opacity:.75}
+.choice-copy{min-width:0}
+.choice-copy b{display:block;margin:0 0 2px;font-size:var(--fs-base);color:var(--cream)}
+.choice-copy small{display:block;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.choice-arrow{font-size:var(--fs-md);line-height:1;color:var(--gold)}
+
+.result-view{position:relative;isolation:isolate}
+.result-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 72% 56% at 50% 50%,#0a0705f5 0%,#0a0705cc 40%,#0a070559 68%,transparent 86%)}
+.result-view>*:not(.result-scrim){position:relative;z-index:1}
+.result-view .result-mark{font-size:var(--fs-3xl);line-height:1}
+.result-view h1{margin:var(--sp-2) 0;font-size:var(--fs-xl);letter-spacing:2px}
+.result-sub{margin:0 0 var(--sp-4);font-size:var(--fs-sm);color:#c9b8a4}
+.result-view .result-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);width:100%;max-width:340px;margin-bottom:var(--sp-5)}
+.result-view .result-grid div{display:flex;flex-direction:column;gap:2px;padding:var(--sp-2) var(--sp-3);border-radius:var(--r-sm);border-color:#574b41;background:#171316d9}
+.result-view .result-grid small{margin:0;font-size:9px;letter-spacing:.5px}
+.result-view .result-grid strong{font-size:var(--fs-md)}
+.result-view .btn.btn-xl{width:100%;max-width:340px;min-height:48px}
+
+/* 短屏（<=720 高）：压掉场景图与纹章，尽量让两个选项同屏可见（只按高度断点，不影响竖栏版式） */
+@media (max-height:720px){
+ .event-view{min-height:0}
+ .event-view .event-chamber{padding-bottom:var(--sp-4)}
+ .event-chamber .event-scene{height:88px;margin-bottom:0}
+ .event-sigil{width:62px;height:62px;margin:-28px auto var(--sp-2)}
+ .event-sigil-inner{width:46px;height:46px;font-size:26px}
+ .event-chamber h1{margin:var(--sp-1) 0;font-size:var(--fs-lg)}
+ .event-chamber .event-story{margin:var(--sp-2) auto var(--sp-3);line-height:1.7}
+ .event-choices .choice{padding:var(--sp-2) var(--sp-3)}
+}
