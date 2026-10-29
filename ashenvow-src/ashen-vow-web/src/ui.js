@@ -351,24 +351,24 @@ function campNavBar(){
 function campBuildingChip(id){
  const def=BUILDINGS[id],lv=buildingLevel(game,id),cost=buildingCost(game,id),max=lv>=MAX_BUILDING_LEVEL;
  return `<article class="camp-building" data-building="${id}">
-  <div class="camp-building-icon">${def.icon}</div>
-  <div class="camp-building-body">
-   <div class="camp-building-name">${def.name} <em>Lv.${lv}</em></div>
-   <div class="camp-building-desc">${def.desc}</div>
-   <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
-  </div>
-  ${max?'<span class="camp-building-max">已满级</span>':button(`升级 · ${cost.gold}◈`,'building',`data-id="${id}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-tiny btn-ghost')}
+  <div class="camp-building-top"><span class="camp-building-icon">${def.icon}</span><span class="camp-building-name">${def.name}<em>Lv.${lv}</em></span></div>
+  <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
+  <div class="camp-building-desc">${def.desc}</div>
+  ${max?'<span class="camp-building-max">已满级</span>':button(`升级 · ${cost.gold}◈`,'building',`data-id="${id}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-tiny btn-ghost btn-full')}
  </article>`;
 }
 function campTeamStrip(){
+ // Phase 6.1：队伍条升为本屏第一信息 —— 说明文案换成可读的整备度
+ const readiness=Math.round(game.heroes.reduce((sum,h)=>sum+clamp(h.hp/Math.max(1,h.maxHp),0,1),0)/Math.max(1,game.heroes.length)*100);
+ const peak=Math.max(0,...game.heroes.map(h=>h.stress||0));
  return `<div class="camp-team-strip">
   <div class="camp-strip-head"><span class="eyebrow">EXPEDITION TEAM · 远征队伍</span>
-   <span class="camp-strip-note">点击英雄卡可在「英雄」页管理站位、装备与天赋</span></div>
+   <span class="camp-strip-note">平均生命 <b>${readiness}%</b> · 最高压力 <b>${peak}</b></span></div>
   <div class="camp-team-row">
    ${game.heroes.map(h=>{
     const t=CLASSES[h.classId],xp=h.xp??Math.min(99,((h.level||1)-1)*22+8);
     return `<button class="camp-team-card" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)} · ${t.name}">
-     <div class="camp-team-face" style="--accent:${t.color}">${heroPortrait(h.classId)}</div>
+     <div class="camp-team-face" style="--accent:${t.color}">${heroPortrait(h.classId)}<span class="camp-team-rank">${h.rank}</span></div>
      <div class="camp-team-meta">
       <b>${ESC(h.name)}</b>
       <small>${t.name} · Lv.${h.level}</small>
@@ -384,11 +384,11 @@ function campTeamStrip(){
 function campReserveStrip(){
  const reserves=game.reserveHeroes||[];
  return `<div class="camp-reserve-strip">
-  <span class="eyebrow">RESERVES · 后备英雄 ${reserves.length}/${MAX_RESERVES}</span>
+  <span class="eyebrow camp-reserve-label">RESERVES · 后备 ${reserves.length}/${MAX_RESERVES}</span>
   <div class="camp-reserve-row">
    ${reserves.map(h=>`<button class="camp-reserve-chip" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)}">${heroPortrait(h.classId)}<i>${ESC(h.name)}</i></button>`).join('')}
    ${Array.from({length:Math.max(0,Math.min(3,MAX_RESERVES-reserves.length))},()=>`<button class="camp-reserve-chip empty" data-action="camp-section" data-id="heroes" title="前往招募">＋</button>`).join('')}
-   ${button('招募/管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost')}
+   ${button('招募 / 管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost camp-reserve-manage')}
   </div>
  </div>`;
 }
@@ -396,21 +396,23 @@ function campQuickActions(){
  const cheapest=game.heroes.filter(h=>h.hp<h.maxHp).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
  const healCost=campHealCost(game);
  return `<div class="camp-quick-actions">
-  ${button(`治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn btn-red camp-quick')}
-  ${button('训练','camp-section','data-id="heroes" data-tab="skills"','btn btn-gold camp-quick')}
-  ${button('锻造','camp-section','data-id="heroes" data-tab="team"','btn btn-gold camp-quick')}
-  ${button('升级','camp-section','data-id="archive" data-tab="town"','btn btn-teal camp-quick')}
+  ${button(`<i>✚</i>治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn btn-gold camp-quick')}
+  ${button('<i>✦</i>训练','camp-section','data-id="heroes" data-tab="skills"','btn btn-ghost camp-quick')}
+  ${button('<i>⚒</i>锻造','camp-section','data-id="heroes" data-tab="team"','btn btn-ghost camp-quick')}
+  ${button('<i>⌂</i>建设','camp-section','data-id="archive" data-tab="town"','btn btn-ghost camp-quick')}
  </div>`;
 }
 function campOverview(){
+ // Phase 6.1：先看人（队伍整备度），再看营地设施，最后看后备 —— 出发仍在固定底栏
  const region=REGIONS[game.selectedRegion]||REGIONS.crypt;
  return `<div class="camp-overview">
+  ${campTeamStrip()}
   <div class="camp-scene">
    <div class="camp-scene-glow"></div>
+   <div class="camp-scene-head"><span class="eyebrow">CAMP GROUNDS · 营地设施</span><small>升级后永久生效于之后每次远征</small></div>
    <div class="camp-buildings">${['infirmary','chapel','workshop','watchtower'].map(campBuildingChip).join('')}</div>
    ${campQuickActions()}
   </div>
-  ${campTeamStrip()}
   ${campReserveStrip()}
   <div class="camp-depart-bar">
    <div class="camp-depart-info">

@@ -1646,3 +1646,56 @@ body:has(.landing) .site-footer{display:none}
 .save-backups[open] summary:before{content:'▾ '}
 .save-backup-list{display:grid;gap:var(--sp-1);margin-top:var(--sp-1)}
 .utility-page .warning-box{margin-top:var(--sp-4);border-radius:var(--r-md);border-left:2px solid var(--gold);background:#241d17}
+
+/* ========================================================================
+   UI 重设计 · Phase 6.1 营地总览
+   —— 顺序改为「队伍 → 设施 → 后备」；建筑与快捷动作降级为紧凑工具栏，
+      出发仍由 64px 固定底栏承担。
+   ======================================================================== */
+.camp-view .camp-overview{gap:var(--sp-3)}
+
+/* 队伍：2×2 全可见，取消横向滚动 */
+.camp-view .camp-team-strip{padding:var(--sp-3);border-radius:var(--r-md)}
+.camp-view .camp-strip-head{margin-bottom:var(--sp-2);align-items:baseline}
+.camp-strip-note{font-family:Arial,sans-serif;font-size:var(--fs-xs);letter-spacing:.6px;color:var(--muted);white-space:nowrap}
+.camp-strip-note b{color:var(--gold-light);font-weight:600}
+.camp-view .camp-team-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);overflow:visible;padding-bottom:0}
+.camp-view .camp-team-card{min-width:0;padding:var(--sp-2);gap:var(--sp-2);align-items:center;border-radius:var(--r-sm);transition:border-color .16s,transform .16s}
+.camp-view .camp-team-card:hover{transform:translateY(-1px)}
+.camp-view .camp-team-face{position:relative;width:var(--sp-9);height:calc(var(--sp-9) + var(--sp-2));border-radius:var(--r-sm)}
+.camp-team-rank{position:absolute;left:0;bottom:0;min-width:14px;padding:0 3px;border-radius:0 var(--r-sm) 0 0;background:#0c0806d9;color:var(--gold);font:600 9px/1.5 Arial,sans-serif;text-align:center}
+.camp-view .camp-team-meta b{font-size:var(--fs-sm);letter-spacing:.3px}
+.camp-view .camp-team-meta small{margin:1px 0 4px;font-size:9.5px}
+.camp-view .camp-team-nums{margin-top:3px;font-size:9px;letter-spacing:.2px;color:var(--dim)}
+
+/* 设施：标题行 + 2×2 紧凑建筑卡 */
+.camp-view .camp-scene{padding:var(--sp-3);gap:var(--sp-2);border-radius:var(--r-md);min-height:0}
+.camp-scene-head{position:relative;z-index:1;display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);padding:0 var(--sp-1)}
+.camp-scene-head small{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
+.camp-view .camp-buildings{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);padding:0}
+.camp-view .camp-building{gap:var(--sp-1);padding:var(--sp-2);border-radius:var(--r-sm);background:linear-gradient(165deg,#1c1209f2,#0e0906f2)}
+.camp-building-top{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.camp-view .camp-building-icon{display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid #8a6236;border-radius:var(--r-sm);font-size:13px;background:linear-gradient(180deg,#3c2512,#1e1008);flex-shrink:0}
+.camp-view .camp-building-body{padding:0;display:none}
+.camp-view .camp-building-name{display:flex;align-items:baseline;gap:var(--sp-1);min-width:0;font-size:13px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-view .camp-building-name em{font-size:9.5px;letter-spacing:0;color:var(--gold);flex-shrink:0}
+.camp-view .camp-building-desc{display:-webkit-box;margin:0;min-height:2.9em;overflow:hidden;font-size:var(--fs-xs);line-height:1.45;color:#bfa07e;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.camp-view .camp-building .town-meter{gap:3px}
+.camp-view .camp-building .town-meter i{height:3px;border-radius:var(--r-pill)}
+.camp-view .camp-building .btn{min-height:26px;margin:0;padding:0;font-size:var(--fs-xs);letter-spacing:.5px}
+.camp-view .camp-building-max{font-size:var(--fs-xs);color:var(--olive);letter-spacing:1px}
+
+/* 快捷动作：一条四格工具栏，只有「治疗」是主色 */
+.camp-view .camp-quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);margin:0;padding:0}
+.camp-view .btn.camp-quick{flex:none;min-width:0;min-height:34px;padding:0;font-family:inherit;font-size:11px;letter-spacing:.5px}
+.camp-quick i{font-style:normal;margin-right:2px;opacity:.75}
+
+/* 后备：单行，溢出可横向滑动 */
+.camp-view .camp-reserve-strip{padding:var(--sp-2) var(--sp-3);gap:var(--sp-2);flex-wrap:nowrap;align-items:center;border-radius:var(--r-md)}
+.camp-reserve-label{flex-shrink:0;font-size:9px;letter-spacing:1.4px}
+.camp-view .camp-reserve-row{flex:1;min-width:0;gap:var(--sp-1);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.camp-view .camp-reserve-row::-webkit-scrollbar{display:none}
+.camp-view .camp-reserve-chip{width:44px;padding:3px;border-radius:var(--r-sm);font-size:9px;letter-spacing:0}
+.camp-view .camp-reserve-chip img{width:34px;height:34px}
+.camp-view .camp-reserve-chip.empty{height:52px;font-size:16px}
+.camp-reserve-manage{flex-shrink:0}

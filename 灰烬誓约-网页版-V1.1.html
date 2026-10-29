@@ -1648,6 +1648,59 @@ body:has(.landing) .site-footer{display:none}
 .save-backup-list{display:grid;gap:var(--sp-1);margin-top:var(--sp-1)}
 .utility-page .warning-box{margin-top:var(--sp-4);border-radius:var(--r-md);border-left:2px solid var(--gold);background:#241d17}
 
+/* ========================================================================
+   UI 重设计 · Phase 6.1 营地总览
+   —— 顺序改为「队伍 → 设施 → 后备」；建筑与快捷动作降级为紧凑工具栏，
+      出发仍由 64px 固定底栏承担。
+   ======================================================================== */
+.camp-view .camp-overview{gap:var(--sp-3)}
+
+/* 队伍：2×2 全可见，取消横向滚动 */
+.camp-view .camp-team-strip{padding:var(--sp-3);border-radius:var(--r-md)}
+.camp-view .camp-strip-head{margin-bottom:var(--sp-2);align-items:baseline}
+.camp-strip-note{font-family:Arial,sans-serif;font-size:var(--fs-xs);letter-spacing:.6px;color:var(--muted);white-space:nowrap}
+.camp-strip-note b{color:var(--gold-light);font-weight:600}
+.camp-view .camp-team-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);overflow:visible;padding-bottom:0}
+.camp-view .camp-team-card{min-width:0;padding:var(--sp-2);gap:var(--sp-2);align-items:center;border-radius:var(--r-sm);transition:border-color .16s,transform .16s}
+.camp-view .camp-team-card:hover{transform:translateY(-1px)}
+.camp-view .camp-team-face{position:relative;width:var(--sp-9);height:calc(var(--sp-9) + var(--sp-2));border-radius:var(--r-sm)}
+.camp-team-rank{position:absolute;left:0;bottom:0;min-width:14px;padding:0 3px;border-radius:0 var(--r-sm) 0 0;background:#0c0806d9;color:var(--gold);font:600 9px/1.5 Arial,sans-serif;text-align:center}
+.camp-view .camp-team-meta b{font-size:var(--fs-sm);letter-spacing:.3px}
+.camp-view .camp-team-meta small{margin:1px 0 4px;font-size:9.5px}
+.camp-view .camp-team-nums{margin-top:3px;font-size:9px;letter-spacing:.2px;color:var(--dim)}
+
+/* 设施：标题行 + 2×2 紧凑建筑卡 */
+.camp-view .camp-scene{padding:var(--sp-3);gap:var(--sp-2);border-radius:var(--r-md);min-height:0}
+.camp-scene-head{position:relative;z-index:1;display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);padding:0 var(--sp-1)}
+.camp-scene-head small{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
+.camp-view .camp-buildings{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);padding:0}
+.camp-view .camp-building{gap:var(--sp-1);padding:var(--sp-2);border-radius:var(--r-sm);background:linear-gradient(165deg,#1c1209f2,#0e0906f2)}
+.camp-building-top{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.camp-view .camp-building-icon{display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid #8a6236;border-radius:var(--r-sm);font-size:13px;background:linear-gradient(180deg,#3c2512,#1e1008);flex-shrink:0}
+.camp-view .camp-building-body{padding:0;display:none}
+.camp-view .camp-building-name{display:flex;align-items:baseline;gap:var(--sp-1);min-width:0;font-size:13px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-view .camp-building-name em{font-size:9.5px;letter-spacing:0;color:var(--gold);flex-shrink:0}
+.camp-view .camp-building-desc{display:-webkit-box;margin:0;min-height:2.9em;overflow:hidden;font-size:var(--fs-xs);line-height:1.45;color:#bfa07e;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.camp-view .camp-building .town-meter{gap:3px}
+.camp-view .camp-building .town-meter i{height:3px;border-radius:var(--r-pill)}
+.camp-view .camp-building .btn{min-height:26px;margin:0;padding:0;font-size:var(--fs-xs);letter-spacing:.5px}
+.camp-view .camp-building-max{font-size:var(--fs-xs);color:var(--olive);letter-spacing:1px}
+
+/* 快捷动作：一条四格工具栏，只有「治疗」是主色 */
+.camp-view .camp-quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);margin:0;padding:0}
+.camp-view .btn.camp-quick{flex:none;min-width:0;min-height:34px;padding:0;font-family:inherit;font-size:11px;letter-spacing:.5px}
+.camp-quick i{font-style:normal;margin-right:2px;opacity:.75}
+
+/* 后备：单行，溢出可横向滑动 */
+.camp-view .camp-reserve-strip{padding:var(--sp-2) var(--sp-3);gap:var(--sp-2);flex-wrap:nowrap;align-items:center;border-radius:var(--r-md)}
+.camp-reserve-label{flex-shrink:0;font-size:9px;letter-spacing:1.4px}
+.camp-view .camp-reserve-row{flex:1;min-width:0;gap:var(--sp-1);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.camp-view .camp-reserve-row::-webkit-scrollbar{display:none}
+.camp-view .camp-reserve-chip{width:44px;padding:3px;border-radius:var(--r-sm);font-size:9px;letter-spacing:0}
+.camp-view .camp-reserve-chip img{width:34px;height:34px}
+.camp-view .camp-reserve-chip.empty{height:52px;font-size:16px}
+.camp-reserve-manage{flex-shrink:0}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
 // Static game data tables extracted from engine.js (Phase 0 refactor).
 // No runtime logic — import-safe constants only.
@@ -2953,24 +3006,24 @@ function campNavBar(){
 function campBuildingChip(id){
  const def=BUILDINGS[id],lv=buildingLevel(game,id),cost=buildingCost(game,id),max=lv>=MAX_BUILDING_LEVEL;
  return `<article class="camp-building" data-building="${id}">
-  <div class="camp-building-icon">${def.icon}</div>
-  <div class="camp-building-body">
-   <div class="camp-building-name">${def.name} <em>Lv.${lv}</em></div>
-   <div class="camp-building-desc">${def.desc}</div>
-   <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
-  </div>
-  ${max?'<span class="camp-building-max">已满级</span>':button(`升级 · ${cost.gold}◈`,'building',`data-id="${id}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-tiny btn-ghost')}
+  <div class="camp-building-top"><span class="camp-building-icon">${def.icon}</span><span class="camp-building-name">${def.name}<em>Lv.${lv}</em></span></div>
+  <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
+  <div class="camp-building-desc">${def.desc}</div>
+  ${max?'<span class="camp-building-max">已满级</span>':button(`升级 · ${cost.gold}◈`,'building',`data-id="${id}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-tiny btn-ghost btn-full')}
  </article>`;
 }
 function campTeamStrip(){
+ // Phase 6.1：队伍条升为本屏第一信息 —— 说明文案换成可读的整备度
+ const readiness=Math.round(game.heroes.reduce((sum,h)=>sum+clamp(h.hp/Math.max(1,h.maxHp),0,1),0)/Math.max(1,game.heroes.length)*100);
+ const peak=Math.max(0,...game.heroes.map(h=>h.stress||0));
  return `<div class="camp-team-strip">
   <div class="camp-strip-head"><span class="eyebrow">EXPEDITION TEAM · 远征队伍</span>
-   <span class="camp-strip-note">点击英雄卡可在「英雄」页管理站位、装备与天赋</span></div>
+   <span class="camp-strip-note">平均生命 <b>${readiness}%</b> · 最高压力 <b>${peak}</b></span></div>
   <div class="camp-team-row">
    ${game.heroes.map(h=>{
     const t=CLASSES[h.classId],xp=h.xp??Math.min(99,((h.level||1)-1)*22+8);
     return `<button class="camp-team-card" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)} · ${t.name}">
-     <div class="camp-team-face" style="--accent:${t.color}">${heroPortrait(h.classId)}</div>
+     <div class="camp-team-face" style="--accent:${t.color}">${heroPortrait(h.classId)}<span class="camp-team-rank">${h.rank}</span></div>
      <div class="camp-team-meta">
       <b>${ESC(h.name)}</b>
       <small>${t.name} · Lv.${h.level}</small>
@@ -2986,11 +3039,11 @@ function campTeamStrip(){
 function campReserveStrip(){
  const reserves=game.reserveHeroes||[];
  return `<div class="camp-reserve-strip">
-  <span class="eyebrow">RESERVES · 后备英雄 ${reserves.length}/${MAX_RESERVES}</span>
+  <span class="eyebrow camp-reserve-label">RESERVES · 后备 ${reserves.length}/${MAX_RESERVES}</span>
   <div class="camp-reserve-row">
    ${reserves.map(h=>`<button class="camp-reserve-chip" data-action="hero-focus" data-id="${h.id}" title="${ESC(h.name)}">${heroPortrait(h.classId)}<i>${ESC(h.name)}</i></button>`).join('')}
    ${Array.from({length:Math.max(0,Math.min(3,MAX_RESERVES-reserves.length))},()=>`<button class="camp-reserve-chip empty" data-action="camp-section" data-id="heroes" title="前往招募">＋</button>`).join('')}
-   ${button('招募/管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost')}
+   ${button('招募 / 管理','camp-section','data-id="heroes"','btn btn-tiny btn-ghost camp-reserve-manage')}
   </div>
  </div>`;
 }
@@ -2998,21 +3051,23 @@ function campQuickActions(){
  const cheapest=game.heroes.filter(h=>h.hp<h.maxHp).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
  const healCost=campHealCost(game);
  return `<div class="camp-quick-actions">
-  ${button(`治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn btn-red camp-quick')}
-  ${button('训练','camp-section','data-id="heroes" data-tab="skills"','btn btn-gold camp-quick')}
-  ${button('锻造','camp-section','data-id="heroes" data-tab="team"','btn btn-gold camp-quick')}
-  ${button('升级','camp-section','data-id="archive" data-tab="town"','btn btn-teal camp-quick')}
+  ${button(`<i>✚</i>治疗${cheapest?` · ${healCost}◈`:''}`,'quick-heal',`${cheapest?`data-id="${cheapest.id}"`:'disabled'} ${game.gold<healCost?'disabled':''}`,'btn btn-gold camp-quick')}
+  ${button('<i>✦</i>训练','camp-section','data-id="heroes" data-tab="skills"','btn btn-ghost camp-quick')}
+  ${button('<i>⚒</i>锻造','camp-section','data-id="heroes" data-tab="team"','btn btn-ghost camp-quick')}
+  ${button('<i>⌂</i>建设','camp-section','data-id="archive" data-tab="town"','btn btn-ghost camp-quick')}
  </div>`;
 }
 function campOverview(){
+ // Phase 6.1：先看人（队伍整备度），再看营地设施，最后看后备 —— 出发仍在固定底栏
  const region=REGIONS[game.selectedRegion]||REGIONS.crypt;
  return `<div class="camp-overview">
+  ${campTeamStrip()}
   <div class="camp-scene">
    <div class="camp-scene-glow"></div>
+   <div class="camp-scene-head"><span class="eyebrow">CAMP GROUNDS · 营地设施</span><small>升级后永久生效于之后每次远征</small></div>
    <div class="camp-buildings">${['infirmary','chapel','workshop','watchtower'].map(campBuildingChip).join('')}</div>
    ${campQuickActions()}
   </div>
-  ${campTeamStrip()}
   ${campReserveStrip()}
   <div class="camp-depart-bar">
    <div class="camp-depart-info">
