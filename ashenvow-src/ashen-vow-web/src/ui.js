@@ -253,16 +253,23 @@ function homePage(){
 }
 function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${heroPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="hero-gear"><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div></div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
 function trinketStatsText(item){return Object.entries(trinketMods(item)).map(([k,v])=>`${MOD_LABELS[k]||k} ${v>=0?'+':''}${v}`).join(' · ');}
-function journalPage(){const summary=expeditionSummary(game);
+function journalPage(){
+ // Phase 6.3：统计四格并排，口径说明收进 details，正文只留数据
+ const summary=expeditionSummary(game);
  const reason={victory:'凯旋',retreat:'撤退',defeat:'溃败'};
- return `<div class="panel journal-page">${label('远征编年史','EXPEDITION CHRONICLE')}<p class="small-muted">仅统计 V0.8 之后完成的远征。旧存档中的历史胜利次数仍会保留，但不会补造收益数字。</p>
- <div class="journal-overview"><div><small>记录场次</small><strong>${summary.total}</strong></div><div><small>胜利场次</small><strong>${summary.victories}</strong></div><div><small>记录金币</small><strong>${summary.gold}</strong></div><div><small>单次平均金币</small><strong>${summary.averageGold}</strong></div></div>
- <div class="journal-table"><div class="journal-row header"><span>营地日</span><span>地区 · 难度</span><span>结局</span><span>金币 / 碎片</span></div>${summary.reports.length?summary.reports.map(r=>`<div class="journal-row"><span>第 ${r.day} 日</span><span>${ESC(REGIONS[r.region]?.name||r.region)} · ${ESC(DIFFICULTIES[r.difficulty]?.name||r.difficulty)}</span><span>${reason[r.reason]||'结束'}</span><span>◈ ${r.gold} / ✥ ${r.shards}</span></div>`).join(''):'<p class="muted">还没有 V0.8 远征记录。完成远征后可在这里复盘。</p>'}</div>
- <p class="small-muted">连续两次全队溃败且营地资金不足 35 金币时，触发一次紧急救济，避免存档陷入无法继续的经济死局。</p></div>`;
+ return `<div class="panel journal-page">${label('远征编年史','EXPEDITION CHRONICLE')}
+ <div class="journal-stats"><div><small>记录场次</small><strong>${summary.total}</strong></div><div><small>胜利</small><strong>${summary.victories}</strong></div><div><small>记录金币</small><strong>${summary.gold}</strong></div><div><small>平均金币</small><strong>${summary.averageGold}</strong></div></div>
+ <div class="journal-table"><div class="journal-row header"><span>营地日</span><span>地区 · 难度</span><span>结局</span><span>金币 / 碎片</span></div>${summary.reports.length?summary.reports.map(r=>`<div class="journal-row"><span>第 ${r.day} 日</span><span>${ESC(REGIONS[r.region]?.name||r.region)} · ${ESC(DIFFICULTIES[r.difficulty]?.name||r.difficulty)}</span><span>${reason[r.reason]||'结束'}</span><span>◈ ${r.gold} / ✥ ${r.shards}</span></div>`).join(''):'<p class="muted journal-empty">还没有记录。完成一次远征后可在这里复盘。</p>'}</div>
+ <details class="journal-notes"><summary>统计口径</summary><p>仅统计 V0.8 之后完成的远征；旧存档的历史胜利次数仍保留，但不补造收益数字。连续两次全队溃败且金币不足 35 时触发一次紧急救济，避免存档陷入无法继续的经济死局。</p></details>
+ </div>`;
 }
 function achievementsPage(){
- const unlocked=Object.keys(game.achievements||{}).length;
- return `<div class="panel v10-section">${label('灰烬功勋','ACHIEVEMENTS')}<p class="small-muted">成就只记录游戏内实际进度，不需要账号，也不提供可重复领取的经济奖励。旧存档会按现有进度补记已达成成就。</p><h3>已解锁 ${unlocked} / ${Object.keys(ACHIEVEMENTS).length}</h3><div class="v10-card-grid">${Object.entries(ACHIEVEMENTS).map(([id,a])=>`<article class="v10-card ${game.achievements?.[id]?'obtained':'locked'}"><span class="v10-symbol">${game.achievements?.[id]?'✦':'◇'}</span><h4>${a.name}</h4><p>${a.desc}</p><small>${game.achievements?.[id]?`第 ${game.achievements[id]} 日达成`:'尚未完成'}</small></article>`).join('')}</div></div>`;
+ // Phase 6.3：进度条置顶，成就卡压成「符号 + 文案」两列
+ const total=Object.keys(ACHIEVEMENTS).length,unlocked=Object.keys(game.achievements||{}).length;
+ return `<div class="panel v10-section achv-page">${label('灰烬功勋','ACHIEVEMENTS')}
+ <div class="achv-progress"><span>已解锁 <strong>${unlocked}</strong> / ${total}</span><div class="bar"><span style="width:${percent(unlocked,total)}%"></span></div></div>
+ <div class="v10-card-grid achv-grid">${Object.entries(ACHIEVEMENTS).map(([id,a])=>{const got=game.achievements?.[id];return `<article class="v10-card achv-card ${got?'obtained':'locked'}"><span class="v10-symbol">${got?'✦':'◇'}</span><div class="achv-copy"><h4>${a.name}</h4><p>${a.desc}</p><small>${got?`第 ${game.achievements[id]} 日达成`:'尚未完成'}</small></div></article>`}).join('')}</div>
+ <p class="achv-note">成就只记录游戏内实际进度，不需要账号，也不提供可重复领取的经济奖励；旧存档会按现有进度补记。</p></div>`;
 }
 function guidePage(){
  // Phase 5：六步改为纵向编号步骤条，每步压到一句话，底部只留一个主操作
@@ -327,13 +334,13 @@ function trinketsPage(){
  </div>`;
 }
 function townPage(){return `<div class="town-page">
- <div class="town-head"><div class="eyebrow">REBUILD THE SANCTUARY</div><h3>在废墟上重建家园</h3><p>升级建筑会永久改变之后每次远征和营地管理的效果。所有建设消耗当前存档的金币和遗物碎片。</p></div>
+ <div class="town-head"><div class="eyebrow">REBUILD THE SANCTUARY</div><h3>在废墟上重建家园</h3><p>升级永久生效于之后每次远征，消耗当前存档的金币与碎片。</p></div>
  <div class="town-grid">${Object.entries(BUILDINGS).map(([id,b])=>{const lv=buildingLevel(game,id),cost=buildingCost(game,id),max=lv>=MAX_BUILDING_LEVEL;
  return `<article class="town-card"><div class="town-card-top"><span class="town-icon">${b.icon}</span><div><div class="eyebrow">${b.en}</div><h4>${b.name}</h4></div><span class="town-level">LV ${lv} / ${MAX_BUILDING_LEVEL}</span></div>
  <div class="town-meter">${Array.from({length:MAX_BUILDING_LEVEL},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>
  <p>${b.desc}</p><div class="town-bonus">${b.bonus}</div>
  ${button(max?'已经达到最高等级':`升级 · ${cost.gold} ◈ / ${cost.shards} ✥`,'building',`data-id="${id}" ${max||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-gold btn-full')}</article>`}).join('')}</div>
- <div class="town-head town-rest"><div class="eyebrow">HEALING & SOLACE</div><h3>伤患照护</h3><p>出战和后备英雄都可以接受治疗和祷告。礼拜堂与医馆升级也会强化归营时后备队的被动恢复。</p></div>
+ <div class="town-head town-rest"><div class="eyebrow">HEALING & SOLACE</div><h3>伤患照护</h3><p>出战与后备英雄都可治疗与祷告，医馆/礼拜堂等级会强化归营恢复。</p></div>
  <div class="town-patients">${[...game.heroes,...game.reserveHeroes].map(h=>`<div class="town-patient"><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · ${h.hp}/${h.maxHp} HP · ${h.stress}/100 压力</small></div><div>${button(`疗伤 ${campHealCost(game)} ◈`,'heal',`data-id="${h.id}" ${game.gold<campHealCost(game)||h.hp===h.maxHp&&h.stress===0?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 ${campPrayerCost(game)} ◈`,'pray',`data-id="${h.id}" ${game.gold<campPrayerCost(game)||h.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${(h.traits||[]).filter(t=>TRAITS[t]?.kind==='negative').map(t=>{const cost=quirkTreatmentCost(game);return button(`治疗${TRAITS[t].name} · ${cost.gold} ◈/${cost.shards} ✥`,'treat-trait',`data-id="${h.id}" data-kind="${t}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-small btn-cure')}).join('')}</div></div>`).join('')}</div>
  </div>`;}
 function talentsPage(){const heroes=[...game.heroes,...game.reserveHeroes],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];

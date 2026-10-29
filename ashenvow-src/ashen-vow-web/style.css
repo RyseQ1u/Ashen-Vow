@@ -1862,3 +1862,63 @@ body:has(.landing) .site-footer{display:none}
 .sidebar-advanced .region-copy b,.sidebar-advanced .summary b{font-size:var(--fs-sm)}
 .sidebar-advanced .region-copy small,.sidebar-advanced .region-copy em,.sidebar-advanced .difficulty-option small,.sidebar-advanced .difficulty-option em,.sidebar-advanced .plan-row small{font-size:9.5px;line-height:1.4}
 .sidebar-advanced .region-hazard{font-size:9.5px;padding:var(--sp-1) var(--sp-2);line-height:1.5}
+
+/* ========================================================================
+   UI 重设计 · Phase 6.3 营地档案（编年史 / 成就 / 城镇）
+   —— 正文只留数据，口径说明收进 details；成就进度条置顶；建筑两列。
+   ======================================================================== */
+
+/* 编年史 */
+.camp-view .journal-page{padding:var(--sp-4);border-radius:var(--r-md)}
+.journal-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);margin:var(--sp-3) 0}
+.journal-stats>div{display:flex;flex-direction:column;gap:2px;padding:var(--sp-2);border:1px solid #574b4150;border-radius:var(--r-sm);background:#1a1619a8}
+.journal-stats small{font-family:Arial,sans-serif;font-size:9.5px;letter-spacing:.5px;color:var(--muted)}
+.journal-stats strong{font-size:var(--fs-md);font-weight:400;color:var(--gold-light)}
+.camp-view .journal-row{grid-template-columns:14% 1fr 18% auto;padding:var(--sp-2) var(--sp-1);font-size:var(--fs-xs);gap:var(--sp-1);border-bottom:1px solid #54473e40}
+.camp-view .journal-row.header{background:none;border-bottom:1px solid #6d4f2866;font-family:Arial,sans-serif;font-size:9px;letter-spacing:.8px;color:var(--gold);opacity:.85}
+.camp-view .journal-row span:last-child{text-align:right;white-space:nowrap}
+.journal-empty{margin:var(--sp-3) 0;font-size:var(--fs-xs);text-align:center}
+.journal-notes{margin-top:var(--sp-3);border-top:1px solid #574b4130;padding-top:var(--sp-1)}
+.journal-notes summary{padding:var(--sp-1) 0;cursor:pointer;font-size:9.5px;letter-spacing:.5px;color:var(--dim);list-style:none}
+.journal-notes summary::-webkit-details-marker{display:none}
+.journal-notes summary:before{content:'▸ ';color:var(--gold)}
+.journal-notes[open] summary:before{content:'▾ '}
+.journal-notes p{margin:var(--sp-1) 0 0;font-size:9.5px;line-height:1.7;color:var(--muted)}
+
+/* 成就 */
+.camp-view .achv-page{padding:var(--sp-4);border-radius:var(--r-md)}
+.achv-progress{display:flex;align-items:center;gap:var(--sp-3);margin:var(--sp-3) 0}
+.achv-progress span{flex-shrink:0;font-family:Arial,sans-serif;font-size:var(--fs-xs);letter-spacing:.5px;color:var(--muted)}
+.achv-progress strong{font-size:var(--fs-base);color:var(--gold-light)}
+.achv-progress .bar{flex:1;height:5px}
+.achv-progress .bar span{background:linear-gradient(90deg,#8a6b3a,#e3c489)}
+.camp-view .achv-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);margin-top:0}
+.camp-view .achv-card{flex-direction:row;align-items:flex-start;gap:var(--sp-2);min-height:0;padding:var(--sp-2);border-radius:var(--r-sm)}
+.camp-view .achv-card .v10-symbol{font-size:var(--fs-base);line-height:1.2;flex-shrink:0}
+.achv-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.achv-copy h4{font-size:var(--fs-xs);letter-spacing:.3px}
+.achv-copy p{font-size:9.5px;line-height:1.45;color:var(--muted)}
+.achv-copy small{font-size:9px}
+.achv-note{margin:var(--sp-3) 0 0;font-size:9.5px;line-height:1.6;color:var(--dim)}
+
+/* 城镇 */
+.town-page .town-head p{font-size:var(--fs-sm);color:var(--muted)}
+.town-page .town-head h3{font-size:var(--fs-lg);margin:var(--sp-1) 0}
+.town-page .town-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+.town-page .town-card{padding:var(--sp-2);gap:var(--sp-1);border-radius:var(--r-sm)}
+.town-page .town-card-top{gap:var(--sp-2);align-items:center}
+.town-page .town-icon{width:28px;height:28px;font-size:15px;border-radius:var(--r-sm);flex-shrink:0}
+.town-page .town-card .eyebrow{font-size:8px;letter-spacing:1px;opacity:.72}
+.town-page .town-card h4{margin:1px 0 0;font-size:var(--fs-sm)}
+.town-page .town-level{font-size:9px;color:var(--gold)}
+.town-page .town-meter{gap:3px}
+.town-page .town-meter i{height:3px;border-radius:var(--r-pill)}
+.town-page .town-card p{min-height:0;font-size:9.5px;line-height:1.45;color:var(--muted)}
+.town-page .town-bonus{padding:var(--sp-1);font-size:9px;line-height:1.45;border-left-width:1px}
+.town-page .town-card .btn{margin-top:var(--sp-1);min-height:28px;font-size:10px}
+.town-page .town-rest{margin-top:var(--sp-4);padding-top:var(--sp-3)}
+.town-page .town-patient{padding:var(--sp-2);gap:var(--sp-1);flex-wrap:nowrap;border-radius:var(--r-sm)}
+.town-page .town-patient b{font-size:var(--fs-xs)}
+.town-page .town-patient small{padding-top:2px;font-size:9px}
+.town-page .town-patient>div:last-child{gap:var(--sp-1);flex-wrap:nowrap;flex-shrink:0}
+.town-page .town-patient .btn{min-height:26px;padding:0 var(--sp-1);font-size:9px;white-space:nowrap}
