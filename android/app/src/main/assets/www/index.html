@@ -1701,6 +1701,169 @@ body:has(.landing) .site-footer{display:none}
 .camp-view .camp-reserve-chip.empty{height:52px;font-size:16px}
 .camp-reserve-manage{flex-shrink:0}
 
+/* ========================================================================
+   UI 重设计 · Phase 6.2 英雄管理（队伍 / 招募 / 饰品 / 天赋 / 技能训练）
+   —— 页签收成单行；英雄卡压成模块；招募与后备改横向行；
+      参考性内容（套装表）收进 details。
+   ======================================================================== */
+
+/* 页签：单行等分，不再折成两行 */
+.camp-view .camp-tabs{flex-wrap:nowrap;gap:var(--sp-1);padding:var(--sp-2) 0;margin-bottom:var(--sp-3);border-bottom:1px solid #574b4130;overflow-x:auto;scrollbar-width:none}
+.camp-view .camp-tabs::-webkit-scrollbar{display:none}
+.camp-view .camp-tab{flex:1 1 0;min-width:0;padding:var(--sp-2) 2px;font-size:11px;letter-spacing:0;white-space:nowrap;text-align:center;border-radius:var(--r-sm)}
+.camp-view .camp-tab.active{background:linear-gradient(135deg,#e5c88b,#b58b52 70%,#d4ae72);color:#191719;border-color:#e2c28a;font-weight:600;box-shadow:0 4px 12px #0005}
+
+/* 队伍页：两列紧凑英雄卡 */
+.camp-view .team-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+.camp-view .hero-card{padding:var(--sp-2);border-radius:var(--r-sm)}
+.camp-view .hero-portrait{height:114px}
+.camp-view .hero-portrait:before{font-size:96px;top:6px}
+.camp-view .frame-top{top:4px;gap:8px;font-size:8px}
+.camp-view .frame-foot{bottom:4px;font-size:8px}
+.camp-view .hero-info{padding:var(--sp-2) 2px 2px}
+.camp-view .hero-name{font-size:var(--fs-sm);letter-spacing:.5px}
+.camp-view .hero-class{margin:2px 0 var(--sp-2);font-size:9.5px}
+.camp-view .vitals{gap:5px}
+.camp-view .barline{grid-template-columns:20px 1fr 40px;gap:4px}
+.camp-view .bar-caption,.camp-view .bar-numbers{font-size:8.5px}
+.camp-view .trait-summary{gap:3px;margin:var(--sp-2) 0 0}
+.camp-view .trait-tag{font-size:8.5px;padding:2px 3px;line-height:1.3}
+.camp-view .formation-controls{margin:var(--sp-2) 0 0;font-size:9px;gap:2px}
+.camp-view .formation-controls .btn{min-height:22px;padding:0 6px;font-size:10px}
+.camp-view .hero-gear{display:grid;gap:3px;margin-top:var(--sp-2)}
+.camp-view .gear-mini{margin:0;gap:3px;font-size:8.5px;color:var(--muted)}
+.camp-view .trinket-mini{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;margin:0}
+.camp-view .trinket-mini span{padding:2px 4px;font-size:8.5px;line-height:1.3}
+.camp-view .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin-top:var(--sp-2)}
+.camp-view .hero-actions .btn{min-width:0;flex:none;min-height:26px;padding:var(--sp-1) 2px;font-size:9.5px;line-height:1.2;letter-spacing:0}
+
+/* 招募：横向卡（头像 + 资料 + 单个动作） */
+.roster-page .roster-intro h3{font-size:var(--fs-md)}
+.roster-page .roster-intro p{font-size:var(--fs-sm);color:var(--muted);margin:var(--sp-1) 0 var(--sp-3)}
+.roster-page .recruit-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-2)}
+.roster-page .recruit-card{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:var(--sp-2);padding:var(--sp-2);border-radius:var(--r-sm)}
+.roster-page .recruit-card>*{min-height:0}
+.roster-page .recruit-face{width:56px;height:64px;overflow:hidden;border:1px solid #6d4f28;border-radius:var(--r-sm);background:#1a171c}
+.roster-page .recruit-face img,.roster-page .recruit-face svg{width:100%;height:100%;object-fit:cover;object-position:top}
+.recruit-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.recruit-copy strong{font-size:var(--fs-sm);color:#e5d0b1}
+.recruit-copy span{font-size:var(--fs-xs);color:#d1b588}
+.recruit-copy small{display:-webkit-box;overflow:hidden;font-size:var(--fs-xs);line-height:1.45;color:var(--muted);-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.recruit-act .btn{min-height:30px;padding:0 var(--sp-2);font-size:var(--fs-xs);white-space:nowrap}
+
+/* 后备：单行卡 + 两个小动作 */
+.roster-page .roster-hint{margin:0 0 var(--sp-2);font-size:var(--fs-xs);color:var(--muted)}
+.roster-page .active-swaps{margin:0 0 var(--sp-2);gap:var(--sp-1)}
+.roster-page .reserve-grid{gap:var(--sp-1)}
+.roster-page .reserve-card{gap:var(--sp-2);padding:var(--sp-2);border-radius:var(--r-sm);flex-wrap:nowrap}
+.roster-page .reserve-actions{width:auto;display:flex;gap:var(--sp-1);flex-shrink:0}
+.roster-page .reserve-actions .btn{min-height:26px;padding:0 var(--sp-1);font-size:9.5px}
+.reserve-copy{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.reserve-copy b{font-size:var(--fs-sm);color:#e4cba8}
+.reserve-copy small{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 饰品：页签式选人、槽位并排、套装表收起 */
+.trinkets-page .roster-intro h3{font-size:var(--fs-md)}
+.trinkets-page .roster-intro p{font-size:var(--fs-sm);color:var(--muted);margin:var(--sp-1) 0 var(--sp-2)}
+.trinkets-page .trinket-summary{display:flex;gap:var(--sp-4);margin:0 0 var(--sp-2);font-size:var(--fs-xs);color:var(--muted)}
+.trinkets-page .trinket-summary b{color:var(--gold-light);font-size:var(--fs-sm)}
+.trinkets-page .trinket-heroes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin:0 0 var(--sp-2)}
+.trinkets-page .trinket-heroes .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trinkets-page .set-readout{padding:var(--sp-2);border-radius:var(--r-sm);margin-bottom:var(--sp-2)}
+.trinkets-page .set-readout strong{font-size:var(--fs-sm)}
+.trinkets-page .set-readout span{font-size:var(--fs-xs);line-height:1.5}
+.trinkets-page .trinket-slots{gap:var(--sp-2);margin:0 0 var(--sp-2)}
+.trinkets-page .trinket-slot{padding:var(--sp-2);border-radius:var(--r-sm);gap:2px}
+.trinkets-page .trinket-slot small{font-size:var(--fs-xs);color:var(--muted)}
+.trinkets-page .trinket-slot strong{font-size:var(--fs-sm)}
+.trinkets-page .trinket-slot span{font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.trinkets-page .trinket-slot .btn{min-height:24px;font-size:9.5px;margin-top:var(--sp-1)}
+.trinkets-page .set-collection{margin:0 0 var(--sp-2);padding:0;border-top:0;border:1px solid #574b4130;border-radius:var(--r-sm)}
+.trinkets-page .set-collection summary{padding:var(--sp-2);cursor:pointer;font-size:var(--fs-xs);color:var(--muted);list-style:none}
+.trinkets-page .set-collection summary::-webkit-details-marker{display:none}
+.trinkets-page .set-collection summary:before{content:'▸ ';color:var(--gold)}
+.trinkets-page .set-collection[open] summary:before{content:'▾ '}
+.trinkets-page .set-collection-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);padding:0 var(--sp-2) var(--sp-2)}
+.trinkets-page .set-collection-item{padding:var(--sp-2);border-radius:var(--r-sm)}
+.trinkets-page .set-collection-item b{font-size:var(--fs-xs)}
+.trinkets-page .set-collection-item small,.trinkets-page .set-collection-item span{font-size:9.5px;line-height:1.4}
+.trinkets-page .trinket-grid{gap:var(--sp-2)}
+.trinkets-page .trinket-card{padding:var(--sp-2);border-radius:var(--r-sm);gap:var(--sp-1)}
+.trinkets-page .trinket-card h4{font-size:var(--fs-sm)}
+.trinkets-page .trinket-card p{font-size:9.5px;line-height:1.45}
+.trinkets-page .trinket-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1)}
+.trinkets-page .trinket-actions .btn{min-height:26px;padding:0 2px;font-size:9px}
+.trinkets-page .trinket-actions .btn:last-child{grid-column:1 / -1}
+
+/* 天赋：两列紧凑卡 */
+.talents-page .town-head p{font-size:var(--fs-sm);color:var(--muted)}
+.talents-page .talent-roster{margin-bottom:var(--sp-2);gap:var(--sp-1)}
+.talents-page .talent-roster .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-2)}
+.talents-page .talent-hero-heading{padding:var(--sp-2);gap:var(--sp-2);border-radius:var(--r-sm);margin-bottom:var(--sp-2)}
+.talents-page .talent-face{width:52px;height:58px;border-radius:var(--r-sm)}
+.talents-page .talent-face svg,.talents-page .talent-face img{width:100%;height:100%;object-fit:cover;object-position:top}
+.talents-page .talent-hero-heading h4{font-size:var(--fs-base);margin:2px 0}
+.talents-page .talent-hero-heading p{font-size:var(--fs-xs)}
+.talents-page .talent-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+.talents-page .talent-card{padding:var(--sp-2);gap:var(--sp-1);border-radius:var(--r-sm)}
+.talents-page .talent-card .talent-symbol{font-size:20px}
+.talents-page .talent-card h4{font-size:var(--fs-sm)}
+.talents-page .talent-card p{min-height:0;font-size:9.5px;line-height:1.45}
+.talents-page .talent-card .btn{min-height:26px;font-size:9.5px}
+
+/* 技能训练：头部一行、数值两列、专精并排 */
+.skills-training-page .town-head p{font-size:var(--fs-sm);color:var(--muted)}
+.skills-training-page .talent-roster{margin-bottom:var(--sp-2);gap:var(--sp-1)}
+.skills-training-page .talent-roster .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-2)}
+.skills-training-page .training-summary{padding:var(--sp-2);font-size:var(--fs-xs);margin-bottom:var(--sp-2);border-radius:var(--r-sm)}
+.skills-training-page .training-summary strong{font-size:var(--fs-sm)}
+.skills-training-page .training-card{min-height:0;padding:var(--sp-3);gap:var(--sp-2);border-radius:var(--r-md)}
+.training-head{display:flex;align-items:center;gap:var(--sp-2)}
+.training-head .training-icon{font-size:20px;line-height:1}
+.training-name{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.training-name h4{margin:0;font-size:var(--fs-base)}
+.training-name .eyebrow{font-size:8.5px;opacity:.75}
+.training-head .training-meter{width:52px;margin:0;gap:3px}
+.training-head .training-meter span{height:4px}
+.skills-training-page .training-card p{flex:none;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.skills-training-page .skill-spec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px var(--sp-2);margin:0}
+.skills-training-page .skill-spec-row{padding:3px var(--sp-1);border-left:1px solid #6d4f28;font-size:9.5px;gap:var(--sp-1)}
+.skills-training-page .skill-spec-row span{letter-spacing:0}
+.skills-training-page .training-card .btn{min-height:32px;font-size:11px}
+.skills-training-page .branch-chooser{margin:0;gap:var(--sp-1)}
+.skills-training-page .branch-chooser>.eyebrow{font-size:8.5px;opacity:.75}
+.branch-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin-top:var(--sp-1)}
+.skills-training-page .branch-option{padding:var(--sp-1) var(--sp-2);gap:2px;border-radius:var(--r-sm)}
+.skills-training-page .branch-option strong{font-size:10.5px}
+.skills-training-page .branch-option small{font-size:9px;line-height:1.35}
+.skills-training-page .branch-option em{font-size:9px}
+
+/* 侧栏：补给紧凑 + 远征设置折叠 */
+.camp-view .sidebar{padding:var(--sp-3);min-height:0;border-radius:var(--r-md)}
+.camp-view .sidebar h2{font-size:var(--fs-md);margin:var(--sp-1) 0 var(--sp-2)}
+.camp-view .sidebar .muted{font-size:var(--fs-xs);line-height:1.6}
+.camp-view .sidebar .ornamental-line{margin:var(--sp-2) 0}
+.camp-view .supply{margin:var(--sp-1) 0;font-size:var(--fs-xs);gap:var(--sp-2)}
+.camp-view .supply strong{font-size:var(--fs-sm)}
+.camp-view .supply .btn{min-height:24px;padding:0 var(--sp-1);font-size:9.5px}
+.camp-view .stats-mini{margin:var(--sp-2) 0;gap:var(--sp-2)}
+.camp-view .stats-mini strong{font-size:var(--fs-md)}
+.camp-view .sidebar .btn.btn-xl{min-height:40px;font-size:var(--fs-sm)}
+.camp-view .sidebar-notice{margin-top:var(--sp-2);font-size:9.5px;line-height:1.6}
+.sidebar-advanced{margin:var(--sp-2) 0 0;border:1px solid #574b4130;border-radius:var(--r-sm)}
+.sidebar-advanced>summary{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);padding:var(--sp-2);cursor:pointer;list-style:none}
+.sidebar-advanced>summary::-webkit-details-marker{display:none}
+.sidebar-advanced>summary:before{content:'▸';color:var(--gold);font-size:10px;margin-right:2px}
+.sidebar-advanced[open]>summary:before{content:'▾'}
+.sidebar-advanced>summary span{flex-shrink:0}
+.sidebar-advanced>summary small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;color:var(--muted)}
+.sidebar-advanced .region-picker,.sidebar-advanced .difficulty-picker,.sidebar-advanced .expedition-plans{padding:0 var(--sp-2) var(--sp-2)}
+.sidebar-advanced .eyebrow{font-size:8.5px;opacity:.72}
+.sidebar-advanced .region-option,.sidebar-advanced .difficulty-option,.sidebar-advanced .plan-row{padding:var(--sp-2);gap:var(--sp-1)}
+.sidebar-advanced .region-copy b,.sidebar-advanced .summary b{font-size:var(--fs-sm)}
+.sidebar-advanced .region-copy small,.sidebar-advanced .region-copy em,.sidebar-advanced .difficulty-option small,.sidebar-advanced .difficulty-option em,.sidebar-advanced .plan-row small{font-size:9.5px;line-height:1.4}
+.sidebar-advanced .region-hazard{font-size:9.5px;padding:var(--sp-1) var(--sp-2);line-height:1.5}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
 // Static game data tables extracted from engine.js (Phase 0 refactor).
 // No runtime logic — import-safe constants only.
@@ -2906,7 +3069,7 @@ function homePage(){
   </div>
  </section>`;
 }
-function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${heroPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
+function heroCard(hero,options={}){const type=CLASSES[hero.classId],stats=heroStats(hero,game);const isCamp=options.camp;return `<article class="hero-card"><div class="hero-portrait" style="--accent:${type.color}"><div class="frame-top">✧ <span>LV. ${hero.level}</span> ✧</div>${heroPortrait(hero.classId)}<div class="frame-foot">${type.title}</div></div><div class="hero-info"><div class="hero-name">${ESC(hero.name)} ${hero.afflicted?`<span class="affliction" title="${ESC(CRISES[hero.crisis]?.desc||'精神创伤')}">${ESC(CRISES[hero.crisis]?.name||'精神崩溃')}</span>`:''}</div><div class="hero-class">${type.name} · 位置 ${hero.rank}</div>${healthBar(hero)}<div class="trait-summary">${(hero.traits||[]).map(id=>`<span class="trait-tag ${TRAITS[id]?.kind||''}" title="${ESC(TRAITS[id]?.desc||'')}">${TRAITS[id]?.kind==='positive'?'✦':'☽'} ${ESC(TRAITS[id]?.name||id)}</span>`).join('')}${hero.crisis?`<span class="trait-tag negative">⚡ ${ESC(CRISES[hero.crisis]?.name||'崩溃')}</span>`:''}</div>${isCamp?`<div class="formation-controls"><span>前排 ← 站位 → 后排</span><div>${button('◀','move',`data-id="${hero.id}" data-direction="-1" ${hero.rank===1?'disabled':''}`,'btn btn-tiny btn-ghost')}${button('▶','move',`data-id="${hero.id}" data-direction="1" ${hero.rank===4?'disabled':''}`,'btn btn-tiny btn-ghost')}</div></div><div class="hero-gear"><div class="gear-mini"><span>✦ 天赋点 ${hero.talentPoints||0}</span><span>⚔ 武器 +${hero.gear?.weapon||0}</span><span>⬡ 护甲 +${hero.gear?.armor||0}</span></div><div class="trinket-mini">${(hero.trinkets||[null,null]).map(itemId=>{const item=game.items?.find(i=>i.id===itemId);return `<span title="${ESC(item?trinketName(item):'空饰品槽')}">${item?'✥ '+ESC(trinketName(item)):'◇ 空饰品槽'}</span>`}).join('')}</div></div><div class="hero-actions">${button(`疗伤 · ${campHealCost(game)} ◈`,'heal',`data-id="${hero.id}" ${game.gold<campHealCost(game)||(hero.hp===hero.maxHp&&hero.stress===0)?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 · ${campPrayerCost(game)} ◈`,'pray',`data-id="${hero.id}" ${game.gold<campPrayerCost(game)||hero.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${button('训练 · 30 ◈ / 5 ✥','upgrade',`data-id="${hero.id}" ${game.gold<30||game.shards<5||hero.level>=5?'disabled':''}`,'btn btn-small btn-ghost')}${['weapon','armor'].map(kind=>{const lv=hero.gear?.[kind]||0,gold=Math.max(10,25+lv*20-buildingLevel(game,'workshop')*5),shards=2+lv*2;return button(`${kind==='weapon'?'锻造武器':'铸造护甲'} +${lv} ${lv<3?`· ${gold} ◈/${shards} ✥`:'· 满级'}`,'forge',`data-id="${hero.id}" data-kind="${kind}" ${lv>=3||game.gold<gold||game.shards<shards?'disabled':''}`,'btn btn-small btn-ghost')}).join('')}</div>`:''}</div></article>`;}
 function trinketStatsText(item){return Object.entries(trinketMods(item)).map(([k,v])=>`${MOD_LABELS[k]||k} ${v>=0?'+':''}${v}`).join(' · ');}
 function journalPage(){const summary=expeditionSummary(game);
  const reason={victory:'凯旋',retreat:'撤退',defeat:'溃败'};
@@ -2945,8 +3108,42 @@ function codexPage(){
  </section>`;
 }
 function campTabs(){const list=campSection==='archive'?[['journal','远征记录'],['achievements','成就'],['town','城镇建设']]:[['team','远征队伍'],['roster','英雄招募'],['trinkets','饰品装备'],['talents','英雄天赋'],['skills','技能训练']];return `<div class="camp-tabs" role="tablist">${list.map(([id,lab])=>`<button class="camp-tab ${campTab===id?'active':''}" role="tab" aria-selected="${campTab===id}" data-action="camp-tab" data-id="${id}">${lab}</button>`).join('')}</div>`;}
-function rosterPage(){const reserves=game.reserveHeroes||[];const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];return `<div class="roster-page"><div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新招募名单。雇佣费用 65 金币，最多容纳 ${MAX_RESERVES} 名后备英雄。</p></div><div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card"><div class="recruit-face">${heroPortrait(offer.classId)}</div><div><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-full')}</article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div><div class="ornamental-line"></div><h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>${reserves.length?`<p class="muted">先选择要替换的出战位置，再点击后备英雄的“替换入队”。</p><div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card"><div class="reserve-icon">${CLASSES[h.classId].icon}</div><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div><div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div></div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}</div>`;}
-function trinketsPage(){const heroes=[...game.heroes,...(game.reserveHeroes||[])],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];const inUse=ownedTrinketIds(game);const available=(game.items||[]).filter(item=>!inUse.has(item.id));return `<div class="trinkets-page"><div class="roster-intro"><h3>遗物收藏 <span>TRINKET VAULT</span></h3><p>战斗和探索有概率发现饰品。精英必掉稀有饰品，首领必掉史诗饰品。每位英雄可装备两件。</p></div><div class="trinket-summary"><span>收藏 <b>${game.items?.length||0}</b></span><span>未装备 <b>${available.length}</b></span><span>已装备 <b>${inUse.size}</b></span></div><div class="trinket-heroes">${heroes.map(h=>button(`${ESC(h.name)} · ${CLASSES[h.classId].name}`, 'equip-hero',`data-id="${h.id}"`,`btn ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="set-readout">${activeTrinketSet(hero,game)?`<strong>✦ 套装已激活 · ${TRINKET_SETS[activeTrinketSet(hero,game)].name}</strong><span>${TRINKET_SETS[activeTrinketSet(hero,game)].effect}</span>`:`<strong>◇ 未激活饰品套装</strong><span>集齐指定两件基底饰品即可获得额外属性。</span>`}</div><div class="trinket-slots">${[0,1].map(i=>{const item=game.items?.find(t=>t.id===hero.trinkets?.[i]);return `<div class="trinket-slot"><small>饰品槽 ${i+1}</small><strong>${item?ESC(trinketName(item)):'◇ 尚未装备'}</strong><span>${item?trinketStatsText(item):'从下方仓库选择一件饰品'}</span>${item?button('卸下','unequip',`data-id="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost'):''}</div>`}).join('')}</div><div class="set-collection"><h4>可收集的双件套</h4><div class="set-collection-grid">${Object.values(TRINKET_SETS).map(set=>`<div class="set-collection-item"><b>${set.name}</b><small>${set.pieces.map(x=>TRINKET_BASES[x].name).join(" + ")}</small><span>${set.effect}</span></div>`).join("")}</div></div><h3 class="roster-section-title">饰品仓库 <span>${available.length} 件可装备</span></h3>${available.length?`<div class="trinket-grid">${available.map(item=>`<article class="trinket-card rarity-${item.rarity}"><div class="trinket-item-top"><span class="trinket-emblem">${TRINKET_BASES[item.baseId].icon}</span><small>${RARITY_NAMES[item.rarity]}</small></div><h4>${ESC(trinketName(item))}</h4><p>${trinketStatsText(item)}</p><div class="trinket-actions">${[0,1].map(i=>button(`装备至槽 ${i+1}`,'equip',`data-id="${item.id}" data-hero="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost')).join('')}${button('分解','salvage',`data-id="${item.id}"`,'btn btn-small btn-ghost')}</div></article>`).join('')}</div>`:'<p class="no-items">仓库中没有未装备的饰品。探索宝箱、击败精英与首领可以获取新饰品。</p>'}</div>`;}
+function rosterPage(){
+ // Phase 6.2：招募卡改为「头像 + 资料 + 一行动作」的横向紧凑卡；后备区压成单行卡
+ const reserves=game.reserveHeroes||[];
+ const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];
+ return `<div class="roster-page">
+ <div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新名单 · 雇佣 65 ◈ · 后备上限 ${MAX_RESERVES} 名</p></div>
+ <div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card">
+   <div class="recruit-face">${heroPortrait(offer.classId)}</div>
+   <div class="recruit-copy"><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>
+   <div class="recruit-act">${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-small')}</div>
+  </article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div>
+ <h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>
+ ${reserves.length?`<p class="roster-hint">先选出战位置，再点后备英雄的「替换入队」。</p>
+  <div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn btn-small ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
+  <div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card">
+    <div class="reserve-icon">${CLASSES[h.classId].icon}</div>
+    <div class="reserve-copy"><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div>
+    <div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div>
+   </div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}
+ </div>`;
+}
+function trinketsPage(){
+ // Phase 6.2：套装参考表收进 details，槽位并排两格，仓库两列
+ const heroes=[...game.heroes,...(game.reserveHeroes||[])],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];
+ const inUse=ownedTrinketIds(game),available=(game.items||[]).filter(item=>!inUse.has(item.id));
+ return `<div class="trinkets-page">
+ <div class="roster-intro"><h3>遗物收藏 <span>TRINKET VAULT</span></h3><p>精英必掉稀有、首领必掉史诗。每位英雄可装备两件。</p></div>
+ <div class="trinket-summary"><span>收藏 <b>${game.items?.length||0}</b></span><span>未装备 <b>${available.length}</b></span><span>已装备 <b>${inUse.size}</b></span></div>
+ <div class="trinket-heroes">${heroes.map(h=>button(`${ESC(h.name)} · ${CLASSES[h.classId].name}`, 'equip-hero',`data-id="${h.id}"`,`btn btn-small ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
+ <div class="set-readout">${activeTrinketSet(hero,game)?`<strong>✦ 套装已激活 · ${TRINKET_SETS[activeTrinketSet(hero,game)].name}</strong><span>${TRINKET_SETS[activeTrinketSet(hero,game)].effect}</span>`:`<strong>◇ 未激活饰品套装</strong><span>集齐指定两件基底饰品即可获得额外属性。</span>`}</div>
+ <div class="trinket-slots">${[0,1].map(i=>{const item=game.items?.find(t=>t.id===hero.trinkets?.[i]);return `<div class="trinket-slot"><small>饰品槽 ${i+1}</small><strong>${item?ESC(trinketName(item)):'◇ 尚未装备'}</strong><span>${item?trinketStatsText(item):'从下方仓库选择一件饰品'}</span>${item?button('卸下','unequip',`data-id="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost'):''}</div>`}).join('')}</div>
+ <details class="set-collection"><summary>可收集的双件套 · ${Object.keys(TRINKET_SETS).length} 套</summary><div class="set-collection-grid">${Object.values(TRINKET_SETS).map(set=>`<div class="set-collection-item"><b>${set.name}</b><small>${set.pieces.map(x=>TRINKET_BASES[x].name).join(" + ")}</small><span>${set.effect}</span></div>`).join("")}</div></details>
+ <h3 class="roster-section-title">饰品仓库 <span>${available.length} 件可装备</span></h3>
+ ${available.length?`<div class="trinket-grid">${available.map(item=>`<article class="trinket-card rarity-${item.rarity}"><div class="trinket-item-top"><span class="trinket-emblem">${TRINKET_BASES[item.baseId].icon}</span><small>${RARITY_NAMES[item.rarity]}</small></div><h4>${ESC(trinketName(item))}</h4><p>${trinketStatsText(item)}</p><div class="trinket-actions">${[0,1].map(i=>button(`装备至槽 ${i+1}`,'equip',`data-id="${item.id}" data-hero="${hero.id}" data-slot="${i}"`,'btn btn-small btn-ghost')).join('')}${button('分解','salvage',`data-id="${item.id}"`,'btn btn-small btn-ghost')}</div></article>`).join('')}</div>`:'<p class="no-items">仓库中没有未装备的饰品。探索宝箱、击败精英与首领可以获取新饰品。</p>'}
+ </div>`;
+}
 function townPage(){return `<div class="town-page">
  <div class="town-head"><div class="eyebrow">REBUILD THE SANCTUARY</div><h3>在废墟上重建家园</h3><p>升级建筑会永久改变之后每次远征和营地管理的效果。所有建设消耗当前存档的金币和遗物碎片。</p></div>
  <div class="town-grid">${Object.entries(BUILDINGS).map(([id,b])=>{const lv=buildingLevel(game,id),cost=buildingCost(game,id),max=lv>=MAX_BUILDING_LEVEL;
@@ -2958,8 +3155,8 @@ function townPage(){return `<div class="town-page">
  <div class="town-patients">${[...game.heroes,...game.reserveHeroes].map(h=>`<div class="town-patient"><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · ${h.hp}/${h.maxHp} HP · ${h.stress}/100 压力</small></div><div>${button(`疗伤 ${campHealCost(game)} ◈`,'heal',`data-id="${h.id}" ${game.gold<campHealCost(game)||h.hp===h.maxHp&&h.stress===0?'disabled':''}`,'btn btn-small btn-ghost')}${button(`祷告 ${campPrayerCost(game)} ◈`,'pray',`data-id="${h.id}" ${game.gold<campPrayerCost(game)||h.stress<=0?'disabled':''}`,'btn btn-small btn-ghost')}${(h.traits||[]).filter(t=>TRAITS[t]?.kind==='negative').map(t=>{const cost=quirkTreatmentCost(game);return button(`治疗${TRAITS[t].name} · ${cost.gold} ◈/${cost.shards} ✥`,'treat-trait',`data-id="${h.id}" data-kind="${t}" ${game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-small btn-cure')}).join('')}</div></div>`).join('')}</div>
  </div>`;}
 function talentsPage(){const heroes=[...game.heroes,...game.reserveHeroes],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];
- return `<div class="talents-page"><div class="town-head"><div class="eyebrow">HERO GROWTH</div><h3>英雄专精</h3><p>英雄每次升级获得 1 个天赋点。每种天赋最多强化 2 次，永久影响角色属性。后备英雄同样可以使用。</p></div>
- <div class="talent-roster">${heroes.map(h=>button(`${ESC(h.name)} · ${h.talentPoints||0} 点`,'talent-hero',`data-id="${h.id}"`,`btn ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
+ return `<div class="talents-page"><div class="town-head"><div class="eyebrow">HERO GROWTH</div><h3>英雄专精</h3><p>每次升级得 1 点天赋，每种天赋最多 2 级，永久生效。</p></div>
+ <div class="talent-roster">${heroes.map(h=>button(`${ESC(h.name)} · ${h.talentPoints||0} 点`,'talent-hero',`data-id="${h.id}"`,`btn btn-small ${hero.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
  <div class="talent-hero-heading"><span class="talent-face">${heroPortrait(hero.classId)}</span><div><div class="eyebrow">${CLASSES[hero.classId].title}</div><h4>${ESC(hero.name)} · Lv.${hero.level}</h4><p>剩余天赋点 <strong>${hero.talentPoints||0}</strong> · 攻击 ${heroStats(hero,game).attack} · 最大生命 ${heroStats(hero,game).maxHp}</p></div></div>
  <div class="talent-grid">${Object.entries(TALENTS).map(([id,t])=>{const lv=hero.talents?.[id]||0;return `<article class="talent-card"><span class="talent-symbol">${t.icon}</span><h4>${t.name}</h4><p>${t.desc}</p><div class="talent-ranks">${Array.from({length:t.max},(_,i)=>`<i class="${i<lv?'filled':''}"></i>`).join('')}</div>${button(lv>=t.max?'已满级':`强化 · 1 天赋点`,'talent',`data-id="${hero.id}" data-kind="${id}" ${lv>=t.max||!hero.talentPoints?'disabled':''}`,'btn btn-gold btn-full')}</article>`}).join('')}</div></div>`;}
 function skillSpecRows(hero,id){
@@ -2988,11 +3185,11 @@ function skillSpecRows(hero,id){
  return rows.map(([k,v])=>`<div class="skill-spec-row"><span>${k}</span><b>${v}</b></div>`).join('');
 }
 function skillTrainingPage(){const heroes=[...game.heroes,...game.reserveHeroes],hero=heroes.find(h=>h.id===chosenEquipHero)||heroes[0];
- return `<div class="skills-training-page"><div class="town-head"><div class="eyebrow">BATTLE TECHNIQUES · ADVANCED</div><h3>职业技能训练</h3><p>每个职业的三项技能都能提升两级。技能达到 +1 后，可在两种互斥专精中选择一种。专精直接改变战斗数值；切换专精需要额外花费。</p></div>
- <div class="talent-roster">${heroes.map(h=>button(ESC(h.name),'talent-hero',`data-id="${h.id}"`,`btn ${h.id===hero.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
+ return `<div class="skills-training-page"><div class="town-head"><div class="eyebrow">BATTLE TECHNIQUES · ADVANCED</div><h3>职业技能训练</h3><p>三项技能各可提升两级；技能 +1 后可在两种互斥专精中选一，切换需额外花费。</p></div>
+ <div class="talent-roster">${heroes.map(h=>button(ESC(h.name),'talent-hero',`data-id="${h.id}"`,`btn btn-small ${h.id===hero.id?'btn-gold':'btn-ghost'}`)).join('')}</div>
  <div class="training-summary"><strong>${ESC(hero.name)} · ${CLASSES[hero.classId].name}</strong><span>金币 ◈ ${game.gold} · 碎片 ✥ ${game.shards}</span></div>
  <div class="skill-training-grid">${CLASSES[hero.classId].skills.map(id=>{const sk=SKILLS[id],lv=skillLevel(hero,id),cost=skillTrainingCost(hero,id),max=lv>=MAX_SKILL_LEVEL;
- return `<article class="training-card"><div class="training-icon">${sk.icon}</div><div class="eyebrow">LEVEL ${lv} / ${MAX_SKILL_LEVEL}</div><h4>${sk.name}</h4><p>${sk.desc}</p><div class="skill-spec">${skillSpecRows(hero,id)}</div><div class="training-meter">${Array.from({length:MAX_SKILL_LEVEL},(_,i)=>`<span class="${i<lv?'filled':''}"></span>`).join('')}</div>${button(max?'已满级':`训练 · ${cost.gold} ◈ / ${cost.shards} ✥`,'train-skill',`data-id="${hero.id}" data-kind="${id}" ${max||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-gold btn-full')}<div class="branch-chooser"><div class="eyebrow">SKILL BRANCH · 技能专精</div>${SKILL_BRANCHES[id].map(br=>{const selected=skillBranch(hero,id)?.id===br.id,cost=hero.skillBranches?.[id]?{gold:22,shards:2}:{gold:35,shards:3};return `<button class="branch-option ${selected?'selected':''}" data-action="skill-branch" data-id="${hero.id}" data-kind="${id}" data-branch="${br.id}" ${lv<1||selected||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}><strong>${selected?'✓ ':''}${br.name}</strong><small>${br.desc}</small><em>${selected?'当前专精':lv<1?'需技能 +1':`${cost.gold} ◈ / ${cost.shards} ✥`}</em></button>`}).join('')}</div></article>`}).join('')}</div></div>`;
+ return `<article class="training-card"><div class="training-head"><span class="training-icon">${sk.icon}</span><div class="training-name"><h4>${sk.name}</h4><span class="eyebrow">LEVEL ${lv} / ${MAX_SKILL_LEVEL}</span></div><div class="training-meter">${Array.from({length:MAX_SKILL_LEVEL},(_,i)=>`<span class="${i<lv?'filled':''}"></span>`).join('')}</div></div><p>${sk.desc}</p><div class="skill-spec">${skillSpecRows(hero,id)}</div>${button(max?'已满级':`训练 · ${cost.gold} ◈ / ${cost.shards} ✥`,'train-skill',`data-id="${hero.id}" data-kind="${id}" ${max||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}`,'btn btn-gold btn-full')}<div class="branch-chooser"><div class="eyebrow">SKILL BRANCH · 技能专精</div><div class="branch-options">${SKILL_BRANCHES[id].map(br=>{const selected=skillBranch(hero,id)?.id===br.id,cost=hero.skillBranches?.[id]?{gold:22,shards:2}:{gold:35,shards:3};return `<button class="branch-option ${selected?'selected':''}" data-action="skill-branch" data-id="${hero.id}" data-kind="${id}" data-branch="${br.id}" ${lv<1||selected||game.gold<cost.gold||game.shards<cost.shards?'disabled':''}><strong>${selected?'✓ ':''}${br.name}</strong><small>${br.desc}</small><em>${selected?'当前专精':lv<1?'需技能 +1':`${cost.gold} ◈ / ${cost.shards} ✥`}</em></button>`}).join('')}</div></div></article>`}).join('')}</div></div>`;
 }
 function difficultyChooserUI(){return `<div class="difficulty-picker"><div class="eyebrow">DUNGEON THREAT · 地牢难度</div><div class="difficulty-options">${Object.entries(DIFFICULTIES).map(([id,d])=>`<button class="difficulty-option ${game.selectedDifficulty===id?'selected':''}" data-action="difficulty" data-id="${id}" aria-pressed="${game.selectedDifficulty===id}"><b>${d.icon} ${d.name}</b><small>${d.desc}</small><em>金币 ×${d.gold} · 碎片 ×${d.shards}</em></button>`).join('')}</div></div>`;}
 function regionChooserUI(){return `<div class="region-picker"><div class="eyebrow">CHOOSE A DUNGEON · 选择地牢</div><div class="region-options">${Object.entries(REGIONS).map(([id,r])=>`<button data-action="region" data-id="${id}" class="region-option region-${id} ${game.selectedRegion===id?'selected':''}" aria-pressed="${game.selectedRegion===id}"><span class="region-symbol">${r.symbol}</span><span class="region-copy"><b>${r.name}</b><small>${r.desc}</small><em>胜利 ${game.regionVictories?.[id]||0} 次 · 威胁等级 ${regionThreatLevel(game,id)} · 金币 ×${r.goldMult} · 碎片 ×${r.shardMult}</em></span><span class="region-check">${game.selectedRegion===id?'✓':'◇'}</span></button>`).join('')}</div><div class="region-hazard">${REGIONS[game.selectedRegion||'crypt'].hazard}</div></div>`;}
@@ -3085,7 +3282,11 @@ function heroHub(){
  }</div>${campSidebar()}</div>`;
 }
 function campSidebar(){
- return `<aside class="panel sidebar"><div class="eyebrow">EXPEDITION</div><h2>走进灰烬深处</h2><p class="muted">腐朽的地底传来召唤。准备物资，选择路线，活着带回遗物。</p><div class="ornamental-line"></div>${['torches','bandages','potions','sigils'].map(k=>{const m=SUPPLY_META[k],cur=game.supplies[k]||0,cap=MAX_SUPPLIES[k];return `<div class="supply"><span>${m.icon} ${m.name} <strong>${cur} / ${cap}</strong></span>${button('+1 · '+m.cost+' ◈','buy',`data-type="${k}" ${game.gold<m.cost||cur>=cap?'disabled':''}`,'btn btn-tiny btn-ghost')}</div>`}).join('')}${regionChooserUI()}${difficultyChooserUI()}${expeditionPlanUI()}<div class="ornamental-line"></div><div class="stats-mini"><div><span>远征次数</span><strong>${game.expeditions}</strong></div><div><span>存档位置</span><strong>${slot} / 3</strong></div><div><span>营地天数</span><strong>${game.day}</strong></div></div>${button('开始远征 <span>→</span>','expedition','','btn btn-gold btn-full btn-xl')}<div class="sidebar-notice">提示：背包饰品会在完成远征或撤退后带回。全队阵亡会失去本次饰品战利品。</div></aside>`;
+ // Phase 6.2：英雄/档案页里的侧栏只保留「补给 + 开始远征」，地牢/难度/方针收进可展开区
+ const region=REGIONS[game.selectedRegion]||REGIONS.crypt;
+ const plan=EXPEDITION_PLANS[game.expeditionPlan];
+ const diff=DIFFICULTIES[game.selectedDifficulty];
+ return `<aside class="panel sidebar"><div class="eyebrow">EXPEDITION</div><h2>走进灰烬深处</h2><p class="muted">腐朽的地底传来召唤。准备物资，选择路线，活着带回遗物。</p><div class="ornamental-line"></div>${['torches','bandages','potions','sigils'].map(k=>{const m=SUPPLY_META[k],cur=game.supplies[k]||0,cap=MAX_SUPPLIES[k];return `<div class="supply"><span>${m.icon} ${m.name} <strong>${cur} / ${cap}</strong></span>${button('+1 · '+m.cost+' ◈','buy',`data-type="${k}" ${game.gold<m.cost||cur>=cap?'disabled':''}`,'btn btn-tiny btn-ghost')}</div>`}).join('')}<details class="sidebar-advanced"><summary><span class="eyebrow">ROUTE · 远征设置</span><small>${region.name} · ${diff?.name||''} · ${plan?.name||''}</small></summary>${regionChooserUI()}${difficultyChooserUI()}${expeditionPlanUI()}</details><div class="ornamental-line"></div><div class="stats-mini"><div><span>远征次数</span><strong>${game.expeditions}</strong></div><div><span>存档位置</span><strong>${slot} / 3</strong></div><div><span>营地天数</span><strong>${game.day}</strong></div></div>${button('开始远征 <span>→</span>','expedition','','btn btn-gold btn-full btn-xl')}<div class="sidebar-notice">提示：背包饰品会在完成远征或撤退后带回。全队阵亡会失去本次饰品战利品。</div></aside>`;
 }
 function archiveHub(){
  return `${campTabs()}<div class="camp-main"><div class="main-column">${campTab==='town'?townPage():campTab==='achievements'?achievementsPage():journalPage()}</div>${campSidebar()}</div>`;

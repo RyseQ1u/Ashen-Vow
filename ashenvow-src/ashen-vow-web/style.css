@@ -1699,3 +1699,166 @@ body:has(.landing) .site-footer{display:none}
 .camp-view .camp-reserve-chip img{width:34px;height:34px}
 .camp-view .camp-reserve-chip.empty{height:52px;font-size:16px}
 .camp-reserve-manage{flex-shrink:0}
+
+/* ========================================================================
+   UI 重设计 · Phase 6.2 英雄管理（队伍 / 招募 / 饰品 / 天赋 / 技能训练）
+   —— 页签收成单行；英雄卡压成模块；招募与后备改横向行；
+      参考性内容（套装表）收进 details。
+   ======================================================================== */
+
+/* 页签：单行等分，不再折成两行 */
+.camp-view .camp-tabs{flex-wrap:nowrap;gap:var(--sp-1);padding:var(--sp-2) 0;margin-bottom:var(--sp-3);border-bottom:1px solid #574b4130;overflow-x:auto;scrollbar-width:none}
+.camp-view .camp-tabs::-webkit-scrollbar{display:none}
+.camp-view .camp-tab{flex:1 1 0;min-width:0;padding:var(--sp-2) 2px;font-size:11px;letter-spacing:0;white-space:nowrap;text-align:center;border-radius:var(--r-sm)}
+.camp-view .camp-tab.active{background:linear-gradient(135deg,#e5c88b,#b58b52 70%,#d4ae72);color:#191719;border-color:#e2c28a;font-weight:600;box-shadow:0 4px 12px #0005}
+
+/* 队伍页：两列紧凑英雄卡 */
+.camp-view .team-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+.camp-view .hero-card{padding:var(--sp-2);border-radius:var(--r-sm)}
+.camp-view .hero-portrait{height:114px}
+.camp-view .hero-portrait:before{font-size:96px;top:6px}
+.camp-view .frame-top{top:4px;gap:8px;font-size:8px}
+.camp-view .frame-foot{bottom:4px;font-size:8px}
+.camp-view .hero-info{padding:var(--sp-2) 2px 2px}
+.camp-view .hero-name{font-size:var(--fs-sm);letter-spacing:.5px}
+.camp-view .hero-class{margin:2px 0 var(--sp-2);font-size:9.5px}
+.camp-view .vitals{gap:5px}
+.camp-view .barline{grid-template-columns:20px 1fr 40px;gap:4px}
+.camp-view .bar-caption,.camp-view .bar-numbers{font-size:8.5px}
+.camp-view .trait-summary{gap:3px;margin:var(--sp-2) 0 0}
+.camp-view .trait-tag{font-size:8.5px;padding:2px 3px;line-height:1.3}
+.camp-view .formation-controls{margin:var(--sp-2) 0 0;font-size:9px;gap:2px}
+.camp-view .formation-controls .btn{min-height:22px;padding:0 6px;font-size:10px}
+.camp-view .hero-gear{display:grid;gap:3px;margin-top:var(--sp-2)}
+.camp-view .gear-mini{margin:0;gap:3px;font-size:8.5px;color:var(--muted)}
+.camp-view .trinket-mini{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;margin:0}
+.camp-view .trinket-mini span{padding:2px 4px;font-size:8.5px;line-height:1.3}
+.camp-view .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin-top:var(--sp-2)}
+.camp-view .hero-actions .btn{min-width:0;flex:none;min-height:26px;padding:var(--sp-1) 2px;font-size:9.5px;line-height:1.2;letter-spacing:0}
+
+/* 招募：横向卡（头像 + 资料 + 单个动作） */
+.roster-page .roster-intro h3{font-size:var(--fs-md)}
+.roster-page .roster-intro p{font-size:var(--fs-sm);color:var(--muted);margin:var(--sp-1) 0 var(--sp-3)}
+.roster-page .recruit-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-2)}
+.roster-page .recruit-card{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:var(--sp-2);padding:var(--sp-2);border-radius:var(--r-sm)}
+.roster-page .recruit-card>*{min-height:0}
+.roster-page .recruit-face{width:56px;height:64px;overflow:hidden;border:1px solid #6d4f28;border-radius:var(--r-sm);background:#1a171c}
+.roster-page .recruit-face img,.roster-page .recruit-face svg{width:100%;height:100%;object-fit:cover;object-position:top}
+.recruit-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.recruit-copy strong{font-size:var(--fs-sm);color:#e5d0b1}
+.recruit-copy span{font-size:var(--fs-xs);color:#d1b588}
+.recruit-copy small{display:-webkit-box;overflow:hidden;font-size:var(--fs-xs);line-height:1.45;color:var(--muted);-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.recruit-act .btn{min-height:30px;padding:0 var(--sp-2);font-size:var(--fs-xs);white-space:nowrap}
+
+/* 后备：单行卡 + 两个小动作 */
+.roster-page .roster-hint{margin:0 0 var(--sp-2);font-size:var(--fs-xs);color:var(--muted)}
+.roster-page .active-swaps{margin:0 0 var(--sp-2);gap:var(--sp-1)}
+.roster-page .reserve-grid{gap:var(--sp-1)}
+.roster-page .reserve-card{gap:var(--sp-2);padding:var(--sp-2);border-radius:var(--r-sm);flex-wrap:nowrap}
+.roster-page .reserve-actions{width:auto;display:flex;gap:var(--sp-1);flex-shrink:0}
+.roster-page .reserve-actions .btn{min-height:26px;padding:0 var(--sp-1);font-size:9.5px}
+.reserve-copy{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.reserve-copy b{font-size:var(--fs-sm);color:#e4cba8}
+.reserve-copy small{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 饰品：页签式选人、槽位并排、套装表收起 */
+.trinkets-page .roster-intro h3{font-size:var(--fs-md)}
+.trinkets-page .roster-intro p{font-size:var(--fs-sm);color:var(--muted);margin:var(--sp-1) 0 var(--sp-2)}
+.trinkets-page .trinket-summary{display:flex;gap:var(--sp-4);margin:0 0 var(--sp-2);font-size:var(--fs-xs);color:var(--muted)}
+.trinkets-page .trinket-summary b{color:var(--gold-light);font-size:var(--fs-sm)}
+.trinkets-page .trinket-heroes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin:0 0 var(--sp-2)}
+.trinkets-page .trinket-heroes .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trinkets-page .set-readout{padding:var(--sp-2);border-radius:var(--r-sm);margin-bottom:var(--sp-2)}
+.trinkets-page .set-readout strong{font-size:var(--fs-sm)}
+.trinkets-page .set-readout span{font-size:var(--fs-xs);line-height:1.5}
+.trinkets-page .trinket-slots{gap:var(--sp-2);margin:0 0 var(--sp-2)}
+.trinkets-page .trinket-slot{padding:var(--sp-2);border-radius:var(--r-sm);gap:2px}
+.trinkets-page .trinket-slot small{font-size:var(--fs-xs);color:var(--muted)}
+.trinkets-page .trinket-slot strong{font-size:var(--fs-sm)}
+.trinkets-page .trinket-slot span{font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.trinkets-page .trinket-slot .btn{min-height:24px;font-size:9.5px;margin-top:var(--sp-1)}
+.trinkets-page .set-collection{margin:0 0 var(--sp-2);padding:0;border-top:0;border:1px solid #574b4130;border-radius:var(--r-sm)}
+.trinkets-page .set-collection summary{padding:var(--sp-2);cursor:pointer;font-size:var(--fs-xs);color:var(--muted);list-style:none}
+.trinkets-page .set-collection summary::-webkit-details-marker{display:none}
+.trinkets-page .set-collection summary:before{content:'▸ ';color:var(--gold)}
+.trinkets-page .set-collection[open] summary:before{content:'▾ '}
+.trinkets-page .set-collection-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);padding:0 var(--sp-2) var(--sp-2)}
+.trinkets-page .set-collection-item{padding:var(--sp-2);border-radius:var(--r-sm)}
+.trinkets-page .set-collection-item b{font-size:var(--fs-xs)}
+.trinkets-page .set-collection-item small,.trinkets-page .set-collection-item span{font-size:9.5px;line-height:1.4}
+.trinkets-page .trinket-grid{gap:var(--sp-2)}
+.trinkets-page .trinket-card{padding:var(--sp-2);border-radius:var(--r-sm);gap:var(--sp-1)}
+.trinkets-page .trinket-card h4{font-size:var(--fs-sm)}
+.trinkets-page .trinket-card p{font-size:9.5px;line-height:1.45}
+.trinkets-page .trinket-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1)}
+.trinkets-page .trinket-actions .btn{min-height:26px;padding:0 2px;font-size:9px}
+.trinkets-page .trinket-actions .btn:last-child{grid-column:1 / -1}
+
+/* 天赋：两列紧凑卡 */
+.talents-page .town-head p{font-size:var(--fs-sm);color:var(--muted)}
+.talents-page .talent-roster{margin-bottom:var(--sp-2);gap:var(--sp-1)}
+.talents-page .talent-roster .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-2)}
+.talents-page .talent-hero-heading{padding:var(--sp-2);gap:var(--sp-2);border-radius:var(--r-sm);margin-bottom:var(--sp-2)}
+.talents-page .talent-face{width:52px;height:58px;border-radius:var(--r-sm)}
+.talents-page .talent-face svg,.talents-page .talent-face img{width:100%;height:100%;object-fit:cover;object-position:top}
+.talents-page .talent-hero-heading h4{font-size:var(--fs-base);margin:2px 0}
+.talents-page .talent-hero-heading p{font-size:var(--fs-xs)}
+.talents-page .talent-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+.talents-page .talent-card{padding:var(--sp-2);gap:var(--sp-1);border-radius:var(--r-sm)}
+.talents-page .talent-card .talent-symbol{font-size:20px}
+.talents-page .talent-card h4{font-size:var(--fs-sm)}
+.talents-page .talent-card p{min-height:0;font-size:9.5px;line-height:1.45}
+.talents-page .talent-card .btn{min-height:26px;font-size:9.5px}
+
+/* 技能训练：头部一行、数值两列、专精并排 */
+.skills-training-page .town-head p{font-size:var(--fs-sm);color:var(--muted)}
+.skills-training-page .talent-roster{margin-bottom:var(--sp-2);gap:var(--sp-1)}
+.skills-training-page .talent-roster .btn{font-size:var(--fs-xs);min-height:28px;padding:2px var(--sp-2)}
+.skills-training-page .training-summary{padding:var(--sp-2);font-size:var(--fs-xs);margin-bottom:var(--sp-2);border-radius:var(--r-sm)}
+.skills-training-page .training-summary strong{font-size:var(--fs-sm)}
+.skills-training-page .training-card{min-height:0;padding:var(--sp-3);gap:var(--sp-2);border-radius:var(--r-md)}
+.training-head{display:flex;align-items:center;gap:var(--sp-2)}
+.training-head .training-icon{font-size:20px;line-height:1}
+.training-name{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.training-name h4{margin:0;font-size:var(--fs-base)}
+.training-name .eyebrow{font-size:8.5px;opacity:.75}
+.training-head .training-meter{width:52px;margin:0;gap:3px}
+.training-head .training-meter span{height:4px}
+.skills-training-page .training-card p{flex:none;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
+.skills-training-page .skill-spec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px var(--sp-2);margin:0}
+.skills-training-page .skill-spec-row{padding:3px var(--sp-1);border-left:1px solid #6d4f28;font-size:9.5px;gap:var(--sp-1)}
+.skills-training-page .skill-spec-row span{letter-spacing:0}
+.skills-training-page .training-card .btn{min-height:32px;font-size:11px}
+.skills-training-page .branch-chooser{margin:0;gap:var(--sp-1)}
+.skills-training-page .branch-chooser>.eyebrow{font-size:8.5px;opacity:.75}
+.branch-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-1);margin-top:var(--sp-1)}
+.skills-training-page .branch-option{padding:var(--sp-1) var(--sp-2);gap:2px;border-radius:var(--r-sm)}
+.skills-training-page .branch-option strong{font-size:10.5px}
+.skills-training-page .branch-option small{font-size:9px;line-height:1.35}
+.skills-training-page .branch-option em{font-size:9px}
+
+/* 侧栏：补给紧凑 + 远征设置折叠 */
+.camp-view .sidebar{padding:var(--sp-3);min-height:0;border-radius:var(--r-md)}
+.camp-view .sidebar h2{font-size:var(--fs-md);margin:var(--sp-1) 0 var(--sp-2)}
+.camp-view .sidebar .muted{font-size:var(--fs-xs);line-height:1.6}
+.camp-view .sidebar .ornamental-line{margin:var(--sp-2) 0}
+.camp-view .supply{margin:var(--sp-1) 0;font-size:var(--fs-xs);gap:var(--sp-2)}
+.camp-view .supply strong{font-size:var(--fs-sm)}
+.camp-view .supply .btn{min-height:24px;padding:0 var(--sp-1);font-size:9.5px}
+.camp-view .stats-mini{margin:var(--sp-2) 0;gap:var(--sp-2)}
+.camp-view .stats-mini strong{font-size:var(--fs-md)}
+.camp-view .sidebar .btn.btn-xl{min-height:40px;font-size:var(--fs-sm)}
+.camp-view .sidebar-notice{margin-top:var(--sp-2);font-size:9.5px;line-height:1.6}
+.sidebar-advanced{margin:var(--sp-2) 0 0;border:1px solid #574b4130;border-radius:var(--r-sm)}
+.sidebar-advanced>summary{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);padding:var(--sp-2);cursor:pointer;list-style:none}
+.sidebar-advanced>summary::-webkit-details-marker{display:none}
+.sidebar-advanced>summary:before{content:'▸';color:var(--gold);font-size:10px;margin-right:2px}
+.sidebar-advanced[open]>summary:before{content:'▾'}
+.sidebar-advanced>summary span{flex-shrink:0}
+.sidebar-advanced>summary small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;color:var(--muted)}
+.sidebar-advanced .region-picker,.sidebar-advanced .difficulty-picker,.sidebar-advanced .expedition-plans{padding:0 var(--sp-2) var(--sp-2)}
+.sidebar-advanced .eyebrow{font-size:8.5px;opacity:.72}
+.sidebar-advanced .region-option,.sidebar-advanced .difficulty-option,.sidebar-advanced .plan-row{padding:var(--sp-2);gap:var(--sp-1)}
+.sidebar-advanced .region-copy b,.sidebar-advanced .summary b{font-size:var(--fs-sm)}
+.sidebar-advanced .region-copy small,.sidebar-advanced .region-copy em,.sidebar-advanced .difficulty-option small,.sidebar-advanced .difficulty-option em,.sidebar-advanced .plan-row small{font-size:9.5px;line-height:1.4}
+.sidebar-advanced .region-hazard{font-size:9.5px;padding:var(--sp-1) var(--sp-2);line-height:1.5}
