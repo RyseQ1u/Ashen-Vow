@@ -265,8 +265,14 @@ function achievementsPage(){
  return `<div class="panel v10-section">${label('灰烬功勋','ACHIEVEMENTS')}<p class="small-muted">成就只记录游戏内实际进度，不需要账号，也不提供可重复领取的经济奖励。旧存档会按现有进度补记已达成成就。</p><h3>已解锁 ${unlocked} / ${Object.keys(ACHIEVEMENTS).length}</h3><div class="v10-card-grid">${Object.entries(ACHIEVEMENTS).map(([id,a])=>`<article class="v10-card ${game.achievements?.[id]?'obtained':'locked'}"><span class="v10-symbol">${game.achievements?.[id]?'✦':'◇'}</span><h4>${a.name}</h4><p>${a.desc}</p><small>${game.achievements?.[id]?`第 ${game.achievements[id]} 日达成`:'尚未完成'}</small></article>`).join('')}</div></div>`;
 }
 function guidePage(){
- const steps=[['整备四人小队','在营地治疗英雄，调整 1～4 号位置。近战技能通常需要前排，治疗和远程技能多在后排。'],['选择地区与难度','首次建议：暮影墓窟、巡礼难度、标准远征。先保留金币购买火把和绷带。'],['沿节点探索','点击高亮的相邻节点前进。战斗、事件、宝箱或篝火会改变远征资源。'],['回合制战斗','按照行动顺序操作：点击技能，再点亮可选敌人或队友。注意技能施法站位和目标位置。'],['压力与撤退','生命、压力和物资同等重要。在地图界面可选择撤退，把已经得到的战利品带回营地。'],['存档与备份','所有数据仅在浏览器本地。建议定期在存档管理导出 JSON；删除网站数据后无法仅凭自动快照恢复。']];
- return `<section class="content-view utility-view v10-page"><div class="utility-heading">${label('启程指南','TRAVELER GUIDE')}<p>无需联网的交互说明。首次开局会打开此页面；之后可以通过顶部「指南」随时查看。</p></div><div class="panel v10-section"><div class="v10-card-grid">${steps.map(([t,d],i)=>`<article class="v10-card"><span class="v10-symbol">0${i+1}</span><h3>${t}</h3><p>${d}</p></article>`).join('')}</div><div class="v10-cta">${game?button('明白了 · 返回游戏','tutorial-done','','btn btn-gold btn-xl'):button('前往存档 · 创建游戏','nav-saves','','btn btn-gold btn-xl')}</div></div></section>`;
+ // Phase 5：六步改为纵向编号步骤条，每步压到一句话，底部只留一个主操作
+ const steps=[['整备四人小队','在营地治疗英雄、调整 1～4 号站位。近战多需前排，治疗与远程多在后排。'],['选择地区与难度','首次建议：暮影墓窟 · 巡礼难度 · 标准远征。留住金币买火把与绷带。'],['沿节点探索','点击高亮的相邻节点前进，战斗、事件、宝箱与篝火都会改变远征资源。'],['回合制战斗','先点技能，再点亮可选敌人或队友。注意施法站位与目标位置。'],['压力与撤退','生命、压力、物资同等重要。地图界面可撤退，把已有战利品带回营地。'],['存档与备份','数据仅在浏览器本地。建议定期导出 JSON；清除网站数据后无法靠自动快照恢复。']];
+ return `<section class="content-view utility-view utility-page">
+ <div class="utility-heading">${label('启程指南','TRAVELER GUIDE')}<p>无需联网的交互说明。首次开局会打开此页，之后可从顶部「指南」随时查看。</p></div>
+ <div class="guide-panel">
+  <ol class="guide-steps">${steps.map(([t,d],i)=>`<li class="guide-step"><span class="guide-num">${String(i+1).padStart(2,'0')}</span><div class="guide-body"><h3>${t}</h3><p>${d}</p></div></li>`).join('')}</ol>
+  <div class="guide-cta">${game?button('明白了 · 返回游戏','tutorial-done','','btn btn-gold btn-xl'):button('前往存档 · 创建游戏','nav-saves','','btn btn-gold btn-xl')}</div>
+ </div></section>`;
 }
 function codexPage(){
  const tabs=[['heroes','职业'],['skills','技能'],['monsters','敌人'],['regions','地牢'],['equipment','饰品套装']];
@@ -276,7 +282,12 @@ function codexPage(){
  if(codexTab==='monsters')entries=Object.entries(ENEMIES).map(([id,e])=>[e.icon,e.name,e.title,`生命 ${e.maxHp} · 攻击 ${e.attack} · 护甲 ${e.armor}`]);
  if(codexTab==='regions')entries=Object.entries(REGIONS).map(([id,v])=>['◇',v.name,v.desc||'前往这一地区探索事件并挑战首领。',`地区首领：${ENEMIES[v.boss?.[0]]?.name||'未知'}`]);
  if(codexTab==='equipment')entries=Object.entries(TRINKET_SETS).map(([id,v])=>['✥',v.name,v.effect,`部件：${v.pieces.map(x=>TRINKET_BASES[x]?.name||x).join(' + ')}`]);
- return `<section class="content-view utility-view v10-page"><div class="utility-heading">${label('灰烬图鉴','THE ASHEN CODEX')}<p>所有职业、技能、怪物与装备资料；内容来自游戏内实际规则，方便查阅与搭配。</p></div><div class="panel v10-section"><div class="v10-tabs">${tabs.map(([id,n])=>button(n,'codex-tab',`data-id="${id}"`,`btn ${id===codexTab?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="v10-card-grid">${entries.map(([icon,title,desc,stat])=>`<article class="v10-card"><span class="v10-symbol">${ESC(icon)}</span><h3>${ESC(title)}</h3><p>${ESC(desc)}</p><small>${ESC(stat)}</small></article>`).join('')}</div></div></section>`;
+ // Phase 5：页签收敛为等宽分段控件，卡片统一为「图标 + 名称 + 说明 + 数值」四级结构
+ return `<section class="content-view utility-view utility-page">
+ <div class="utility-heading">${label('灰烬图鉴','THE ASHEN CODEX')}<p>当前分类 ${entries.length} 条 · 资料全部取自游戏内实际规则。</p></div>
+ <div class="codex-tabs" role="tablist" aria-label="图鉴分类">${tabs.map(([id,n])=>`<button class="codex-tab ${id===codexTab?'active':''}" role="tab" aria-selected="${id===codexTab}" data-action="codex-tab" data-id="${id}">${n}</button>`).join('')}</div>
+ <div class="codex-grid">${entries.map(([icon,title,desc,stat])=>`<article class="codex-card"><div class="codex-card-head"><span class="codex-icon">${ESC(icon)}</span><h3>${ESC(title)}</h3></div><p>${ESC(desc)}</p><small>${ESC(stat)}</small></article>`).join('')}</div>
+ </section>`;
 }
 function campTabs(){const list=campSection==='archive'?[['journal','远征记录'],['achievements','成就'],['town','城镇建设']]:[['team','远征队伍'],['roster','英雄招募'],['trinkets','饰品装备'],['talents','英雄天赋'],['skills','技能训练']];return `<div class="camp-tabs" role="tablist">${list.map(([id,lab])=>`<button class="camp-tab ${campTab===id?'active':''}" role="tab" aria-selected="${campTab===id}" data-action="camp-tab" data-id="${id}">${lab}</button>`).join('')}</div>`;}
 function rosterPage(){const reserves=game.reserveHeroes||[];const active=chosenActiveHero&&game.heroes.find(h=>h.id===chosenActiveHero)||game.heroes[0];return `<div class="roster-page"><div class="roster-intro"><h3>候选人旅店 <span>THE WAYWARD INN</span></h3><p>每次远征归来刷新招募名单。雇佣费用 65 金币，最多容纳 ${MAX_RESERVES} 名后备英雄。</p></div><div class="recruit-grid">${(game.recruits||[]).length?(game.recruits||[]).map((offer,i)=>`<article class="recruit-card"><div class="recruit-face">${heroPortrait(offer.classId)}</div><div><strong>${ESC(offer.name)}</strong><span>${CLASSES[offer.classId].name}</span><small>${CLASSES[offer.classId].lore}</small></div>${button('雇佣 · 65 ◈','recruit',`data-index="${i}" ${game.gold<65||reserves.length>=MAX_RESERVES?'disabled':''}`,'btn btn-gold btn-full')}</article>`).join(''):'<p class="no-items">本轮没有可招募的旅人，请完成一次远征后再来。</p>'}</div><div class="ornamental-line"></div><h3 class="roster-section-title">后备英雄 <span>${reserves.length} / ${MAX_RESERVES}</span></h3>${reserves.length?`<p class="muted">先选择要替换的出战位置，再点击后备英雄的“替换入队”。</p><div class="active-swaps">${game.heroes.map(h=>button(`${h.rank} · ${ESC(h.name)}`, 'active-choice',`data-id="${h.id}"` ,`btn ${active.id===h.id?'btn-gold':'btn-ghost'}`)).join('')}</div><div class="reserve-grid">${reserves.map(h=>`<div class="reserve-card"><div class="reserve-icon">${CLASSES[h.classId].icon}</div><div><b>${ESC(h.name)}</b><small>${CLASSES[h.classId].name} · Lv.${h.level} · HP ${h.hp}/${h.maxHp}</small></div><div class="reserve-actions">${button('替换入队','swap-hero',`data-id="${h.id}" data-active="${active.id}"`,'btn btn-small btn-gold')}${button('遣散','dismiss',`data-id="${h.id}"`,'btn btn-small btn-ghost')}</div></div>`).join('')}</div>`:'<p class="no-items">暂无后备英雄。先招募一位旅人，再调整出战阵容。</p>'}</div>`;}
@@ -604,16 +615,50 @@ function eventPage(){const event=game.event,region=regionOf(game),presentation=e
  return `<section class="content-view event-view region-${presentation.region} event-${presentation.motif}"><div class="event-chamber"><div class="event-scene" aria-hidden="true"><span class="event-horizon"></span><span class="event-silhouette"></span><span class="event-light"></span></div><div class="event-sigil"><div class="event-sigil-inner">${presentation.glyph}</div></div><div class="eyebrow overline">${ESC(event.eyebrow)} · ${presentation.kicker}</div><h1>${ESC(event.title)}</h1><div class="ornament">✦ ─── ❖ ─── ✦</div><p class="event-story">${ESC(event.desc)}</p><div class="event-choice-heading">请选择行动 <span>CHOICES HAVE CONSEQUENCES</span></div><div class="event-choices">${event.choices.map((choice,i)=>`<button class="choice" data-action="choice" data-id="${ESC(choice.kind)}"><span class="choice-index">0${i+1}</span><span><b>${ESC(choice.label)}</b><small>${ESC(choice.hint)}</small></span><span class="choice-arrow">→</span></button>`).join('')}</div></div></section>`;
 }
 function resultPage(){const r=game.result,win=r.reason==='victory',region=REGIONS[r.region]||REGIONS.crypt;return `<section class="content-view result-view region-${r.region||'crypt'}"><div class="result-mark">${win?'✦':r.reason==='retreat'?'◇':'☽'}</div><div class="eyebrow overline">${region.name} · ${DIFFICULTIES[r.difficulty||'pilgrim']?.name||'巡礼'} · EXPEDITION REPORT</div><h1>${win?'黎明尚未消亡':r.reason==='retreat'?'从深渊归来':'黑暗夺走一切'}</h1><p class="result-sub">${win?'代价沉重，但你们守住了誓约。':r.reason==='retreat'?'逃离不代表怯懦。仍然活着，就是机会。':'火焰熄灭了，但营地仍在等待。'}</p><div class="result-grid"><div><small>探索房间</small><strong>${r.rooms}</strong></div><div><small>收获金币</small><strong>◈ ${r.rewards.gold}</strong></div><div><small>遗物碎片</small><strong>✥ ${r.rewards.shards}</strong></div><div><small>饰品战利品</small><strong>✧ ${r.rewards.items?.length||0}</strong></div></div>${button('返回残火营地 <span>→</span>','camp','','btn btn-gold btn-xl')}</section>`;}
-function savesPage(){return `<section class="content-view utility-view"><div class="utility-heading">${label('命运的残页','SAVE ARCHIVES')}<p>所有进度仅存储在当前浏览器。建议定期导出 JSON 备份。</p></div><div class="saves-grid">${Array.from({length:SLOT_COUNT},(_,i)=>{const num=i+1,rec=slotRecord(num),saved=rec&&snapshotValid(rec)&&isValidSave(rec.data)?rec.data:null;return `<article class="save-card"><div class="save-index">ARCHIVE <strong>0${num}</strong></div><div class="save-emblem">${saved?'✥':'◇'}</div><h3>${saved?'残火营地 · 第 '+(saved.day||1)+' 日':rec?'存档需要恢复':'空白存档'}</h3><p>${saved?`远征 ${saved.expeditions||0} 次 · ${stamp(rec.updatedAt)}`:rec?'存档异常，请恢复备份':'尚未记录任何誓约'}</p><div class="save-actions">${saved?`${button('继续游戏','load',`data-slot="${num}"`,'btn btn-gold btn-full')}${button('导出备份','export',`data-slot="${num}"`,'btn btn-ghost btn-full')}${button('覆盖新建','new',`data-slot="${num}"`,'btn btn-ghost btn-full')}${button('删除存档','delete',`data-slot="${num}"`,'btn btn-danger btn-full')}`:button('创建新游戏','new',`data-slot="${num}"`,'btn btn-gold btn-full')}${button('从 JSON 导入','import',`data-slot="${num}"`,'btn btn-ghost btn-full')}${!saved&&rec?button('删除损坏存档','delete',`data-slot="${num}"`,'btn btn-danger btn-full'):''}${(cachedBackups[num]||[]).map(b=>button(`恢复备份 ${b.age} · 第${b.day||'?'}日${b.valid?'':'（损坏）'}`,'restore',`data-slot="${num}" data-age="${b.age}" ${b.valid?'':'disabled'}`,'btn btn-ghost btn-full')).join('')}</div></article>`}).join('')}</div><div class="warning-box"><strong>重要存档提示</strong><p>隐私模式、浏览器清理网站数据、切换浏览器或域名会导致进度不可访问。导出 JSON 文件可以离线备份；导入时会校验格式，并在覆盖前确认。</p></div></section>`;}
-function settingsPage(){return `<section class="content-view utility-view"><div class="utility-heading">${label('旅人手记','SETTINGS')}<p>全部设置仅保存在当前浏览器，游戏不需要账号、联网或后端服务。</p></div><div class="settings-panel panel">
- <div class="setting-row"><div><h3>界面音效</h3><p>启用或静音合成音效</p></div><button class="switch ${settings.sound?'on':''}" data-action="setting-sound" aria-label="切换音效"><span></span></button></div>
- <div class="setting-row"><div><h3>环境音乐</h3><p>营地与旅途的低吟氛围音（合成生成，离线可用）</p></div><button class="switch ${settings.music?'on':''}" data-action="setting-music" aria-label="切换环境音乐"><span></span></button></div>
- <div class="setting-row"><div><h3>减少动态效果</h3><p>关闭多数装饰性过渡和动画</p></div><button class="switch ${settings.lowMotion?'on':''}" data-action="setting-motion" aria-label="切换减少动效"><span></span></button></div>
- <div class="setting-row"><div><h3>大字体模式</h3><p>扩大文字，方便在较小屏幕阅读</p></div><button class="switch ${settings.largeText?'on':''}" data-action="setting-text" aria-label="切换大字体"><span></span></button></div>
- <div class="setting-row"><div><h3>精简战斗日志</h3><p>启用后战斗面板只显示最近 20 条记录，关闭则显示最近 200 条；两种模式均可点击「完整战报」查看并复制整场战斗文本。</p></div><button class="switch ${settings.shortLogs?'on':''}" data-action="setting-log" aria-label="切换精简战斗日志"><span></span></button></div>
- <div class="setting-row"><div><h3>音效音量</h3><p>调整战斗、治疗和菜单音效（0 = 静音）</p></div><label class="volume-control"><input id="volume-control" type="range" min="0" max="100" step="5" value="${settings.volume}" aria-label="音效音量"/><output id="volume-value" for="volume-control">${settings.volume}%</output></label></div>
- <div class="setting-row"><div><h3>战斗表现节奏</h3><p>控制技能字样、伤害数字及打击动效速度，不改变回合规则</p></div><div class="pace-options" role="group" aria-label="战斗表现节奏">${[['slow','沉浸'],['normal','标准'],['fast','快速']].map(([value,title])=>`<button type="button" data-action="pace" data-id="${value}" class="btn btn-tiny ${settings.pace===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.pace===value}">${title}</button>`).join('')}</div></div>
- <div class="setting-row"><div><h3>显示模式</h3><p>切换浏览器全屏（可能需要许可）</p></div>${button('切换全屏','fullscreen','','btn btn-ghost')}</div><div class="ornamental-line"></div><p class="small-muted">版本 V1.1 · 纯 Web · IndexedDB 本地存档 · 原创游戏与场景美术 · 支持离线运行。</p></div></section>`;}
+function savesPage(){
+ // Phase 5：单列档案卡 —— 主操作（继续/新建）独占一行，破坏性操作降为小按钮，备份列表收进 details
+ return `<section class="content-view utility-view utility-page">
+ <div class="utility-heading">${label('命运的残页','SAVE ARCHIVES')}<p>所有进度仅存储在当前浏览器。建议定期导出 JSON 备份。</p></div>
+ <div class="saves-grid">${Array.from({length:SLOT_COUNT},(_,i)=>{
+  const num=i+1,rec=slotRecord(num),saved=rec&&snapshotValid(rec)&&isValidSave(rec.data)?rec.data:null,backups=cachedBackups[num]||[];
+  const meta=saved?`远征 ${saved.expeditions||0} 次 · ${stamp(rec.updatedAt)}`:rec?'存档异常，请恢复备份':'尚未记录任何誓约';
+  const title=saved?'残火营地 · 第 '+(saved.day||1)+' 日':rec?'存档需要恢复':'空白存档';
+  return `<article class="save-card ${saved?'is-loaded':''}">
+  <div class="save-card-top"><span class="save-index">ARCHIVE <strong>0${num}</strong></span><span class="save-state">${saved?'可继续':rec?'需恢复':'空档位'}</span></div>
+  <div class="save-body"><span class="save-emblem">${saved?'✥':'◇'}</span><div class="save-copy"><h3>${title}</h3><p>${meta}</p></div></div>
+  <div class="save-primary">${saved?button('继续游戏','load',`data-slot="${num}"`,'btn btn-gold btn-full'):button('创建新游戏','new',`data-slot="${num}"`,'btn btn-gold btn-full')}</div>
+  <div class="save-secondary">
+   ${saved||rec?button('导出','export',`data-slot="${num}"`,'btn btn-small btn-ghost'):''}
+   ${button('导入','import',`data-slot="${num}"`,'btn btn-small btn-ghost')}
+   ${saved?button('覆盖新建','new',`data-slot="${num}"`,'btn btn-small btn-ghost'):''}
+   ${saved||rec?button(rec&&!saved?'删除损坏存档':'删除','delete',`data-slot="${num}"`,'btn btn-small btn-danger'):''}
+  </div>
+  ${backups.length?`<details class="save-backups"><summary>历史备份 ${backups.length} 份</summary><div class="save-backup-list">${backups.map(b=>button(`第 ${b.age} 份 · 第${b.day||'?'}日${b.valid?'':'（损坏）'}`,'restore',`data-slot="${num}" data-age="${b.age}" ${b.valid?'':'disabled'}`,'btn btn-tiny btn-ghost btn-full')).join('')}</div></details>`:''}
+ </article>`}).join('')}</div>
+ <div class="warning-box"><strong>重要存档提示</strong><p>隐私模式、浏览器清理网站数据、切换浏览器或域名会导致进度不可访问。导出 JSON 文件可以离线备份；导入时会校验格式，并在覆盖前确认。</p></div></section>`;
+}
+function settingsPage(){
+ // Phase 5：按「声音 / 画面与动效 / 战斗记录」三组收纳，行内说明降为一行小字
+ const toggle=(action,on,aria)=>`<button class="switch ${on?'on':''}" data-action="${action}" role="switch" aria-checked="${on}" aria-label="${aria}"><span></span></button>`;
+ const row=(title,desc,control,extra='')=>`<div class="setting-row ${extra}"><div class="setting-copy"><h3>${title}</h3><p>${desc}</p></div>${control}</div>`;
+ const group=(en,cn,rows)=>`<div class="setting-group"><div class="setting-group-head"><span class="eyebrow">${en}</span><h2>${cn}</h2></div>${rows}</div>`;
+ return `<section class="content-view utility-view utility-page">
+ <div class="utility-heading">${label('旅人手记','SETTINGS')}<p>全部设置仅保存在当前浏览器，游戏不需要账号、联网或后端服务。</p></div>
+ <div class="settings-panel">
+  ${group('AUDIO','声音',
+   row('界面音效','启用或静音合成音效',toggle('setting-sound',settings.sound,'切换音效'))
+   +row('环境音乐','营地与旅途的低吟氛围音（合成生成，离线可用）',toggle('setting-music',settings.music,'切换环境音乐'))
+   +row('音效音量','调整战斗、治疗与菜单音效（0 = 静音）',`<label class="volume-control"><input id="volume-control" type="range" min="0" max="100" step="5" value="${settings.volume}" aria-label="音效音量"/><output id="volume-value" for="volume-control">${settings.volume}%</output></label>`))}
+  ${group('DISPLAY','画面与动效',
+   row('减少动态效果','关闭多数装饰性过渡和动画',toggle('setting-motion',settings.lowMotion,'切换减少动效'))
+   +row('大字体模式','扩大文字，方便在较小屏幕阅读',toggle('setting-text',settings.largeText,'切换大字体'))
+   +row('战斗表现节奏','技能字样、伤害数字与打击动效的速度，不影响回合规则',`<div class="pace-options" role="group" aria-label="战斗表现节奏">${[['slow','沉浸'],['normal','标准'],['fast','快速']].map(([value,title])=>`<button type="button" data-action="pace" data-id="${value}" class="btn btn-tiny ${settings.pace===value?'btn-gold':'btn-ghost'}" aria-pressed="${settings.pace===value}">${title}</button>`).join('')}</div>`,'setting-row-wide')
+   +row('显示模式','切换浏览器全屏（可能需要许可）',button('切换全屏','fullscreen','','btn btn-ghost btn-small')))}
+  ${group('BATTLE LOG','战斗记录',
+   row('精简战斗日志','战报只保留最近 20 条，关闭则保留 200 条；两种模式都能打开「完整战报」。',toggle('setting-log',settings.shortLogs,'切换精简战斗日志')))}
+  <p class="settings-foot">版本 V1.1 · 纯 Web · IndexedDB 本地存档 · 原创游戏与场景美术 · 支持离线运行</p>
+ </div></section>`;
+}
 function footer(){return `<footer class="site-footer"><span>ASHEN VOW © ORIGINAL BROWSER PROTOTYPE</span><span><span class="save-light"></span><span id="save-text">${saveStatus}</span> · 存档 ${slot} / 3</span></footer><div class="toast" id="toast" role="status"></div><input type="file" id="import-file" accept="application/json,.json" hidden/>`}
 function render(){clearFx();if(game&&settings.sound&&settings.music&&!bgmNodes)startBgm();root.innerHTML=`${rotateHint()}<div class="app-frame phase-${view==='game'&&game?game.phase:'shell'} ${reducedMotion()?'low-motion':''} ${settings.largeText?'large-text':''} pace-${settings.pace}"><div class="grain"></div>${view==='menu'?'':hud()}<main class="main">${view==='menu'?homePage():view==='saves'?savesPage():view==='settings'?settingsPage():view==='guide'?guidePage():view==='codex'?codexPage():!game?homePage():game.phase==='camp'?campPage():game.phase==='map'?mapPage():game.phase==='battle'?battlePage():game.phase==='event'?eventPage():resultPage()}</main>${footer()}</div>`;
  const f=document.getElementById('import-file');if(f)f.addEventListener('change',handleImport);
