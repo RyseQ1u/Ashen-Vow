@@ -1,7 +1,27 @@
+// ============================================================================
+// 灰烬誓约 Ashen Vow · UI 层（唯一渲染 + 事件 + 音效入口）
+// ----------------------------------------------------------------------------
+// 区块导航（6 区，方便定位）：
+//   §1 依赖导入           —— import engine/storage/presentation（引擎层冻结，勿改）
+//   §2 常量与纯工具        —— ESC/ICONS/TYPE_*/button/label/percent 等纯函数
+//   §3 UI 模块级状态       —— game/slot/view/campSection/... settings（名字冻结，勿改名）
+//   §4 基础设施            —— announce/sound/BGM/save/mutate/commitBattleAction/render
+//   §5 各屏渲染纯函数       —— homePage/campPage/.../resultPage/settingsPage
+//   §6 事件分发与启动       —— actionRun/root.addEventListener/启动 IIFE
+// ----------------------------------------------------------------------------
+// 契约红线（见 tests/ui-contract.test.js）：
+//   · 引擎层 engine.js/tables.js/storage.js/presentation.js 一行不可动
+//   · 65 个 data-action 名不可增删改名
+//   · UI 状态绝不可写入 game 对象（isValidSave 白名单会拦截）
+//   · 战斗时序：commitBattleAction 内 before→change→render→visualImpact 顺序不可变
+// ============================================================================
+
+// §1 依赖导入 ----------------------------------------------------------------
 import {VERSION,CLASSES,SKILLS,ENEMIES,freshGame,heroStats,beginExpedition,reachableNodes,enterNode,resolveEvent,currentActor,validTargets,performSkill,useBandage,retreat,backToCamp,healAtCamp,upgradeHero,forgeGear,moveHero,buySupplies,isValidSave,skipTurn,clamp,ensureProgression,MAX_RESERVES,hireRecruit,swapHero,dismissReserve,equipTrinket,unequipTrinket,salvageTrinket,trinketName,trinketMods,TRINKET_BASES,MOD_LABELS,RARITY_NAMES,ownedTrinketIds,BUILDINGS,MAX_BUILDING_LEVEL,EXPEDITION_PLANS,TALENTS,buildingLevel,buildingCost,upgradeBuilding,campHealCost,campPrayerCost,prayAtCamp,selectExpeditionPlan,allocateTalent,REGIONS,ELITE_TRAITS,selectRegion,regionOf,DIFFICULTIES,selectDifficulty,TRAITS,CRISES,MAX_SKILL_LEVEL,skillTrainingCost,skillLevel,trainSkill,SKILL_BRANCHES,skillBranch,chooseSkillBranch,TRINKET_SETS,activeTrinketSet,enemyResistances,quirkTreatmentCost,treatNegativeTrait,regionThreatLevel,enemyIntent,expeditionSummary,ACHIEVEMENTS,unlockAchievements,basicAttack,endTurn,SKILL_CATEGORY_LABELS,previewSkillDamage,nodePreview,usePotion,useSigil,teamPower,SUPPLY_META,MAX_SUPPLIES} from './engine.js';
 import {SLOT_COUNT,allSlots,getSlot,storeSlot,deleteSlot,downloadSave,readSaveFile,listBackups,restoreBackup,snapshotValid} from './storage.js';
 import {battleTelemetry,eventPresentation,cueForTelemetry} from './presentation.js';
 
+// §3 UI 模块级状态 -----------------------------------------------------------
 const root=document.getElementById('app');
 const preferences={getItem(key){try{return window.localStorage.getItem(key)}catch{return null}},setItem(key,value){try{window.localStorage.setItem(key,value)}catch{}}};
 let game=null,slot=1,view='menu',campSection='camp',mapSelectedNode=null,chosenSkill=null,toastId=0,saveQueue=Promise.resolve(),saveStatus='未载入',cachedSlots=[],importTarget=1,waiting=false,inspectUnitId=null,campTab='team',chosenActiveHero=null,chosenEquipHero=null,codexTab='heroes',cachedBackups={},fullLogOpen=false;
@@ -13,10 +33,12 @@ function clearFx(){for(const timer of fxTimers)clearTimeout(timer);fxTimers.clea
 function effectDuration(){return reducedMotion()?0:settings.pace==='fast'?470:settings.pace==='slow'?1250:850;}
 function htmlEscapeAttribute(value){return ESC(value);}
 
+// §2 常量与纯工具 -----------------------------------------------------------
 const ESC=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const ICONS={camp:'⌂',map:'◇',battle:'⚔',event:'✧',result:'✦',saves:'▤',settings:'⚙'};
 const TYPE_NAMES={battle:'遭遇战',elite:'精英战',boss:'噬誓者',event:'未知事件',treasure:'战利品',rest:'篝火',supply:'补给箱',shrine:'灰火祭坛',ambush:'伏击回廊',cache:'遗物秘库',oracle:'占兆祭坛',caravan:'流亡商队'};
 const TYPE_ICON={battle:'⚔',elite:'✷',boss:'♛',event:'?',treasure:'◆',rest:'♨',supply:'✚',shrine:'✥',ambush:'⚡',cache:'▣',oracle:'◉',caravan:'♜'};
+// §4 基础设施（提示 / 音效 / 存档 / 战斗时序 / 渲染）----------------------------
 function announce(text,error=false){const el=document.getElementById('toast');if(!el)return;el.textContent=text;el.classList.add('visible');el.classList.toggle('danger',error);const thisId=++toastId;setTimeout(()=>{if(toastId===thisId)el.classList.remove('visible')},2800);}
 let audioContext=null;
 function sound(kind='tap'){
@@ -170,6 +192,7 @@ function healthBar(u,enemy=false){const hp=Math.max(0,u.hp), stress=clamp(u.stre
 function label(name,sub){return `<div class="section-heading"><span class="rule"></span><span class="eyebrow">${ESC(sub)}</span><h2>${ESC(name)}</h2></div>`}
 function button(text,action='',attrs='',className='btn'){return `<button class="${className}" ${action?`data-action="${action}"`:''} ${attrs}>${text}</button>`}
 function hud(){return `<header class="topbar"><div class="brand" data-action="nav-menu" role="button" tabindex="0"><div class="brand-mark">✧</div><div><div class="brand-title">灰烬誓约<span> · ASHEN VOW</span></div><div class="brand-sub">THE LAST FLAME ENDURES</div></div></div><nav class="nav-tabs"><button data-action="nav-game" class="nav-tab ${view==='game'?'selected':''}" ${!game?'disabled':''}>${ICONS[game?.phase||'camp']} ${game?.phase==='battle'?'战斗中':game?.phase==='map'?'地牢地图':game?.phase==='event'?'遭遇事件':'营地'}</button><button data-action="nav-saves" class="nav-tab ${view==='saves'?'selected':''}">▤ 存档</button><button data-action="nav-guide" class="nav-tab ${view==='guide'?'selected':''}">? 指南</button><button data-action="nav-codex" class="nav-tab ${view==='codex'?'selected':''}">✥ 图鉴</button><button data-action="nav-settings" class="nav-tab ${view==='settings'?'selected':''}">⚙ 设置</button></nav><div class="resource-bar">${game?`<span title="金币">◈ <strong>${game.gold}</strong></span><span title="遗物碎片">✥ <strong>${game.shards}</strong></span><span class="date-line">第 ${game.day} 日</span>`:'<span class="date-line">单机 · 离线</span>'}</div></header>`}
+// §5 各屏渲染纯函数 ----------------------------------------------------------
 function playerLevel(saved){
  if(!saved)return 1;
  return 1+Math.floor((saved.expeditions||0)*2+(saved.day||1)/3+Object.keys(saved.achievements||{}).length*3);
@@ -631,6 +654,7 @@ function syncMobileLayout(){
  }catch(err){}
 }
 async function handleImport(e){const file=e.target.files?.[0];if(!file)return;try{const data=await readSaveFile(file,isValidSave);if(!window.confirm(`确定把导入的存档写入存档槽 ${importTarget} 吗？该槽位旧数据会被覆盖。`))return;await saveQueue.catch(()=>{});await storeSlot(importTarget,data);await reloadSlots();if(game&&slot===importTarget){game=ensureProgression(data);view='game';chosenSkill=null}else{view='saves'}render();announce('存档导入成功');}catch(err){announce(`导入失败：${err.message}`,true)}finally{e.target.value='';}}
+// §6 事件分发与启动 ----------------------------------------------------------
 async function actionRun(el){const a=el.dataset.action, id=el.dataset.id, n=Number(el.dataset.slot);
  if(a==='nav-menu'){uiNavigate('menu');return;}if(a==='nav-game'){if(game)uiNavigate('game');return;}
  if(a==='nav-saves'){await reloadSlots();uiNavigate('saves');return;}if(a==='nav-settings'){uiNavigate('settings');return;}if(a==='nav-guide'){uiNavigate('guide');return;}if(a==='nav-codex'){uiNavigate('codex');return;}if(a==='codex-tab'){if(['heroes','skills','monsters','regions','equipment'].includes(id))codexTab=id;render();return;}
