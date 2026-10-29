@@ -1922,3 +1922,43 @@ body:has(.landing) .site-footer{display:none}
 .town-page .town-patient small{padding-top:2px;font-size:9px}
 .town-page .town-patient>div:last-child{gap:var(--sp-1);flex-wrap:nowrap;flex-shrink:0}
 .town-page .town-patient .btn{min-height:26px;padding:0 var(--sp-1);font-size:9px;white-space:nowrap}
+
+/* ========================================================================
+   UI 重设计 · Phase 7 地图
+   —— 顶部压成「地名 + 五个补给格」一行，删掉无法点击的地区页签（假页签），
+      地图与队伍条因此上移；底部 36vh 情报面板与「进入节点」CTA 保持不变。
+   ======================================================================== */
+.map-view .map-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--sp-2);margin:0 0 var(--sp-2)}
+.map-head-title{min-width:0}
+.map-view .map-head .section-heading{margin:0}
+.map-view .map-head .section-heading .rule{width:16px;margin-right:6px}
+.map-view .map-head .section-heading .eyebrow{font-size:8px;letter-spacing:1.4px}
+.map-view .map-head .section-heading h2{margin:1px 0 0;font-size:var(--fs-md);letter-spacing:1px}
+.map-head-sub{display:-webkit-box;margin:1px 0 0;overflow:hidden;font-size:9px;line-height:1.4;color:var(--muted);-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.map-supplies{display:flex;gap:2px;flex-shrink:0}
+.map-chip{display:flex;flex-direction:column;align-items:center;min-width:36px;padding:2px 4px;border:1px solid #574b4150;border-radius:var(--r-sm);background:#171316b3}
+.map-chip small{font-size:8px;letter-spacing:0;color:var(--dim);line-height:1.2}
+.map-chip b{font-family:Arial,sans-serif;font-size:11px;font-weight:600;white-space:nowrap;color:var(--gold-light);line-height:1.3}
+.map-chip.is-danger{border-color:#8b4a44}
+.map-chip.is-danger b{color:#e0897d}
+
+/* 队伍条：四人并排，不再横滑 */
+.map-view .map-team-strip{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-md)}
+.map-view .map-strip-head{margin-bottom:var(--sp-1);align-items:baseline;flex-wrap:nowrap}
+.map-view .map-strip-head b{font-size:var(--fs-xs);letter-spacing:1px;color:var(--cream)}
+.map-view .map-strip-note{font-size:9px;letter-spacing:0;color:var(--muted);white-space:nowrap}
+.map-view .map-strip-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);overflow:visible;padding-bottom:0}
+.map-view .map-strip-card{min-width:0;flex-direction:column;align-items:stretch;gap:2px;padding:var(--sp-1);border-radius:var(--r-sm)}
+.map-view .map-strip-face{width:100%;height:50px;border-radius:var(--r-sm)}
+.map-view .map-strip-face img{width:100%;height:100%;object-fit:cover;object-position:top}
+.map-view .map-strip-meta b{font-size:9.5px;letter-spacing:0}
+.map-view .map-strip-nums{margin-top:2px;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-view .map-strip-actions{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:3px;flex-wrap:nowrap}
+.map-view .map-strip-actions .btn{min-height:19px;padding:0;font-size:8px;letter-spacing:0}
+
+/* 地图画布：留白收紧，节点区优先 */
+.map-view .map-panel{padding:var(--sp-1) 0 0}
+.map-view .map-legend{gap:var(--sp-2);padding:0 var(--sp-2);font-size:8px}
+.map-view .map-progress{gap:2px;padding:0 var(--sp-2)}
+.map-view .map-progress span{padding:1px var(--sp-1);font-size:8px}
+.map-view .dungeon-map{margin-top:0}

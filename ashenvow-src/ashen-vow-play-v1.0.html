@@ -1924,6 +1924,46 @@ body:has(.landing) .site-footer{display:none}
 .town-page .town-patient>div:last-child{gap:var(--sp-1);flex-wrap:nowrap;flex-shrink:0}
 .town-page .town-patient .btn{min-height:26px;padding:0 var(--sp-1);font-size:9px;white-space:nowrap}
 
+/* ========================================================================
+   UI 重设计 · Phase 7 地图
+   —— 顶部压成「地名 + 五个补给格」一行，删掉无法点击的地区页签（假页签），
+      地图与队伍条因此上移；底部 36vh 情报面板与「进入节点」CTA 保持不变。
+   ======================================================================== */
+.map-view .map-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--sp-2);margin:0 0 var(--sp-2)}
+.map-head-title{min-width:0}
+.map-view .map-head .section-heading{margin:0}
+.map-view .map-head .section-heading .rule{width:16px;margin-right:6px}
+.map-view .map-head .section-heading .eyebrow{font-size:8px;letter-spacing:1.4px}
+.map-view .map-head .section-heading h2{margin:1px 0 0;font-size:var(--fs-md);letter-spacing:1px}
+.map-head-sub{display:-webkit-box;margin:1px 0 0;overflow:hidden;font-size:9px;line-height:1.4;color:var(--muted);-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.map-supplies{display:flex;gap:2px;flex-shrink:0}
+.map-chip{display:flex;flex-direction:column;align-items:center;min-width:36px;padding:2px 4px;border:1px solid #574b4150;border-radius:var(--r-sm);background:#171316b3}
+.map-chip small{font-size:8px;letter-spacing:0;color:var(--dim);line-height:1.2}
+.map-chip b{font-family:Arial,sans-serif;font-size:11px;font-weight:600;white-space:nowrap;color:var(--gold-light);line-height:1.3}
+.map-chip.is-danger{border-color:#8b4a44}
+.map-chip.is-danger b{color:#e0897d}
+
+/* 队伍条：四人并排，不再横滑 */
+.map-view .map-team-strip{padding:var(--sp-2) var(--sp-3);border-radius:var(--r-md)}
+.map-view .map-strip-head{margin-bottom:var(--sp-1);align-items:baseline;flex-wrap:nowrap}
+.map-view .map-strip-head b{font-size:var(--fs-xs);letter-spacing:1px;color:var(--cream)}
+.map-view .map-strip-note{font-size:9px;letter-spacing:0;color:var(--muted);white-space:nowrap}
+.map-view .map-strip-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);overflow:visible;padding-bottom:0}
+.map-view .map-strip-card{min-width:0;flex-direction:column;align-items:stretch;gap:2px;padding:var(--sp-1);border-radius:var(--r-sm)}
+.map-view .map-strip-face{width:100%;height:50px;border-radius:var(--r-sm)}
+.map-view .map-strip-face img{width:100%;height:100%;object-fit:cover;object-position:top}
+.map-view .map-strip-meta b{font-size:9.5px;letter-spacing:0}
+.map-view .map-strip-nums{margin-top:2px;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-view .map-strip-actions{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:3px;flex-wrap:nowrap}
+.map-view .map-strip-actions .btn{min-height:19px;padding:0;font-size:8px;letter-spacing:0}
+
+/* 地图画布：留白收紧，节点区优先 */
+.map-view .map-panel{padding:var(--sp-1) 0 0}
+.map-view .map-legend{gap:var(--sp-2);padding:0 var(--sp-2);font-size:8px}
+.map-view .map-progress{gap:2px;padding:0 var(--sp-2)}
+.map-view .map-progress span{padding:1px var(--sp-1);font-size:8px}
+.map-view .dungeon-map{margin-top:0}
+
 </style></head><body><div id="app"><div style="color:#dec69a;padding:50px;text-align:center">正在点燃营地篝火…</div></div><script>
 // Static game data tables extracted from engine.js (Phase 0 refactor).
 // No runtime logic — import-safe constants only.
@@ -3375,7 +3415,7 @@ function mapNodeDetail(){
  const ex=game.expedition;if(!ex)return '';
  const sel=mapSelectedNode?nodePreview(game,mapSelectedNode):null;
  const can=reachableNodes(game).map(n=>n.id);
- if(!sel)return '<div class="map-detail empty"><div class="map-detail-art"></div><div class="eyebrow">NODE INTEL</div><h3>选择一个节点</h3><p class="muted">点击地图上可探索的房间，查看遭遇预估、风险与战利品，再决定是否进入。</p></div>';
+ if(!sel)return '<div class="map-detail empty"><div class="map-detail-art"></div><div class="eyebrow">NODE INTEL</div><h3>选择一个节点</h3><p class="muted">点选相邻房间，查看遭遇、风险与奖励再决定是否进入。</p></div>';
  const power=teamPower(game);
  const riskSkulls='<span class="risk-skulls">'+'☠'.repeat(sel.risk)+'<i>'+'☠'.repeat(5-sel.risk)+'</i></span>';
  const enterable=can.includes(sel.id)&&!sel.visited;
@@ -3392,16 +3432,17 @@ function mapNodeDetail(){
  '</div>';
 }
 function mapTeamStrip(){
+ // Phase 7：四人并排（不再横向滚动），每格只留头像、血条、状态与两个补给动作
  const ex=game.expedition;if(!ex)return '';
- const use=(kind,hero,disabled)=>button(kind==='potion'?'⚗ 药剂':'✥ 圣徽',kind==='potion'?'use-potion':'use-sigil','data-id="'+hero.id+'" '+(disabled?'disabled':''),'btn btn-tiny btn-ghost');
- return '<div class="map-team-strip"><div class="map-strip-head"><b>远征队伍</b><span class="map-strip-note">补给：♨ 火把 '+ex.torch+' · ✚ 绷带 '+ex.bandages+' · ⚗ 药剂 '+(ex.potions||0)+' · ✥ 圣徽 '+(ex.sigils||0)+'</span></div><div class="map-strip-row">'+
-  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+heroPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><small>'+ESC(CLASSES[h.classId]?.name||'')+'</small><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' HP · 压力 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
+ const use=(kind,hero,disabled)=>button(kind==='potion'?'药剂':'圣徽',kind==='potion'?'use-potion':'use-sigil','data-id="'+hero.id+'" '+(disabled?'disabled':''),'btn btn-tiny btn-ghost map-strip-use');
+ return '<div class="map-team-strip"><div class="map-strip-head"><b>远征队伍</b><span class="map-strip-note">♨ '+ex.torch+' · ✚ '+ex.bandages+' · ⚗ '+(ex.potions||0)+' · ✥ '+(ex.sigils||0)+'</span></div><div class="map-strip-row">'+
+  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+heroPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' · 压 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
  '</div></div>';
 }
 function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REGIONS.crypt;const possible=reachableNodes(game).map(n=>n.id);const pos=n=>({x:90+n.layer*174,y:195+n.row*103});let edges='';
  for(let layer=0;layer<4;layer++){const src=ex.nodes.filter(n=>n.layer===layer),dst=ex.nodes.filter(n=>n.layer===layer+1);for(const a of src)for(const b of dst){if(b.layer===4||Math.abs(a.row-b.row)<=1){const v=pos(a),w=pos(b);edges+=`<path d="M${v.x} ${v.y} C${v.x+60} ${v.y},${w.x-60} ${w.y},${w.x} ${w.y}" class="map-edge ${a.visited&&b.visited?'travelled':''}"/>`;}}}
  const nodes=ex.nodes.map(n=>{const v=pos(n),can=possible.includes(n.id),visited=n.visited,scouted=buildingLevel(game,'watchtower')>0&&n.layer<=ex.layer+1+buildingLevel(game,'watchtower'),known=can||visited||scouted;return `<g transform="translate(${v.x},${v.y})" class="map-node ${can?'available':''} ${visited?'explored':''} ${n.type==='boss'?'map-boss':''} ${mapSelectedNode===n.id?'selected':''}" data-action="node" data-id="${n.id}" role="button" tabindex="0" aria-label="${TYPE_NAMES[n.type]}"><circle r="31" class="node-outer"/><circle r="24" class="node-inner"/><text y="8" text-anchor="middle" class="node-symbol">${known?TYPE_ICON[n.type]:'◇'}</text><text y="53" text-anchor="middle" class="node-label">${known?(n.name||TYPE_NAMES[n.type]):'未知房间'}</text></g>`}).join('');
- return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="view-heading"><div>${label(region.name,`DUNGEON · ${region.en}`)}<p class="muted">${region.desc} 每次只能前进一层，战利品需要活着带回营地。</p></div><div class="map-metrics"><div><span>深入层数</span><strong>${ex.layer+1} / 5</strong></div><div><span>火把</span><strong class="${ex.torch===0?'danger-text':''}">♨ ${ex.torch}</strong></div><div><span>绷带</span><strong>✚ ${ex.bandages}</strong></div><div><span>药剂</span><strong>⚗ ${ex.potions||0}</strong></div><div><span>圣徽</span><strong>✥ ${ex.sigils||0}</strong></div></div></div><div class="region-tabs">${['crypt','mire','forge'].map(k=>{const r=REGIONS[k];return `<div class="region-tab region-${k} ${ex.region===k?'active':''}"><b>${r.symbol} ${r.name}</b><small>${r.short} · ${r.en}</small></div>`}).join('')}</div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
+ return `<section class="content-view map-view region-${ex.region||'crypt'}"><div class="map-head"><div class="map-head-title">${label(region.name,`DUNGEON · ${region.en}`)}</div><div class="map-supplies"><span class="map-chip ${ex.layer+1>=5?'is-danger':''}"><small>层</small><b>${ex.layer+1}/5</b></span><span class="map-chip ${ex.torch===0?'is-danger':''}"><small>火把</small><b>♨ ${ex.torch}</b></span><span class="map-chip"><small>绷带</small><b>✚ ${ex.bandages}</b></span><span class="map-chip"><small>药剂</small><b>⚗ ${ex.potions||0}</b></span><span class="map-chip"><small>圣徽</small><b>✥ ${ex.sigils||0}</b></span></div></div><div class="map-layout"><div class="map-panel"><div class="map-legend"><span><i class="dot active"></i> 可探索</span><span><i class="dot done"></i> 已探索</span><span><i class="dot upcoming"></i> 未知</span></div><div class="map-progress">${Array.from({length:5},(_,i)=>`<span class="${i<ex.layer?'cleared':i===ex.layer?'current':''}">第 ${i+1} 层</span>`).join('')}</div><svg viewBox="0 0 885 440" class="dungeon-map" role="img" aria-label="地牢路线图"><g class="map-edges">${edges}</g>${nodes}</svg><div class="map-floor">入口 <span>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> 最深处</div></div><aside class="panel map-aside"><div class="eyebrow">CURRENT EXPEDITION</div><h3>路途中的战利品</h3><div class="loot-row"><span>金币</span><strong>◈ ${ex.lootGold}</strong></div><div class="loot-row"><span>遗物碎片</span><strong>✥ ${ex.lootShards}</strong></div><div class="loot-row"><span>待结算饰品</span><strong>✧ ${ex.lootItems?.length||0} 件</strong></div><div class="ornamental-line"></div>${mapNodeDetail()}<div class="ornamental-line"></div><div class="town-bonus">${region.symbol} ${region.name} · ${region.hazard}<div>难度：${DIFFICULTIES[ex.difficulty||'pilgrim']?.name||'巡礼'} · 方针：${(EXPEDITION_PLANS[ex.plan]||EXPEDITION_PLANS.standard).name} · 守夜塔 Lv.${buildingLevel(game,'watchtower')}</div></div><p class="small-muted">无火把时每进入一间房间，所有存活英雄会增加压力。</p>${button('撤退并带回战利品','retreat','','btn btn-ghost btn-full')}</aside></div>${mapTeamStrip()}</section>`;}
 function statusBadges(unit){const ss=unit.statuses||{},names={poison:'中毒',bleed:'流血',guard:'守护',mark:'标记',weak:'虚弱',stun:'眩晕'};return Object.entries(names).filter(([key])=>ss[key]>0).map(([key,name])=>`<span class="status-token status-${key}" title="${name} · 剩余 ${ss[key]} 次行动">${name} ${ss[key]}</span>`).join('')||'<span class="status-token status-none">无异常</span>'}
 function unitCard(unit,side){const enemy=side==='enemy',active=game.battle.activeId===unit.id,skill=chosenSkill&&SKILLS[chosenSkill],actor=currentActor(game),basic=chosenSkill==='__basic__',allowed=actor?.side==='hero'?(basic?(enemy&&unit.hp>0):skill?validTargets(game.battle,actor,skill).some(t=>t.id===unit.id):false):false;
  const info=enemy?ENEMIES[unit.type]:CLASSES[unit.classId],selected=inspectUnitId===unit.id;
