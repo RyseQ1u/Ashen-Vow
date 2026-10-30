@@ -79,6 +79,28 @@ test('地图屏：撤退收进 D 区、节点命中区放大、进入节点 CTA 
   assert.doesNotMatch(aside[0], /data-action="retreat"/, '底部面板仍有撤退入口，主操作不唯一');
 });
 
+test('地图补给条：4 人各带药剂/圣徽，且受伤时可用（防再次被面板遮住而删掉）', async () => {
+  const { ctx, root } = loadUI();
+  await Promise.resolve(); await new Promise(r => setImmediate(r));
+  run(ctx, `game=freshGame(9006);view='game';beginExpedition(game);
+    game.expedition.potions=2; game.expedition.sigils=2;
+    game.heroes[0].hp=Math.max(1,game.heroes[0].maxHp-10); render();`);
+  const html = root.innerHTML;
+
+  assert.match(html, /class="map-team-strip"/, '地图缺少远征队伍补给条');
+  assert.match(html, /<div class="map-strip-row">/, '补给条缺少队伍行');
+
+  const uses = html.match(/data-action="use-potion"/g) || [];
+  const sigils = html.match(/data-action="use-sigil"/g) || [];
+  assert.equal(uses.length, 4, `应给 4 名英雄各一个药剂键，实际 ${uses.length}`);
+  assert.equal(sigils.length, 4, `应给 4 名英雄各一个圣徽键，实际 ${sigils.length}`);
+
+  // 掉血的那位英雄，药剂键必须是可点的（不是 disabled）
+  const firstPotion = html.match(/<button[^>]*data-action="use-potion"[^>]*>/);
+  assert.ok(firstPotion, '缺少药剂按钮');
+  assert.doesNotMatch(firstPotion[0], /disabled/, '队伍有伤且药剂充足时，药剂键仍被禁用');
+});
+
 test('营地与设置：出发 64pt 底栏、惯用手开关存在', async () => {
   const { ctx, root } = loadUI();
   await Promise.resolve(); await new Promise(r => setImmediate(r));

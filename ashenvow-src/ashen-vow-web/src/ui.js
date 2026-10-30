@@ -534,11 +534,13 @@ function mapNodeDetail(){
  '</div>';
 }
 function mapTeamStrip(){
- // Phase 7：四人并排（不再横向滚动），每格只留头像、血条、状态与两个补给动作
+ // 队伍条驻留在底部情报面板顶部（拇指区），4 人并排，补给键竖排 44×44。
+ // 2026-10-30 修复：原先它挂在面板之后、被 position:fixed 的 36vh 情报面板整块盖住，
+ // 初始不可见也不可点，必须向下滚动约 260px 才能用上药剂/圣徽。
  const ex=game.expedition;if(!ex)return '';
  const use=(kind,hero,disabled)=>button(kind==='potion'?'药剂':'圣徽',kind==='potion'?'use-potion':'use-sigil','data-id="'+hero.id+'" '+(disabled?'disabled':''),'btn btn-tiny btn-ghost map-strip-use');
- return '<div class="map-team-strip"><div class="map-strip-head"><b>远征队伍</b><span class="map-strip-note">♨ '+ex.torch+' · ✚ '+ex.bandages+' · ⚗ '+(ex.potions||0)+' · ✥ '+(ex.sigils||0)+'</span></div><div class="map-strip-row">'+
-  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-face">'+heroPortrait(h.classId)+'</div><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+' · 压 '+Math.round(h.stress||0)+'</div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div></div>').join('')+
+ return '<div class="map-team-strip"><div class="map-strip-row">'+
+  game.heroes.map(h=>'<div class="map-strip-card"><div class="map-strip-meta"><b>'+ESC(h.name)+'</b><div class="bar hp"><span style="width:'+percent(h.hp,h.maxHp)+'%"></span></div><div class="map-strip-nums">'+Math.round(h.hp)+'/'+h.maxHp+'</div></div><div class="map-strip-actions">'+use('potion',h,(ex.potions||0)<=0||h.hp<=0||h.hp>=h.maxHp)+use('sigil',h,(ex.sigils||0)<=0||h.hp<=0||(h.stress||0)<=0)+'</div></div>').join('')+
  '</div></div>';
 }
 function mapPage(){const ex=game.expedition;const region=REGIONS[ex.region]||REGIONS.crypt;const possible=reachableNodes(game).map(n=>n.id);const pos=n=>({x:90+n.layer*174,y:195+n.row*103});let edges='';
@@ -769,7 +771,10 @@ function syncMobileLayout(){
   svg.setAttribute('viewBox','0 55 885 415');
   const aside=document.querySelector('.map-aside');
   if(aside){
-   const limit=aside.getBoundingClientRect().top-panel.getBoundingClientRect().top-8;
+   // 补给条常驻在情报面板之上，地图区域要把它的高度一起扣掉
+   const strip=document.querySelector('.map-team-strip');
+   const stripH=strip?strip.getBoundingClientRect().height+6:0;
+   const limit=aside.getBoundingClientRect().top-panel.getBoundingClientRect().top-8-stripH;
    panel.style.maxHeight=Math.max(160,Math.round(limit))+'px';
   }
   const pr=panel.getBoundingClientRect(),sr=svg.getBoundingClientRect();

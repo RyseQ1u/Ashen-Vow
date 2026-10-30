@@ -1197,7 +1197,7 @@ body:has(.landing) .site-footer{display:none}
   /* ---------- 二、地图：节点情报与「进入」钉在底部拇指区 ---------- */
   .app-frame.phase-map .map-view {
     --map-sheet-h: 36vh; /* 底部情报面板高度，与 .map-aside 的 max-height 共用 */
-    padding: 0 0 calc(var(--map-sheet-h) + 16px);
+    padding: 0 0 calc(var(--map-sheet-h) + 104px); /* 面板 + 补给条 */
     animation: none;
   }
 
@@ -1455,6 +1455,7 @@ body:has(.landing) .site-footer{display:none}
 
   /* 栏内的固定元素靠视口定位，必须显式收进竖栏（否则会横跨整个窗口） */
   .camp-depart-bar,
+  .map-view .map-team-strip,
   .map-view .map-aside {
     left: calc(50% - 280px);
     right: auto;
@@ -2290,8 +2291,72 @@ body:has(.landing) .site-footer{display:none}
 /* 节点热区：视觉仍是 62px 圆，命中区放大到 r=40（约 63px 直径，方案 §5.1 ≥72 的近似） */
 .map-node .node-hit{ fill: transparent; stroke: none; pointer-events: all; }
 
-/* 队伍条补给键：高度补到 44pt（4 列并排下宽度受卡宽限制） */
-.map-view .map-strip-actions .btn{ min-height: 44px; font-size: 9px; }
+/* 队伍条：常驻在情报面板之上的 B 区窄条（单行横滑，方案 §2 允许队伍条横滑）。
+   2026-10-30 修复：原先它挂在面板之后，被 position:fixed 的 36vh 情报面板整块盖住，
+   初始不可见也不可点，必须向下滚约 260px 才能用上药剂/圣徽。
+   现在是独立一层：面板保持 36vh 完整情报区，补给键常驻拇指区，互不挤压。 */
+.map-view .map-team-strip{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--map-sheet-h) + 6px);
+  z-index: 29;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-top: 1px solid #6d583f;
+  border-radius: 0;
+  background: linear-gradient(180deg, #171317f2, #0d0c10fa);
+  box-shadow: 0 -10px 24px #0008;
+  min-height: 0;
+}
+.map-view .map-strip-row{
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.map-view .map-strip-row::-webkit-scrollbar{ display: none; }
+.map-view .map-strip-card{
+  flex: 0 0 auto;
+  width: 158px;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  min-height: 56px;
+  border-radius: var(--r-sm);
+  background: #1b1c22e6;
+}
+.map-view .map-strip-meta{ flex: 1 1 auto; min-width: 0; gap: 1px; }
+.map-view .map-strip-meta b{ font-size: 9.5px; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.map-view .map-strip-nums{ margin: 0; font-size: 8px; white-space: nowrap; }
+.map-view .map-strip-actions{ display: flex; flex: 0 0 auto; gap: 2px; margin: 0; width: auto; }
+.map-view .map-strip-actions .btn{ width: 44px; min-width: 0; min-height: 44px; padding: 0; font-size: 9px; letter-spacing: 0; }
+
+/* 大屏竖栏（≥601）：补给条要和情报面板一起收进 560px，不能横跨窗口 */
+@media (min-width: 601px){
+  .map-view .map-team-strip{ left: calc(50% - 280px); right: auto; width: 560px; }
+}
+
+/* 地图头部：标题列在窄机上会被 5 个补给芯片压成逐字换行（320 下标题占 5 行、地图只剩 100px），
+   统一改成单行省略；≤400 时芯片收成纯数字，把宽度还给地图。 */
+.map-view .map-head .section-heading .eyebrow{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.map-view .map-head .section-heading h2{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 400px){
+  .map-view .map-head{ padding: 4px 8px 0; gap: 6px; }
+  .map-view .map-head .section-heading .eyebrow{ display: none; }
+  .map-view .map-head .section-heading h2{ font-size: 15px; letter-spacing: 1px; }
+  .map-view .map-head-title{ min-width: 0; flex: 1 1 auto; }
+  .map-view .map-supplies{ gap: 2px; }
+  .map-view .map-chip{ min-width: 30px; padding: 2px; }
+  .map-view .map-chip small{ display: none; }
+  .map-view .map-chip b{ font-size: 10px; }
+  .map-view .map-exit{ width: 40px; height: 40px; min-width: 40px; }
+}
 
 /* —— 3. 营地：出发 64pt 固定底栏、快捷动作 48pt、侧导航 44pt —— */
 .camp-view{ padding-bottom: calc(104px + var(--safe-bottom)); }
